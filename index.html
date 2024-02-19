@@ -1621,93 +1621,6 @@ zset-max-ziplist-value 64
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/wsl_proxy/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/linux/wsl_proxy/" class="post-title-link" itemprop="url">wsl代理配置</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>1.3k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>2 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="wsl1-proxy"><a href="#wsl1-proxy" class="headerlink" title="wsl1 proxy"></a>wsl1 proxy</h1><p>勾选 “Allow LAN” 后，设置如下:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export ALL_PROXY=&quot;http://127.0.0.1:7890&quot;</span><br></pre></td></tr></table></figure>
-
-<h1 id="wsl2-proxy"><a href="#wsl2-proxy" class="headerlink" title="wsl2 proxy"></a>wsl2 proxy</h1><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/592620059">https://zhuanlan.zhihu.com/p/592620059</a></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line">hostip=$(cat /etc/resolv.conf | grep nameserver | awk &#x27;&#123; print $2 &#125;&#x27;)</span><br><span class="line">wslip=$(hostname -I | awk &#x27;&#123;print $1&#125;&#x27;)</span><br><span class="line"># 这里填写主机代理的端口</span><br><span class="line">port=7890</span><br><span class="line"></span><br><span class="line">PROXY_HTTP=&quot;http://$&#123;hostip&#125;:$&#123;port&#125;&quot;</span><br><span class="line"></span><br><span class="line">set_proxy()&#123;</span><br><span class="line">    export http_proxy=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">    export HTTP_PROXY=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line"></span><br><span class="line">    export https_proxy=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">    export HTTPS_proxy=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line"></span><br><span class="line">    git config --global http.proxy &quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">    git config --global https.proxy &quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">unset_proxy()&#123;</span><br><span class="line">    unset http_proxy</span><br><span class="line">    unset HTTP_PROXY</span><br><span class="line">    unset https_proxy</span><br><span class="line">    unset HTTPS_PROXY</span><br><span class="line">    git config --global --unset http.proxy</span><br><span class="line">    git config --global --unset https.proxy</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test_setting()&#123;</span><br><span class="line">    echo &quot;Host ip:&quot; $&#123;hostip&#125;</span><br><span class="line">    echo &quot;WSL ip:&quot; $&#123;wslip&#125;</span><br><span class="line">    echo &quot;Current proxy:&quot; $https_proxy</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if [ &quot;$1&quot; = &quot;set&quot; ]</span><br><span class="line">then</span><br><span class="line">    set_proxy</span><br><span class="line"></span><br><span class="line">elif [ &quot;$1&quot; = &quot;unset&quot; ]</span><br><span class="line">then</span><br><span class="line">    unset_proxy</span><br><span class="line"></span><br><span class="line">elif [ &quot;$1&quot; = &quot;test&quot; ]</span><br><span class="line">then</span><br><span class="line">    test_setting</span><br><span class="line">else</span><br><span class="line">    echo &quot;Unsupported arguments.&quot;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/strace/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1774,6 +1687,93 @@ zset-max-ziplist-value 64
 <li><code>-e trace=/exec</code> - filter system calls so only ones starting with exec are shown</li>
 </ul>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -o forked.log -s 1024 -f -e trace=/exec gcc hello.c.s -o hello_gcc</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/wsl_proxy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/linux/wsl_proxy/" class="post-title-link" itemprop="url">wsl代理配置</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="wsl1-proxy"><a href="#wsl1-proxy" class="headerlink" title="wsl1 proxy"></a>wsl1 proxy</h1><p>勾选 “Allow LAN” 后，设置如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export ALL_PROXY=&quot;http://127.0.0.1:7890&quot;</span><br></pre></td></tr></table></figure>
+
+<h1 id="wsl2-proxy"><a href="#wsl2-proxy" class="headerlink" title="wsl2 proxy"></a>wsl2 proxy</h1><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/592620059">https://zhuanlan.zhihu.com/p/592620059</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line">hostip=$(cat /etc/resolv.conf | grep nameserver | awk &#x27;&#123; print $2 &#125;&#x27;)</span><br><span class="line">wslip=$(hostname -I | awk &#x27;&#123;print $1&#125;&#x27;)</span><br><span class="line"># 这里填写主机代理的端口</span><br><span class="line">port=7890</span><br><span class="line"></span><br><span class="line">PROXY_HTTP=&quot;http://$&#123;hostip&#125;:$&#123;port&#125;&quot;</span><br><span class="line"></span><br><span class="line">set_proxy()&#123;</span><br><span class="line">    export http_proxy=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">    export HTTP_PROXY=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line"></span><br><span class="line">    export https_proxy=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">    export HTTPS_proxy=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line"></span><br><span class="line">    git config --global http.proxy &quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">    git config --global https.proxy &quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">unset_proxy()&#123;</span><br><span class="line">    unset http_proxy</span><br><span class="line">    unset HTTP_PROXY</span><br><span class="line">    unset https_proxy</span><br><span class="line">    unset HTTPS_PROXY</span><br><span class="line">    git config --global --unset http.proxy</span><br><span class="line">    git config --global --unset https.proxy</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test_setting()&#123;</span><br><span class="line">    echo &quot;Host ip:&quot; $&#123;hostip&#125;</span><br><span class="line">    echo &quot;WSL ip:&quot; $&#123;wslip&#125;</span><br><span class="line">    echo &quot;Current proxy:&quot; $https_proxy</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if [ &quot;$1&quot; = &quot;set&quot; ]</span><br><span class="line">then</span><br><span class="line">    set_proxy</span><br><span class="line"></span><br><span class="line">elif [ &quot;$1&quot; = &quot;unset&quot; ]</span><br><span class="line">then</span><br><span class="line">    unset_proxy</span><br><span class="line"></span><br><span class="line">elif [ &quot;$1&quot; = &quot;test&quot; ]</span><br><span class="line">then</span><br><span class="line">    test_setting</span><br><span class="line">else</span><br><span class="line">    echo &quot;Unsupported arguments.&quot;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -2158,7 +2158,7 @@ zset-max-ziplist-value 64
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/readelf/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/sar/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -2176,7 +2176,7 @@ zset-max-ziplist-value 64
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/linux/readelf/" class="post-title-link" itemprop="url">Linux readelf</a>
+          <a href="/2024/02/19/note/linux/sar/" class="post-title-link" itemprop="url">Linux sar</a>
         </h2>
 
         <div class="post-meta-container">
@@ -2197,14 +2197,14 @@ zset-max-ziplist-value 64
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>1.6k</span>
+      <span>10k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>3 分钟</span>
+      <span>17 分钟</span>
     </span>
 </div>
 
@@ -2215,11 +2215,132 @@ zset-max-ziplist-value 64
     
     
     <div class="post-body" itemprop="articleBody">
-          <h2 id="Dump-section-header-table"><a href="#Dump-section-header-table" class="headerlink" title="Dump section header table"></a>Dump section header table</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">readelf -S -W a.o</span></span><br><span class="line">There are 13 section headers, starting at offset 0x298:</span><br><span class="line"></span><br><span class="line">Section Headers:</span><br><span class="line">  [Nr] Name              Type            Address          Off    Size   ES Flg Lk Inf Al</span><br><span class="line">  [ 0]                   NULL            0000000000000000 000000 000000 00      0   0  0</span><br><span class="line">  [ 1] .text             PROGBITS        0000000000000000 000040 000010 00  AX  0   0  1</span><br><span class="line">  [ 2] .rela.text        RELA            0000000000000000 0001f8 000018 18   I 10   1  8</span><br><span class="line">  [ 3] .data             PROGBITS        0000000000000000 000050 000000 00  WA  0   0  1</span><br><span class="line">  [ 4] .bss              NOBITS          0000000000000000 000050 000000 00  WA  0   0  1</span><br><span class="line">  [ 5] .comment          PROGBITS        0000000000000000 000050 00002c 01  MS  0   0  1</span><br><span class="line">  [ 6] .note.GNU-stack   PROGBITS        0000000000000000 00007c 000000 00      0   0  1</span><br><span class="line">  [ 7] .note.gnu.property NOTE            0000000000000000 000080 000020 00   A  0   0  8</span><br><span class="line">  [ 8] .eh_frame         PROGBITS        0000000000000000 0000a0 000038 00   A  0   0  8</span><br><span class="line">  [ 9] .rela.eh_frame    RELA            0000000000000000 000210 000018 18   I 10   8  8</span><br><span class="line">  [10] .symtab           SYMTAB          0000000000000000 0000d8 000108 18     11   9  8</span><br><span class="line">  [11] .strtab           STRTAB          0000000000000000 0001e0 000012 00      0   0  1</span><br><span class="line">  [12] .shstrtab         STRTAB          0000000000000000 000228 00006c 00      0   0  1</span><br><span class="line">Key to Flags:</span><br><span class="line">  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),</span><br><span class="line">  L (link order), O (extra OS processing required), G (group), T (TLS),</span><br><span class="line">  C (compressed), x (unknown), o (OS specific), E (exclude),</span><br><span class="line">  l (large), p (processor specific)</span><br></pre></td></tr></table></figure>
+          <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>sar &#x3D; <strong>s</strong>ystem <strong>a</strong>ctivity <strong>r</strong>eport</p>
+<p>sar是一套组件，监控Linux系统整体各项运行参数（CPU，内存等），同时支持以文件形式保留过去N天的历史记录以备后续查看。</p>
+<ul>
+<li>sar(system activity reporter) - 收集、存储与展示各项参数</li>
+<li>sadc(system activity data collector) - 收集各项参数，是sar背后的数据来源</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/sysstat/sysstat/blob/master/sa1.in">sa1</a> - 是封装了sadc的shell脚本（<code>vim /usr/lib64/sa/sa1</code>查看实现），特别适配了跨天等特殊情况，专门用于cron定时任务</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/sysstat/sysstat/blob/master/sa2.in">sa2</a> - 是封装了sar的shell脚本（<code>vim /usr/lib64/sa/sa2</code>），同sa1，专门用于cron</li>
+<li>sadf(system activity data formatter) displays data collected by sar in multiple formats (CSV, XML, JSON, etc.)</li>
+</ul>
+<p>是否装了</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">which</span> sar</span></span><br><span class="line">/usr/bin/sar</span><br></pre></td></tr></table></figure>
 
-<h2 id="Dump-content-of-a-section"><a href="#Dump-content-of-a-section" class="headerlink" title="Dump content of a section"></a>Dump content of a section</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">readelf -x .rela.text a.o</span></span><br><span class="line"></span><br><span class="line">Hex dump of section &#x27;.rela.text&#x27;:</span><br><span class="line">  0x00000000 0a000000 00000000 02000000 0a000000 ................</span><br><span class="line">  0x00000010 fcffffff ffffffff                   ........</span><br></pre></td></tr></table></figure>
+<p>如果没有，安装命令（sar包含在sysstat工具中）:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install sysstat</span><br></pre></td></tr></table></figure>
 
-<h2 id="Dump-relocation-entries"><a href="#Dump-relocation-entries" class="headerlink" title="Dump relocation entries"></a>Dump relocation entries</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">readelf -r a.o</span></span><br><span class="line"></span><br><span class="line">Relocation section &#x27;.rela.text&#x27; at offset 0x1f8 contains 1 entry:</span><br><span class="line">  Offset          Info           Type           Sym. Value    Sym. Name + Addend</span><br><span class="line">00000000000a  000a00000002 R_X86_64_PC32     0000000000000000 foo - 4</span><br><span class="line"></span><br><span class="line">Relocation section &#x27;.rela.eh_frame&#x27; at offset 0x210 contains 1 entry:</span><br><span class="line">  Offset          Info           Type           Sym. Value    Sym. Name + Addend</span><br><span class="line">000000000020  000200000002 R_X86_64_PC32     0000000000000000 .text + 0</span><br></pre></td></tr></table></figure>
+<h1 id="命令说明"><a href="#命令说明" class="headerlink" title="命令说明"></a>命令说明</h1><h2 id="sar"><a href="#sar" class="headerlink" title="sar"></a>sar</h2><p>集收集、存储与展示与一体，输出为人可直接读格式。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sar [options] [interval] [count]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>有interval则取实时数据，无则读取当天的 <code>/var/log/sa/sadd</code> 历史数据，或者-f指明读取那个文件</p>
+</li>
+<li><p>有count则执行count次，无count则按interval持续采样</p>
+</li>
+</ul>
+<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><p>只列出大部分常见的选项，完整选项及输出中各列的含义参考：<code>man sar</code></p>
+<h4 id="CPU"><a href="#CPU" class="headerlink" title="CPU"></a>CPU</h4><blockquote>
+<p>-u    Report CPU utilization.</p>
+</blockquote>
+<p>间隔1秒，实时采样cpu利用率</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# sar -u 1</span><br><span class="line">Linux 3.10.0-957.21.2.el7.x86_64 (localhost.localdomain)        11/28/2023      _x86_64_        (8 CPU)</span><br><span class="line"></span><br><span class="line">02:01:31 PM     CPU     %user     %nice   %system   %iowait    %steal     %idle</span><br><span class="line">02:01:32 PM     all      0.00      0.00      0.00      0.00      0.00    100.00</span><br><span class="line">02:01:33 PM     all      0.00      0.00      0.00      0.12      0.00     99.88</span><br><span class="line">02:01:34 PM     all      0.00      0.00      0.00      0.00      0.00    100.00</span><br><span class="line">Average:        all      0.00      0.00      0.00      0.04      0.00     99.96</span><br></pre></td></tr></table></figure>
+
+<h4 id="内存"><a href="#内存" class="headerlink" title="内存"></a>内存</h4><blockquote>
+<p>-r     Report memory utilization statistics.</p>
+<p>-R     Report memory statistics. </p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 release]$ sar -r 1</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">03:41:09 PM kbmemfree kbmemused  %memused kbbuffers  kbcached  kbcommit   %commit  kbactive   kbinact   kbdirty</span><br><span class="line">03:41:10 PM    245456  32532996     99.25     52744  15628984  33275528    101.52  22506656   8187572       632</span><br><span class="line">03:41:11 PM    248036  32530416     99.24     52744  15629016  33276372    101.52  22506524   8187576       816</span><br><span class="line">03:41:12 PM    332940  32445512     98.98     52760  15561484  33257372    101.46  22454672   8154880       748</span><br><span class="line">03:41:13 PM    328256  32450196     99.00     52760  15562648  33260864    101.47  22457052   8155832       780</span><br><span class="line">03:41:14 PM    330184  32448268     98.99     52760  15562676  33260168    101.47  22457036   8155836       876</span><br><span class="line">03:41:15 PM    329732  32448720     98.99     52760  15562708  33258960    101.47  22455684   8155836       948</span><br></pre></td></tr></table></figure>
+
+<h4 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h4><blockquote>
+<p>-n Report network statistics.</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 glinkd]$ sar -n TCP 1</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">03:55:51 PM  active/s passive/s    iseg/s    oseg/s</span><br><span class="line">03:55:52 PM      3.00      0.00   8188.00  10050.00</span><br><span class="line">03:55:53 PM      3.00      0.00   9427.00  11465.00</span><br><span class="line">03:55:54 PM      5.00      0.00   7342.00   8941.00</span><br></pre></td></tr></table></figure>
+
+<h4 id="I-O"><a href="#I-O" class="headerlink" title="I&#x2F;O"></a>I&#x2F;O</h4><blockquote>
+<p>-b     Report I&#x2F;O and transfer rate statistics. </p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 glinkd]$ sar -b 1</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">03:59:49 PM       tps      rtps      wtps   bread/s   bwrtn/s</span><br><span class="line">03:59:50 PM    134.00      0.00    134.00      0.00    588.00</span><br><span class="line">03:59:51 PM    123.00      0.00    123.00      0.00    543.00</span><br><span class="line">03:59:52 PM     94.00      0.00     94.00      0.00    407.00</span><br><span class="line">03:59:53 PM    150.00      0.00    150.00      0.00    659.00</span><br></pre></td></tr></table></figure>
+
+<h4 id="块设备"><a href="#块设备" class="headerlink" title="块设备"></a>块设备</h4><blockquote>
+<p>-d     Report activity for each block device. </p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 glinkd]$ sar -d 1</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">04:00:25 PM       DEV       tps  rd_sec/s  wr_sec/s  avgrq-sz  avgqu-sz     await     svctm     %util</span><br><span class="line">04:00:26 PM  dev253-0      3.00      0.00    160.00     53.33      0.00      1.33      1.00      0.30</span><br><span class="line">04:00:26 PM dev253-16    202.00      0.00   2488.00     12.32      0.65      3.50      1.51     30.50</span><br><span class="line"></span><br><span class="line">04:00:26 PM       DEV       tps  rd_sec/s  wr_sec/s  avgrq-sz  avgqu-sz     await     svctm     %util</span><br><span class="line">04:00:27 PM  dev253-0      1.00      0.00      8.00      8.00      0.00      1.00      1.00      0.10</span><br><span class="line">04:00:27 PM dev253-16    108.00      0.00    499.00      4.62      0.09      2.07      0.75      8.10</span><br></pre></td></tr></table></figure>
+
+<h4 id="页面系统"><a href="#页面系统" class="headerlink" title="页面系统"></a>页面系统</h4><blockquote>
+<p>-B     Report paging statistics. </p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 glinkd]$ sar 1 -B</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">03:50:01 PM  pgpgin/s pgpgout/s   fault/s  majflt/s  pgfree/s pgscank/s pgscand/s pgsteal/s    %vmeff</span><br><span class="line">03:50:02 PM      0.00    142.00  13400.00      0.00   9255.00      0.00      0.00      0.00      0.00</span><br><span class="line">03:50:03 PM      0.00    250.00  18728.00      0.00  12830.00      0.00      0.00      0.00      0.00</span><br><span class="line">03:50:04 PM      0.00    344.00  14404.00      0.00  10405.00      0.00      0.00      0.00      0.00</span><br><span class="line">03:50:05 PM      0.00    218.00  58759.00      0.00  22695.00      0.00      0.00      0.00      0.00</span><br></pre></td></tr></table></figure>
+
+<h4 id="任务创建与调度"><a href="#任务创建与调度" class="headerlink" title="任务创建与调度"></a>任务创建与调度</h4><blockquote>
+<p>-w     Report task creation and system switching activity.</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 glinkd]$ sar -w 1</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">04:03:15 PM    proc/s   cswch/s</span><br><span class="line">04:03:16 PM      6.00 157005.00</span><br><span class="line">04:03:17 PM      8.00 154067.00</span><br><span class="line">04:03:18 PM     11.00 158563.00</span><br><span class="line">04:03:19 PM      7.00 154540.00</span><br><span class="line">04:03:20 PM      8.00 149415.00</span><br><span class="line">04:03:21 PM     10.00 153150.00</span><br><span class="line">04:03:22 PM      7.00 153668.00</span><br></pre></td></tr></table></figure>
+
+<h4 id="任务队列负载"><a href="#任务队列负载" class="headerlink" title="任务队列负载"></a>任务队列负载</h4><blockquote>
+<p>-q Report queue length and load averages.</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 glinkd]$ sar -q 1</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">03:52:59 PM   runq-sz  plist-sz   ldavg-1   ldavg-5  ldavg-15   blocked</span><br><span class="line">03:53:00 PM         3      2451      6.25      8.25      9.51         0</span><br><span class="line">03:53:01 PM         8      2450      6.25      8.25      9.51         0</span><br><span class="line">03:53:02 PM        10      2453      6.25      8.25      9.51         0</span><br><span class="line">03:53:03 PM         3      2453      6.25      8.25      9.51         0</span><br></pre></td></tr></table></figure>
+
+<h4 id="swap"><a href="#swap" class="headerlink" title="swap"></a>swap</h4><blockquote>
+<p>-S     Report swap space utilization statistics. </p>
+<p>-W     Report swapping statistics.</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 glinkd]$ sar 1 -S</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">03:52:08 PM kbswpfree kbswpused  %swpused  kbswpcad   %swpcad</span><br><span class="line">03:52:09 PM         0         0      0.00         0      0.00</span><br><span class="line">03:52:10 PM         0         0      0.00         0      0.00</span><br><span class="line">03:52:11 PM         0         0      0.00         0      0.00</span><br><span class="line">03:52:12 PM         0         0      0.00         0      0.00</span><br><span class="line">03:52:13 PM         0         0      0.00         0      0.00</span><br></pre></td></tr></table></figure>
+
+<h4 id="中断"><a href="#中断" class="headerlink" title="中断"></a>中断</h4><blockquote>
+<p>-I    Report  statistics  for a given interrupt.</p>
+</blockquote>
+<p>中断次数</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost demo]# sar -I ALL 1</span><br><span class="line">Linux 3.10.0-957.21.2.el7.x86_64 (localhost.localdomain)        11/28/2023      _x86_64_        (8 CPU)</span><br><span class="line"></span><br><span class="line">03:20:01 PM      INTR    intr/s</span><br><span class="line">03:20:03 PM         0      0.00</span><br><span class="line">03:20:03 PM         1      0.00</span><br><span class="line">03:20:03 PM         2      0.00</span><br><span class="line">03:20:03 PM         3      0.00</span><br><span class="line">03:20:03 PM         4      0.00</span><br><span class="line">03:20:03 PM         5      0.00</span><br><span class="line">03:20:03 PM         6      0.00</span><br><span class="line">03:20:03 PM         7      0.00</span><br><span class="line">03:20:03 PM         8      0.00</span><br><span class="line">03:20:03 PM         9      0.00</span><br><span class="line">03:20:03 PM        10      0.00</span><br><span class="line">03:20:03 PM        11      0.00</span><br><span class="line">03:20:03 PM        12      0.00</span><br><span class="line">03:20:03 PM        13      0.00</span><br><span class="line">03:20:03 PM        14      0.00</span><br><span class="line">03:20:03 PM        15      1.89</span><br></pre></td></tr></table></figure>
+
+<h2 id="sadc"><a href="#sadc" class="headerlink" title="sadc"></a>sadc</h2><p>专门用于收集运行参数，输出为二进制格式，人不可直接读，命令格式为：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/lib64/sa/sadc [options] [interval [count] &gt; &lt;sadc_outfile&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="例子-1"><a href="#例子-1" class="headerlink" title="例子"></a>例子</h3><p>以1秒间隔，收集3次所有参数，结果存到sadc.out文件（二进制格式），需要用sar解析为可读格式</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/lib64/sa/sadc 1 3 &gt; sadc.out</span><br></pre></td></tr></table></figure>
+
+<p>用sar解析刚刚生成的sadc.out文件为可读格式</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sar -A -f &lt;sadc outfile&gt; &gt; &lt;sar outfile&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>-A 所有运行参数</p>
+</li>
+<li><p>-f 指明二进制数据文件</p>
+</li>
+</ul>
+<p>输出到命令行：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost demo]# sar -A -f sadc.out</span><br><span class="line">Linux 3.10.0-957.21.2.el7.x86_64 (localhost.localdomain)        11/28/2023      _x86_64_        (8 CPU)</span><br><span class="line"></span><br><span class="line">02:21:15 PM     CPU      %usr     %nice      %sys   %iowait    %steal      %irq     %soft    %guest    %gnice     %idle</span><br><span class="line">02:21:16 PM     all      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00    100.00</span><br><span class="line">02:21:16 PM       0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00    100.00</span><br><span class="line">02:21:16 PM       1      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00    100.00</span><br><span class="line">02:21:16 PM       2      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00    100.00</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">02:21:15 PM    proc/s   cswch/s</span><br><span class="line">02:21:16 PM      1.00     37.00</span><br><span class="line">02:21:17 PM      0.00     34.00</span><br><span class="line">Average:         0.50     35.50</span><br><span class="line"></span><br><span class="line">02:21:15 PM  pswpin/s pswpout/s</span><br><span class="line">02:21:16 PM      0.00      0.00</span><br><span class="line">02:21:17 PM      0.00      0.00</span><br><span class="line">Average:         0.00      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM  pgpgin/s pgpgout/s   fault/s  majflt/s  pgfree/s pgscank/s pgscand/s pgsteal/s    %vmeff</span><br><span class="line">02:21:16 PM      0.00      0.00     22.00      0.00     27.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM      0.00      0.00     17.00      0.00     28.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:         0.00      0.00     19.50      0.00     27.50      0.00      0.00      0.00      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM       tps      rtps      wtps   bread/s   bwrtn/s</span><br><span class="line">02:21:16 PM      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:         0.00      0.00      0.00      0.00      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM   frmpg/s   bufpg/s   campg/s</span><br><span class="line">02:21:16 PM      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM     25.00      0.00     -1.00</span><br><span class="line">Average:        12.50      0.00     -0.50</span><br><span class="line"></span><br><span class="line">02:21:15 PM kbmemfree kbmemused  %memused kbbuffers  kbcached  kbcommit   %commit  kbactive   kbinact   kbdirty</span><br><span class="line">02:21:16 PM  11018224    969344      8.09      3140    408484    539808      3.83    303072    192240         0</span><br><span class="line">02:21:17 PM  11018324    969244      8.09      3140    408480    539808      3.83    303204    192240         8</span><br><span class="line">Average:     11018274    969294      8.09      3140    408482    539808      3.83    303138    192240         4</span><br><span class="line"></span><br><span class="line">02:21:15 PM kbswpfree kbswpused  %swpused  kbswpcad   %swpcad</span><br><span class="line">02:21:16 PM   2097148         0      0.00         0      0.00</span><br><span class="line">02:21:17 PM   2097148         0      0.00         0      0.00</span><br><span class="line">Average:      2097148         0      0.00         0      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM kbhugfree kbhugused  %hugused</span><br><span class="line">02:21:16 PM         0         0      0.00</span><br><span class="line">02:21:17 PM         0         0      0.00</span><br><span class="line">Average:            0         0      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM dentunusd   file-nr  inode-nr    pty-nr</span><br><span class="line">02:21:16 PM    108395      1760     91408         2</span><br><span class="line">02:21:17 PM    108395      1760     91408         2</span><br><span class="line">Average:       108395      1760     91408         2</span><br><span class="line"></span><br><span class="line">02:21:15 PM   runq-sz  plist-sz   ldavg-1   ldavg-5  ldavg-15   blocked</span><br><span class="line">02:21:16 PM         0       210      0.00      0.01      0.05         0</span><br><span class="line">02:21:17 PM         0       210      0.00      0.01      0.05         0</span><br><span class="line">Average:            0       210      0.00      0.01      0.05         0</span><br><span class="line"></span><br><span class="line">02:21:15 PM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s</span><br><span class="line">02:21:16 PM    enp0s3      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:16 PM        lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:16 PM virbr0-nic      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:16 PM    virbr0      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM    enp0s3      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM        lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM virbr0-nic      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM    virbr0      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:       enp0s3      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:    virbr0-nic      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:       virbr0      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM     IFACE   rxerr/s   txerr/s    coll/s  rxdrop/s  txdrop/s  txcarr/s  rxfram/s  rxfifo/s  txfifo/s</span><br><span class="line">02:21:16 PM    enp0s3      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:16 PM        lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:16 PM virbr0-nic      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:16 PM    virbr0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM    enp0s3      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM        lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM virbr0-nic      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM    virbr0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:       enp0s3      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:    virbr0-nic      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:       virbr0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM    call/s retrans/s    read/s   write/s  access/s  getatt/s</span><br><span class="line">02:21:16 PM      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:         0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM   scall/s badcall/s  packet/s     udp/s     tcp/s     hit/s    miss/s   sread/s  swrite/s saccess/s sgetatt/s</span><br><span class="line">02:21:16 PM      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:         0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM    totsck    tcpsck    udpsck    rawsck   ip-frag    tcp-tw</span><br><span class="line">02:21:16 PM       294        10         5         0         0         0</span><br><span class="line">02:21:17 PM       294        10         5         0         0         0</span><br><span class="line">Average:          294        10         5         0         0         0</span><br></pre></td></tr></table></figure>
+
+<h2 id="sa1-和-sa2"><a href="#sa1-和-sa2" class="headerlink" title="sa1 和 sa2"></a>sa1 和 sa2</h2><p>sa1和sa2分别是sadc和sar的定时任务版，特别适配了cron定时任务执行环境（如跨天等）。</p>
+<p><code>/usr/lib64/sa/sa1</code> 封装了 sadc，收集的数据，以二进制形式写入 <code>/var/log/sa/saDD</code> (DD是天数占位符)</p>
+<ul>
+<li>例如：2023&#x2F;11&#x2F;28的所有sa1结果都存到：&#x2F;var&#x2F;log&#x2F;sa&#x2F;sa28</li>
+</ul>
+<p><code>/usr/local/lib64/sa/sa2</code> 封装了sar，取今天的 <code>/var/log/sa/saDD</code> 解析为人可直接读格式，另存为 <code>/var/log/sa/sarDD</code> (文件名多了个 r)</p>
+<ul>
+<li>例如：2023&#x2F;11&#x2F;28 执行后，sa2读取 &#x2F;var&#x2F;log&#x2F;sa&#x2F;sa28，另存为人可读的：&#x2F;var&#x2F;log&#x2F;sa&#x2F;sar28</li>
+</ul>
+<h3 id="例子-2"><a href="#例子-2" class="headerlink" title="例子"></a>例子</h3><p>centos7 默认配置了每隔10分钟执行一次sadc，和每天 23:53:00 执行一次 sar 的定时任务。</p>
+<p>定时任务</p>
+<ul>
+<li><p><code>*/10 * * * * root /usr/lib64/sa/sa1 1 1</code> 每隔10分钟运行一次sa1(即sadc)，收集一次系统所有运行参数，结果保存至 <code>/var/log/sa/sadd</code> 文件(以二进制格式存储), dd是占位符，代表具体天数，取值 [01, 31]，比如 2023&#x2F;11&#x2F;28 的结果都存到文件: <code>/var/log/sa/sa28</code>。</p>
+</li>
+<li><p><code>53 23 * * * root /usr/lib64/sa/sa2 -A</code> 每天的 23:53:00 执行一次 sa2(即sar), 读上一步每隔10分钟收集一次的定时任务生成的当天的所有数据 <code>/var/log/sa/sadd</code>，用sar解析成可读的版本存到文件 <code>/var/log/sa/sardd</code>，例如 2023&#x2F;11&#x2F;28 日，23:53:00 读取 <code>/var/log/sa/sa28</code> 生成可读版本 <code>/var/log/sa/sar28</code></p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@vm10-245-65-72 ~]# cat /etc/cron.d/sysstat</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Run system activity accounting tool every 10 minutes</span></span><br><span class="line">*/10 * * * * root /usr/lib64/sa/sa1 1 1</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">0 * * * * root /usr/lib64/sa/sa1 600 6 &amp;</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Generate a daily summary of process accounting at 23:53</span></span><br><span class="line">53 23 * * * root /usr/lib64/sa/sa2 -A</span><br></pre></td></tr></table></figure>
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考:"></a>参考:</h1><ul>
+<li><p><a target="_blank" rel="noopener" href="https://linux.die.net/man/8/sadc">sadc(8) - Linux man page</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="http://www.lostpenguin.net/index.php/sar-sadc-sa1/">Sar, Sadc &amp; Sa1</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://luppeng.wordpress.com/2023/05/03/differences-between-sadc-and-sar-vs-sa1-and-sa2/">Differences Between sadc and sar, vs sa1 and sa2</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.thegeekstuff.com/2011/03/sar-examples/">10 Useful Sar (Sysstat) Examples for UNIX &#x2F; Linux Performance Monitoring</a></p>
+</li>
+</ul>
 
       
     </div>
