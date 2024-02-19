@@ -259,6 +259,95 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/bfd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/linux/bfd/" class="post-title-link" itemprop="url">Linux bfd</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>573</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>1 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><h2 id="arelent"><a href="#arelent" class="headerlink" title="arelent"></a>arelent</h2><blockquote>
+<p>BFD represents a relocation as a pointer to the ‘arelent’ type. A relocation describes an action which the linker must take to modify the section contents. Relocations have a symbol, an address, an addend, and a pointer to a howto structure which describes how to perform the relocation. </p>
+</blockquote>
+<blockquote>
+<p>In BFD, each section has an array of ‘arelent’ structures. Each structure has a pointer to a symbol, an address within the section, an addend, and a pointer to a ‘reloc_howto_struct’ structure. The howto structure has a bunch of fields describing the reloc, including a type field. The type field is specific to the object file format backend; none of the generic code in BFD examines it.</p>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/PageCache%20/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -350,95 +439,6 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建一个200MB的文件</span></span><br><span class="line">wqj@ubuntu-server:~/demo$ <span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=bigfile bs=1M count=200</span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ ll -h</span><br><span class="line">total 201M</span><br><span class="line">drwxrwxr-x  2 wqj wqj 4.0K Oct 16 09:51 ./</span><br><span class="line">drwxr-xr-x 12 wqj wqj 4.0K Oct 16 09:40 ../</span><br><span class="line">-rw-rw-r--  1 wqj wqj 200M Oct 16 09:43 bigfile      <span class="comment"># 有一个200M的文件</span></span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ fincore bigfile <span class="comment"># 没有生成pagecache</span></span><br><span class="line">RES PAGES  SIZE FILE</span><br><span class="line"> 0B     0  200M bigfile</span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ time <span class="built_in">cat</span> bigfile &gt; /dev/null <span class="comment"># 读这个文件（生成pagecache）</span></span><br><span class="line"></span><br><span class="line">real    0m0.242s</span><br><span class="line">user    0m0.011s</span><br><span class="line">sys     0m0.203s</span><br><span class="line">wqj@ubuntu-server:~/demo$ fincore bigfile <span class="comment"># 验证生成pagecache</span></span><br><span class="line">  RES PAGES  SIZE FILE</span><br><span class="line"> 200M 51200  200M bigfile</span><br><span class="line"></span><br><span class="line"><span class="comment"># 再次读这个文件，读的是pagecache，速度提升 0.242/0.032=7.56倍</span></span><br><span class="line">wqj@ubuntu-server:~/demo$ time <span class="built_in">cat</span> bigfile &gt; /dev/null </span><br><span class="line"></span><br><span class="line">real    0m0.032s</span><br><span class="line">user    0m0.000s</span><br><span class="line">sys     0m0.032s</span><br></pre></td></tr></table></figure>
 
 <h1 id="pcstat"><a href="#pcstat" class="headerlink" title="pcstat"></a>pcstat</h1><p><a target="_blank" rel="noopener" href="https://github.com/tobert/pcstat">https://github.com/tobert/pcstat</a></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/bfd/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/linux/bfd/" class="post-title-link" itemprop="url">Linux bfd</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>573</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>1 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><h2 id="arelent"><a href="#arelent" class="headerlink" title="arelent"></a>arelent</h2><blockquote>
-<p>BFD represents a relocation as a pointer to the ‘arelent’ type. A relocation describes an action which the linker must take to modify the section contents. Relocations have a symbol, an address, an addend, and a pointer to a howto structure which describes how to perform the relocation. </p>
-</blockquote>
-<blockquote>
-<p>In BFD, each section has an array of ‘arelent’ structures. Each structure has a pointer to a symbol, an address within the section, an addend, and a pointer to a ‘reloc_howto_struct’ structure. The howto structure has a bunch of fields describing the reloc, including a type field. The type field is specific to the object file format backend; none of the generic code in BFD examines it.</p>
-</blockquote>
 
       
     </div>

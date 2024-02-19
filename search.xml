@@ -47,6 +47,18 @@
       </tags>
   </entry>
   <entry>
+    <title>CMake备忘</title>
+    <url>/2024/02/19/note/cpp/CMake%20/</url>
+    <content><![CDATA[<p>add cxx flags for a target</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">target_compile_options(scope_lock_exe PRIVATE -std=c++20 -Wall -Wextra -pedantic-errors -fsanitize=thread -g)</span><br><span class="line">target_link_libraries(scope_lock_exe PRIVATE tsan)</span><br></pre></td></tr></table></figure>
+
+<p>list all targets</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cmake --build . --target help</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>cpp</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>布隆过滤器</title>
     <url>/2024/02/19/note/algo/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/</url>
     <content><![CDATA[<h1 id="Bloom-Filter的原理"><a href="#Bloom-Filter的原理" class="headerlink" title="Bloom Filter的原理"></a>Bloom Filter的原理</h1><p>用来告诉你 “某个元素一定不存在或者可能存在”。</p>
@@ -64,18 +76,6 @@
 ]]></content>
       <tags>
         <tag>algo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>CMake备忘</title>
-    <url>/2024/02/19/note/cpp/CMake%20/</url>
-    <content><![CDATA[<p>add cxx flags for a target</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">target_compile_options(scope_lock_exe PRIVATE -std=c++20 -Wall -Wextra -pedantic-errors -fsanitize=thread -g)</span><br><span class="line">target_link_libraries(scope_lock_exe PRIVATE tsan)</span><br></pre></td></tr></table></figure>
-
-<p>list all targets</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cmake --build . --target help</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>cpp</tag>
       </tags>
   </entry>
   <entry>
@@ -281,6 +281,16 @@
       </tags>
   </entry>
   <entry>
+    <title>coredump备忘</title>
+    <url>/2024/02/19/note/cpp/coredump/</url>
+    <content><![CDATA[<p>The location of the core file depends on <code>/proc/sys/kernel/core_pattern</code></p>
+]]></content>
+      <tags>
+        <tag>c++</tag>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C++ lambda 中 mutable 关键字</title>
     <url>/2024/02/19/note/cpp/cpp%20lambda/</url>
     <content><![CDATA[<h1 id="lambda-“mutable”-keyword"><a href="#lambda-“mutable”-keyword" class="headerlink" title="lambda “mutable” keyword"></a>lambda “mutable” keyword</h1><p>lamda按值捕获的变量不能修改</p>
@@ -305,16 +315,6 @@
 ]]></content>
       <tags>
         <tag>c++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>coredump备忘</title>
-    <url>/2024/02/19/note/cpp/coredump/</url>
-    <content><![CDATA[<p>The location of the core file depends on <code>/proc/sys/kernel/core_pattern</code></p>
-]]></content>
-      <tags>
-        <tag>c++</tag>
-        <tag>linux</tag>
       </tags>
   </entry>
   <entry>
@@ -1074,42 +1074,14 @@
       </tags>
   </entry>
   <entry>
-    <title>Linux page cache</title>
-    <url>/2024/02/19/note/linux/PageCache%20/</url>
-    <content><![CDATA[<h1 id="PageCache"><a href="#PageCache" class="headerlink" title="PageCache"></a>PageCache</h1><h1 id="是什么？"><a href="#是什么？" class="headerlink" title="是什么？"></a>是什么？</h1><ul>
-<li>pagecache是最主要的一种disk cache</li>
-<li>通过程序的方式，当读&#x2F;写文件时，将文件<strong>部分</strong>内容以页为单位在内存中缓存一份，提高未来多个进程对该文件的读写速度，由于是以页为单位，因此缓存的文件页不一定是文件中连续的。</li>
-<li>如果有空闲内存，那么缓存的页一直常驻内存</li>
-<li>当把页写回块设备时，也缓存一份要写入的内容，但内核不是立即写入设备，而是推迟一会儿写入设备，因为每次写入硬盘的速度很慢，攒够一波再发车。</li>
-<li>read()和write()都用pagecache，除非是像数据库有数据立即写入硬盘需求，可以加O_DIRECT禁用pagecache。</li>
-<li>如果断电了，page cache中未写入硬盘的页全丢了</li>
-<li>dirty page写回硬盘的策略<ul>
-<li>page cache量超出阈值或者dirty page cache超出阈值</li>
-<li>dirty时常超出阈值</li>
-<li>用户程序调sync(), fsync(), fdatasync()系统调用</li>
-</ul>
-</li>
-<li>TODO：分析page cache工具 <a href="https://www.percona.com/blog/using-linux-fincore-to-check-linux-page-cache-usage/">https://www.percona.com/blog/using-linux-fincore-to-check-linux-page-cache-usage/</a></li>
-<li>TODO: 实验page cache优化效果 <a href="https://www.linuxatemyram.com/play.html">https://www.linuxatemyram.com/play.html</a></li>
-</ul>
-<h1 id="清空disk-cache"><a href="#清空disk-cache" class="headerlink" title="清空disk cache"></a>清空disk cache</h1><ul>
-<li><p>To free pagecache:</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">echo 1 | sudo tee /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>To free dentries and inodes:</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">echo 2 | sudo tee /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>To free pagecache, dentries and inodes:</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">echo 3 | sudo tee /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure></li>
-</ul>
-<p>参考：</p>
-<ul>
-<li><a href="https://unix.stackexchange.com/a/87909/375713">https://unix.stackexchange.com/a/87909/375713</a></li>
-</ul>
-<h1 id="fincore"><a href="#fincore" class="headerlink" title="fincore"></a>fincore</h1><p>查看文件的pagecache情况</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 创建一个200MB的文件</span></span><br><span class="line">wqj@ubuntu-server:~/demo$ <span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=bigfile bs=1M count=200</span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ ll -h</span><br><span class="line">total 201M</span><br><span class="line">drwxrwxr-x  2 wqj wqj 4.0K Oct 16 09:51 ./</span><br><span class="line">drwxr-xr-x 12 wqj wqj 4.0K Oct 16 09:40 ../</span><br><span class="line">-rw-rw-r--  1 wqj wqj 200M Oct 16 09:43 bigfile      <span class="comment"># 有一个200M的文件</span></span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ fincore bigfile <span class="comment"># 没有生成pagecache</span></span><br><span class="line">RES PAGES  SIZE FILE</span><br><span class="line"> 0B     0  200M bigfile</span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ time <span class="built_in">cat</span> bigfile &gt; /dev/null <span class="comment"># 读这个文件（生成pagecache）</span></span><br><span class="line"></span><br><span class="line">real    0m0.242s</span><br><span class="line">user    0m0.011s</span><br><span class="line">sys     0m0.203s</span><br><span class="line">wqj@ubuntu-server:~/demo$ fincore bigfile <span class="comment"># 验证生成pagecache</span></span><br><span class="line">  RES PAGES  SIZE FILE</span><br><span class="line"> 200M 51200  200M bigfile</span><br><span class="line"></span><br><span class="line"><span class="comment"># 再次读这个文件，读的是pagecache，速度提升 0.242/0.032=7.56倍</span></span><br><span class="line">wqj@ubuntu-server:~/demo$ time <span class="built_in">cat</span> bigfile &gt; /dev/null </span><br><span class="line"></span><br><span class="line">real    0m0.032s</span><br><span class="line">user    0m0.000s</span><br><span class="line">sys     0m0.032s</span><br></pre></td></tr></table></figure>
-
-<h1 id="pcstat"><a href="#pcstat" class="headerlink" title="pcstat"></a>pcstat</h1><p><a href="https://github.com/tobert/pcstat">https://github.com/tobert/pcstat</a></p>
+    <title>Linux bfd</title>
+    <url>/2024/02/19/note/linux/bfd/</url>
+    <content><![CDATA[<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><h2 id="arelent"><a href="#arelent" class="headerlink" title="arelent"></a>arelent</h2><blockquote>
+<p>BFD represents a relocation as a pointer to the ‘arelent’ type. A relocation describes an action which the linker must take to modify the section contents. Relocations have a symbol, an address, an addend, and a pointer to a howto structure which describes how to perform the relocation. </p>
+</blockquote>
+<blockquote>
+<p>In BFD, each section has an array of ‘arelent’ structures. Each structure has a pointer to a symbol, an address within the section, an addend, and a pointer to a ‘reloc_howto_struct’ structure. The howto structure has a bunch of fields describing the reloc, including a type field. The type field is specific to the object file format backend; none of the generic code in BFD examines it.</p>
+</blockquote>
 ]]></content>
       <tags>
         <tag>linux</tag>
@@ -1409,20 +1381,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Linux bfd</title>
-    <url>/2024/02/19/note/linux/bfd/</url>
-    <content><![CDATA[<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><h2 id="arelent"><a href="#arelent" class="headerlink" title="arelent"></a>arelent</h2><blockquote>
-<p>BFD represents a relocation as a pointer to the ‘arelent’ type. A relocation describes an action which the linker must take to modify the section contents. Relocations have a symbol, an address, an addend, and a pointer to a howto structure which describes how to perform the relocation. </p>
-</blockquote>
-<blockquote>
-<p>In BFD, each section has an array of ‘arelent’ structures. Each structure has a pointer to a symbol, an address within the section, an addend, and a pointer to a ‘reloc_howto_struct’ structure. The howto structure has a bunch of fields describing the reloc, including a type field. The type field is specific to the object file format backend; none of the generic code in BFD examines it.</p>
-</blockquote>
-]]></content>
-      <tags>
-        <tag>linux</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Linux epoll 学习</title>
     <url>/2024/02/19/note/linux/epoll/</url>
     <content><![CDATA[<h1 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a>epoll</h1><h1 id="边沿触发和水平触发"><a href="#边沿触发和水平触发" class="headerlink" title="边沿触发和水平触发"></a>边沿触发和水平触发</h1><p>只有epoll有这两种模式，select和poll均只有水平触发。</p>
@@ -1452,6 +1410,48 @@
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">[<span class="number">1</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">1</span>]Child found readable fd</span><br><span class="line">[<span class="number">2</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">2</span>]Child found readable fd</span><br><span class="line">[<span class="number">3</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">3</span>]Child found readable fd</span><br><span class="line">[<span class="number">4</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">4</span>]Child found readable fd</span><br><span class="line">[<span class="number">5</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">5</span>]Child found readable fd</span><br><span class="line">[<span class="number">6</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">6</span>]Child found readable fd</span><br><span class="line">[<span class="number">7</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">7</span>]Child found readable fd</span><br><span class="line">[<span class="number">8</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">8</span>]Child found readable fd</span><br><span class="line">[<span class="number">9</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">9</span>]Child found readable fd</span><br><span class="line">[<span class="number">10</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">10</span>]Child found readable fd</span><br></pre></td></tr></table></figure>
 
 <h1 id="为什么边沿触发效率更高"><a href="#为什么边沿触发效率更高" class="headerlink" title="为什么边沿触发效率更高"></a>为什么边沿触发效率更高</h1>]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Linux page cache</title>
+    <url>/2024/02/19/note/linux/PageCache%20/</url>
+    <content><![CDATA[<h1 id="PageCache"><a href="#PageCache" class="headerlink" title="PageCache"></a>PageCache</h1><h1 id="是什么？"><a href="#是什么？" class="headerlink" title="是什么？"></a>是什么？</h1><ul>
+<li>pagecache是最主要的一种disk cache</li>
+<li>通过程序的方式，当读&#x2F;写文件时，将文件<strong>部分</strong>内容以页为单位在内存中缓存一份，提高未来多个进程对该文件的读写速度，由于是以页为单位，因此缓存的文件页不一定是文件中连续的。</li>
+<li>如果有空闲内存，那么缓存的页一直常驻内存</li>
+<li>当把页写回块设备时，也缓存一份要写入的内容，但内核不是立即写入设备，而是推迟一会儿写入设备，因为每次写入硬盘的速度很慢，攒够一波再发车。</li>
+<li>read()和write()都用pagecache，除非是像数据库有数据立即写入硬盘需求，可以加O_DIRECT禁用pagecache。</li>
+<li>如果断电了，page cache中未写入硬盘的页全丢了</li>
+<li>dirty page写回硬盘的策略<ul>
+<li>page cache量超出阈值或者dirty page cache超出阈值</li>
+<li>dirty时常超出阈值</li>
+<li>用户程序调sync(), fsync(), fdatasync()系统调用</li>
+</ul>
+</li>
+<li>TODO：分析page cache工具 <a href="https://www.percona.com/blog/using-linux-fincore-to-check-linux-page-cache-usage/">https://www.percona.com/blog/using-linux-fincore-to-check-linux-page-cache-usage/</a></li>
+<li>TODO: 实验page cache优化效果 <a href="https://www.linuxatemyram.com/play.html">https://www.linuxatemyram.com/play.html</a></li>
+</ul>
+<h1 id="清空disk-cache"><a href="#清空disk-cache" class="headerlink" title="清空disk cache"></a>清空disk cache</h1><ul>
+<li><p>To free pagecache:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">echo 1 | sudo tee /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>To free dentries and inodes:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">echo 2 | sudo tee /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>To free pagecache, dentries and inodes:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">echo 3 | sudo tee /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>参考：</p>
+<ul>
+<li><a href="https://unix.stackexchange.com/a/87909/375713">https://unix.stackexchange.com/a/87909/375713</a></li>
+</ul>
+<h1 id="fincore"><a href="#fincore" class="headerlink" title="fincore"></a>fincore</h1><p>查看文件的pagecache情况</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 创建一个200MB的文件</span></span><br><span class="line">wqj@ubuntu-server:~/demo$ <span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=bigfile bs=1M count=200</span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ ll -h</span><br><span class="line">total 201M</span><br><span class="line">drwxrwxr-x  2 wqj wqj 4.0K Oct 16 09:51 ./</span><br><span class="line">drwxr-xr-x 12 wqj wqj 4.0K Oct 16 09:40 ../</span><br><span class="line">-rw-rw-r--  1 wqj wqj 200M Oct 16 09:43 bigfile      <span class="comment"># 有一个200M的文件</span></span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ fincore bigfile <span class="comment"># 没有生成pagecache</span></span><br><span class="line">RES PAGES  SIZE FILE</span><br><span class="line"> 0B     0  200M bigfile</span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ time <span class="built_in">cat</span> bigfile &gt; /dev/null <span class="comment"># 读这个文件（生成pagecache）</span></span><br><span class="line"></span><br><span class="line">real    0m0.242s</span><br><span class="line">user    0m0.011s</span><br><span class="line">sys     0m0.203s</span><br><span class="line">wqj@ubuntu-server:~/demo$ fincore bigfile <span class="comment"># 验证生成pagecache</span></span><br><span class="line">  RES PAGES  SIZE FILE</span><br><span class="line"> 200M 51200  200M bigfile</span><br><span class="line"></span><br><span class="line"><span class="comment"># 再次读这个文件，读的是pagecache，速度提升 0.242/0.032=7.56倍</span></span><br><span class="line">wqj@ubuntu-server:~/demo$ time <span class="built_in">cat</span> bigfile &gt; /dev/null </span><br><span class="line"></span><br><span class="line">real    0m0.032s</span><br><span class="line">user    0m0.000s</span><br><span class="line">sys     0m0.032s</span><br></pre></td></tr></table></figure>
+
+<h1 id="pcstat"><a href="#pcstat" class="headerlink" title="pcstat"></a>pcstat</h1><p><a href="https://github.com/tobert/pcstat">https://github.com/tobert/pcstat</a></p>
+]]></content>
       <tags>
         <tag>linux</tag>
       </tags>
@@ -2814,18 +2814,6 @@
       </tags>
   </entry>
   <entry>
-    <title>C++ std::vector::emplace_back</title>
-    <url>/2024/02/19/note/cpp/stl/emplace_back/</url>
-    <content><![CDATA[<p>emplace_back可传入对象的参数列表，在容器末尾的位置用 placement new 原地构造，连move都省去了。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">President</span></span><br><span class="line">&#123;</span><br><span class="line">    std::string name;</span><br><span class="line">    std::string country;</span><br><span class="line">    <span class="type">int</span> year;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(std::string p_name, std::string p_country, <span class="type">int</span> p_year)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(p_name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(p_country)), <span class="built_in">year</span>(p_year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; name &lt;&lt; <span class="string">&quot; being constructed.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(President&amp;&amp; other)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(other.name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(other.country)), <span class="built_in">year</span>(other.year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; name &lt;&lt; <span class="string">&quot; being moved.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    President&amp; <span class="keyword">operator</span>=(<span class="type">const</span> President&amp; other) = <span class="keyword">default</span>;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::vector&lt;President&gt; elections;</span><br><span class="line">    elections.<span class="built_in">reserve</span>(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;emplace_back obj&#x27;s args:\n&quot;</span>;</span><br><span class="line">    elections.<span class="built_in">emplace_back</span>(<span class="string">&quot;Nelson&quot;</span>, <span class="string">&quot;South Africa&quot;</span>, <span class="number">1994</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果emplace_back一个对象，则是先构造，后移动</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\nemplace_back an obj:\n&quot;</span>;</span><br><span class="line">    elections.<span class="built_in">emplace_back</span>(<span class="built_in">President</span>(<span class="string">&quot;aaa&quot;</span>, <span class="string">&quot;usa&quot;</span>, <span class="number">2000</span>));</span><br><span class="line">    </span><br><span class="line"> </span><br><span class="line">    std::vector&lt;President&gt; reElections;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\npush_back:\n&quot;</span>;</span><br><span class="line">    reElections.<span class="built_in">push_back</span>(<span class="built_in">President</span>(<span class="string">&quot;Franklin&quot;</span>, <span class="string">&quot;the USA&quot;</span>, <span class="number">1936</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>输出：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">emplace_back obj&#x27;s args:</span><br><span class="line">Nelson being constructed.</span><br><span class="line"></span><br><span class="line">emplace_back an obj:</span><br><span class="line">aaa being constructed.</span><br><span class="line">aaa being moved.</span><br><span class="line"></span><br><span class="line">push_back:</span><br><span class="line">Franklin being constructed.</span><br><span class="line">Franklin being moved.</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>cpp</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Redis数据类型</title>
     <url>/2024/02/19/note/redis/redis%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/</url>
     <content><![CDATA[<h1 id="String"><a href="#String" class="headerlink" title="String"></a>String</h1><h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>用来存这些类型的值：</p>
@@ -3271,6 +3259,18 @@ zset-max-ziplist-value 64
 ]]></content>
       <tags>
         <tag>redis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>C++ std::vector::emplace_back</title>
+    <url>/2024/02/19/note/cpp/stl/emplace_back/</url>
+    <content><![CDATA[<p>emplace_back可传入对象的参数列表，在容器末尾的位置用 placement new 原地构造，连move都省去了。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">President</span></span><br><span class="line">&#123;</span><br><span class="line">    std::string name;</span><br><span class="line">    std::string country;</span><br><span class="line">    <span class="type">int</span> year;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(std::string p_name, std::string p_country, <span class="type">int</span> p_year)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(p_name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(p_country)), <span class="built_in">year</span>(p_year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; name &lt;&lt; <span class="string">&quot; being constructed.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(President&amp;&amp; other)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(other.name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(other.country)), <span class="built_in">year</span>(other.year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; name &lt;&lt; <span class="string">&quot; being moved.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    President&amp; <span class="keyword">operator</span>=(<span class="type">const</span> President&amp; other) = <span class="keyword">default</span>;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::vector&lt;President&gt; elections;</span><br><span class="line">    elections.<span class="built_in">reserve</span>(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;emplace_back obj&#x27;s args:\n&quot;</span>;</span><br><span class="line">    elections.<span class="built_in">emplace_back</span>(<span class="string">&quot;Nelson&quot;</span>, <span class="string">&quot;South Africa&quot;</span>, <span class="number">1994</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果emplace_back一个对象，则是先构造，后移动</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\nemplace_back an obj:\n&quot;</span>;</span><br><span class="line">    elections.<span class="built_in">emplace_back</span>(<span class="built_in">President</span>(<span class="string">&quot;aaa&quot;</span>, <span class="string">&quot;usa&quot;</span>, <span class="number">2000</span>));</span><br><span class="line">    </span><br><span class="line"> </span><br><span class="line">    std::vector&lt;President&gt; reElections;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\npush_back:\n&quot;</span>;</span><br><span class="line">    reElections.<span class="built_in">push_back</span>(<span class="built_in">President</span>(<span class="string">&quot;Franklin&quot;</span>, <span class="string">&quot;the USA&quot;</span>, <span class="number">1936</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">emplace_back obj&#x27;s args:</span><br><span class="line">Nelson being constructed.</span><br><span class="line"></span><br><span class="line">emplace_back an obj:</span><br><span class="line">aaa being constructed.</span><br><span class="line">aaa being moved.</span><br><span class="line"></span><br><span class="line">push_back:</span><br><span class="line">Franklin being constructed.</span><br><span class="line">Franklin being moved.</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>cpp</tag>
       </tags>
   </entry>
   <entry>
