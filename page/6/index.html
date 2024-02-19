@@ -372,115 +372,6 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/GDB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/GDB/" class="post-title-link" itemprop="url">GDB指令备忘</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>1.2k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>2 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><a target="_blank" rel="noopener" href="https://sourceware.org/gdb/current/onlinedocs/gdb.pdf">GDB使用手册</a></p>
-<h2 id="watchpoint"><a href="#watchpoint" class="headerlink" title="watchpoint"></a>watchpoint</h2><p>watchpoint又叫数据断点（data breakpoint），用于监控内存的读写。</p>
-<h3 id="监控内存地址"><a href="#监控内存地址" class="headerlink" title="监控内存地址"></a>监控内存地址</h3><p>如果要监控 <code>0x402000</code> 上的读写。</p>
-<p>如下不行，因为 <code>0x402000</code> 被当作常量，永不变化</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) watch 0x402000</span><br><span class="line">Cannot watch constant value `0x402000&#x27;.</span><br></pre></td></tr></table></figure>
-
-<p>而要用</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) watch *0x402000</span><br><span class="line">Hardware watchpoint 5: *0x402000</span><br></pre></td></tr></table></figure>
-
-<p>如果要按hex打印变更前后数值，用如下</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">watch *(char**)0x402000</span><br><span class="line">watch *(void**)0x402000</span><br></pre></td></tr></table></figure>
-
-<h2 id="Demangle-symbol"><a href="#Demangle-symbol" class="headerlink" title="Demangle symbol"></a>Demangle symbol</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) dem _ZTV1C</span><br><span class="line">vtable for C</span><br></pre></td></tr></table></figure>
-
-<p>ref: <a target="_blank" rel="noopener" href="https://sourceware.org/gdb/current/onlinedocs/gdb.html/Debugging-C-Plus-Plus.html">https://sourceware.org/gdb/current/onlinedocs/gdb.html/Debugging-C-Plus-Plus.html</a></p>
-<h2 id="打印对象的虚函数表"><a href="#打印对象的虚函数表" class="headerlink" title="打印对象的虚函数表"></a>打印对象的虚函数表</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info vtbl c</span><br></pre></td></tr></table></figure>
-
-<h2 id="打印对象内部成员布局"><a href="#打印对象内部成员布局" class="headerlink" title="打印对象内部成员布局"></a>打印对象内部成员布局</h2><p>测试代码:</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">Foo</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> a;</span><br><span class="line">    <span class="type">int</span> b;</span><br><span class="line">    <span class="type">double</span> c;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Foo foo;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>结构体成员内存布局如下：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">(gdb) pt /o foo</span><br><span class="line"><span class="comment">/* offset    |  size */</span>  type = <span class="keyword">struct</span> Foo &#123;</span><br><span class="line"><span class="comment">/*    0      |     1 */</span>    <span class="type">char</span> a;</span><br><span class="line"><span class="comment">/* XXX  3-byte hole */</span></span><br><span class="line"><span class="comment">/*    4      |     4 */</span>    <span class="type">int</span> b;</span><br><span class="line"><span class="comment">/*    8      |     8 */</span>    <span class="type">double</span> c;</span><br><span class="line"><span class="comment">/* total size (bytes):   16 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="找到类型定义的源文件位置"><a href="#找到类型定义的源文件位置" class="headerlink" title="找到类型定义的源文件位置"></a>找到类型定义的源文件位置</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info types _Atomic_word</span><br><span class="line">All types matching regular expression &quot;_Atomic_word&quot;:</span><br><span class="line"></span><br><span class="line">File /opt/rh/devtoolset-8/root/usr/include/c++/8/x86_64-redhat-linux/bits/atomic_word.h:</span><br><span class="line">32:     typedef int _Atomic_word;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>通过正则表达式搜索所有包含pattern的类型，比如会搜到模板参数实例化为pattern的类型，因此精确搜索要加上^和$，限制字符左右边界。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info types ^__gnu_cxx::_Lock_policy$</span><br><span class="line">All types matching regular expression &quot;^__gnu_cxx::_Lock_policy$&quot;:</span><br><span class="line"></span><br><span class="line">File /opt/rh/devtoolset-8/root/usr/include/c++/8/ext/concurrence.h:</span><br><span class="line">49:     __gnu_cxx::_Lock_policy;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/Template%20Type%20Deduction%20/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -680,6 +571,115 @@
 <li>形式一定是 auto&amp;&amp;</li>
 </ul>
 
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/GDB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/GDB/" class="post-title-link" itemprop="url">GDB指令备忘</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><a target="_blank" rel="noopener" href="https://sourceware.org/gdb/current/onlinedocs/gdb.pdf">GDB使用手册</a></p>
+<h2 id="watchpoint"><a href="#watchpoint" class="headerlink" title="watchpoint"></a>watchpoint</h2><p>watchpoint又叫数据断点（data breakpoint），用于监控内存的读写。</p>
+<h3 id="监控内存地址"><a href="#监控内存地址" class="headerlink" title="监控内存地址"></a>监控内存地址</h3><p>如果要监控 <code>0x402000</code> 上的读写。</p>
+<p>如下不行，因为 <code>0x402000</code> 被当作常量，永不变化</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) watch 0x402000</span><br><span class="line">Cannot watch constant value `0x402000&#x27;.</span><br></pre></td></tr></table></figure>
+
+<p>而要用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) watch *0x402000</span><br><span class="line">Hardware watchpoint 5: *0x402000</span><br></pre></td></tr></table></figure>
+
+<p>如果要按hex打印变更前后数值，用如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">watch *(char**)0x402000</span><br><span class="line">watch *(void**)0x402000</span><br></pre></td></tr></table></figure>
+
+<h2 id="Demangle-symbol"><a href="#Demangle-symbol" class="headerlink" title="Demangle symbol"></a>Demangle symbol</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) dem _ZTV1C</span><br><span class="line">vtable for C</span><br></pre></td></tr></table></figure>
+
+<p>ref: <a target="_blank" rel="noopener" href="https://sourceware.org/gdb/current/onlinedocs/gdb.html/Debugging-C-Plus-Plus.html">https://sourceware.org/gdb/current/onlinedocs/gdb.html/Debugging-C-Plus-Plus.html</a></p>
+<h2 id="打印对象的虚函数表"><a href="#打印对象的虚函数表" class="headerlink" title="打印对象的虚函数表"></a>打印对象的虚函数表</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info vtbl c</span><br></pre></td></tr></table></figure>
+
+<h2 id="打印对象内部成员布局"><a href="#打印对象内部成员布局" class="headerlink" title="打印对象内部成员布局"></a>打印对象内部成员布局</h2><p>测试代码:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">Foo</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> a;</span><br><span class="line">    <span class="type">int</span> b;</span><br><span class="line">    <span class="type">double</span> c;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Foo foo;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>结构体成员内存布局如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">(gdb) pt /o foo</span><br><span class="line"><span class="comment">/* offset    |  size */</span>  type = <span class="keyword">struct</span> Foo &#123;</span><br><span class="line"><span class="comment">/*    0      |     1 */</span>    <span class="type">char</span> a;</span><br><span class="line"><span class="comment">/* XXX  3-byte hole */</span></span><br><span class="line"><span class="comment">/*    4      |     4 */</span>    <span class="type">int</span> b;</span><br><span class="line"><span class="comment">/*    8      |     8 */</span>    <span class="type">double</span> c;</span><br><span class="line"><span class="comment">/* total size (bytes):   16 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="找到类型定义的源文件位置"><a href="#找到类型定义的源文件位置" class="headerlink" title="找到类型定义的源文件位置"></a>找到类型定义的源文件位置</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info types _Atomic_word</span><br><span class="line">All types matching regular expression &quot;_Atomic_word&quot;:</span><br><span class="line"></span><br><span class="line">File /opt/rh/devtoolset-8/root/usr/include/c++/8/x86_64-redhat-linux/bits/atomic_word.h:</span><br><span class="line">32:     typedef int _Atomic_word;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>通过正则表达式搜索所有包含pattern的类型，比如会搜到模板参数实例化为pattern的类型，因此精确搜索要加上^和$，限制字符左右边界。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info types ^__gnu_cxx::_Lock_policy$</span><br><span class="line">All types matching regular expression &quot;^__gnu_cxx::_Lock_policy$&quot;:</span><br><span class="line"></span><br><span class="line">File /opt/rh/devtoolset-8/root/usr/include/c++/8/ext/concurrence.h:</span><br><span class="line">49:     __gnu_cxx::_Lock_policy;</span><br></pre></td></tr></table></figure>
       
     </div>
 
