@@ -756,113 +756,6 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E7%BC%96%E8%AF%91%E5%99%A8%E7%94%9F%E6%88%90%E7%9A%84%E6%9E%84%E9%80%A0%EF%BC%8C%E6%8B%B7%E8%B4%9D%EF%BC%8C%E7%A7%BB%E5%8A%A8%E5%87%BD%E6%95%B0%20/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/%E7%BC%96%E8%AF%91%E5%99%A8%E7%94%9F%E6%88%90%E7%9A%84%E6%9E%84%E9%80%A0%EF%BC%8C%E6%8B%B7%E8%B4%9D%EF%BC%8C%E7%A7%BB%E5%8A%A8%E5%87%BD%E6%95%B0%20/" class="post-title-link" itemprop="url">C++ 编译器自动生成的构造，拷贝，移动函数</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>989</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>2 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>什么时候自动生成？</p>
-</blockquote>
-<ul>
-<li>没声明且用到了，则编译器自动生成一个默认的。</li>
-</ul>
-<blockquote>
-<p>怎么禁止编译器生成？</p>
-</blockquote>
-<ul>
-<li>≥ C++11 用delete</li>
-<li>只声明不实现，放在private中，如果调用了，报链接错误，undefined reference to xxx</li>
-</ul>
-<h2 id="空类，只用到默认构造"><a href="#空类，只用到默认构造" class="headerlink" title="空类，只用到默认构造"></a>空类，只用到默认构造</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>用 cppinsights 能看到：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="空类，用到构造、拷贝构造、拷贝赋值"><a href="#空类，用到构造、拷贝构造、拷贝赋值" class="headerlink" title="空类，用到构造、拷贝构造、拷贝赋值"></a>空类，用到构造、拷贝构造、拷贝赋值</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  <span class="function">Empty <span class="title">e2</span><span class="params">(e1)</span></span>;</span><br><span class="line">  e2 = e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty(const Empty &amp;) noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty &amp; operator=(const Empty &amp;) noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1 = <span class="built_in">Empty</span>();</span><br><span class="line">  Empty e2 = <span class="built_in">Empty</span>(e1);</span><br><span class="line">  e2.<span class="keyword">operator</span>=(e1);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="空类，只用到默认构造、拷贝赋值"><a href="#空类，只用到默认构造、拷贝赋值" class="headerlink" title="空类，只用到默认构造、拷贝赋值"></a>空类，只用到默认构造、拷贝赋值</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  Empty e2 = e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty(const Empty &amp;) noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  Empty e2 = <span class="built_in">Empty</span>(e1);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E8%99%9A%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1008,6 +901,113 @@
 <li>vtable+128</li>
 </ol>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">Vtable <span class="keyword">for</span> C</span><br><span class="line">C::vtable <span class="keyword">for</span> C: <span class="number">18</span> entries</span><br><span class="line"><span class="number">0</span>     (<span class="built_in">int</span> (*)(...))<span class="number">0</span></span><br><span class="line"><span class="number">8</span>     (<span class="built_in">int</span> (*)(...))(&amp; typeinfo <span class="keyword">for</span> C)</span><br><span class="line"><span class="number">16</span>    (<span class="built_in">int</span> (*)(...))A::aFunc1</span><br><span class="line"><span class="number">24</span>    (<span class="built_in">int</span> (*)(...))C::aFunc2</span><br><span class="line"><span class="number">32</span>    (<span class="built_in">int</span> (*)(...))C::cFunc1</span><br><span class="line"><span class="number">40</span>    (<span class="built_in">int</span> (*)(...))C::dFunc1</span><br><span class="line"><span class="number">48</span>    (<span class="built_in">int</span> (*)(...))<span class="number">-8</span></span><br><span class="line"><span class="number">56</span>    (<span class="built_in">int</span> (*)(...))(&amp; typeinfo <span class="keyword">for</span> C)</span><br><span class="line"><span class="number">64</span>    (<span class="built_in">int</span> (*)(...))B::bFunc1</span><br><span class="line"><span class="number">72</span>    (<span class="built_in">int</span> (*)(...))B::bFunc2</span><br><span class="line"><span class="number">80</span>    (<span class="built_in">int</span> (*)(...))<span class="number">-16</span></span><br><span class="line"><span class="number">88</span>    (<span class="built_in">int</span> (*)(...))(&amp; typeinfo <span class="keyword">for</span> C)</span><br><span class="line"><span class="number">96</span>    (<span class="built_in">int</span> (*)(...))C::non-<span class="function"><span class="keyword">virtual</span> thunk to <span class="title">C::dFunc1</span><span class="params">()</span></span></span><br><span class="line"><span class="function">104   <span class="params">(<span class="type">int</span> (*)(...))</span>D::dFunc2</span></span><br><span class="line"><span class="function">112   <span class="params">(<span class="type">int</span> (*)(...))</span>-24</span></span><br><span class="line"><span class="function">120   <span class="params">(<span class="type">int</span> (*)(...))</span><span class="params">(&amp; typeinfo <span class="keyword">for</span> C)</span></span></span><br><span class="line"><span class="function">128   <span class="params">(<span class="type">int</span> (*)(...))</span>E::eFunc1</span></span><br><span class="line"><span class="function">136   <span class="params">(<span class="type">int</span> (*)(...))</span>E::eFunc2</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">Class C</span></span><br><span class="line"><span class="function">   size</span>=<span class="number">32</span> align=<span class="number">8</span></span><br><span class="line">   base size=<span class="number">32</span> base align=<span class="number">8</span></span><br><span class="line"><span class="built_in">C</span> (<span class="number">0x0</span>x7fa0d22ea900) <span class="number">0</span></span><br><span class="line">    vptr=((&amp; C::vtable <span class="keyword">for</span> C) + <span class="number">16</span>)</span><br><span class="line">  <span class="built_in">A</span> (<span class="number">0x0</span>x7fa0d2424e40) <span class="number">0</span> nearly-empty</span><br><span class="line">      primary-<span class="keyword">for</span> <span class="built_in">C</span> (<span class="number">0x0</span>x7fa0d22ea900)</span><br><span class="line">  <span class="built_in">B</span> (<span class="number">0x0</span>x7fa0d2424ea0) <span class="number">8</span> nearly-empty</span><br><span class="line">      vptr=((&amp; C::vtable <span class="keyword">for</span> C) + <span class="number">64</span>)</span><br><span class="line">  <span class="built_in">D</span> (<span class="number">0x0</span>x7fa0d2424f00) <span class="number">16</span> nearly-empty</span><br><span class="line">      vptr=((&amp; C::vtable <span class="keyword">for</span> C) + <span class="number">96</span>)</span><br><span class="line">  <span class="built_in">E</span> (<span class="number">0x0</span>x7fa0d2424f60) <span class="number">24</span> nearly-empty</span><br><span class="line">      vptr=((&amp; C::vtable <span class="keyword">for</span> C) + <span class="number">128</span>)</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E7%BC%96%E8%AF%91%E5%99%A8%E7%94%9F%E6%88%90%E7%9A%84%E6%9E%84%E9%80%A0%EF%BC%8C%E6%8B%B7%E8%B4%9D%EF%BC%8C%E7%A7%BB%E5%8A%A8%E5%87%BD%E6%95%B0%20/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/%E7%BC%96%E8%AF%91%E5%99%A8%E7%94%9F%E6%88%90%E7%9A%84%E6%9E%84%E9%80%A0%EF%BC%8C%E6%8B%B7%E8%B4%9D%EF%BC%8C%E7%A7%BB%E5%8A%A8%E5%87%BD%E6%95%B0%20/" class="post-title-link" itemprop="url">C++ 编译器自动生成的构造，拷贝，移动函数</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>989</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>什么时候自动生成？</p>
+</blockquote>
+<ul>
+<li>没声明且用到了，则编译器自动生成一个默认的。</li>
+</ul>
+<blockquote>
+<p>怎么禁止编译器生成？</p>
+</blockquote>
+<ul>
+<li>≥ C++11 用delete</li>
+<li>只声明不实现，放在private中，如果调用了，报链接错误，undefined reference to xxx</li>
+</ul>
+<h2 id="空类，只用到默认构造"><a href="#空类，只用到默认构造" class="headerlink" title="空类，只用到默认构造"></a>空类，只用到默认构造</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用 cppinsights 能看到：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="空类，用到构造、拷贝构造、拷贝赋值"><a href="#空类，用到构造、拷贝构造、拷贝赋值" class="headerlink" title="空类，用到构造、拷贝构造、拷贝赋值"></a>空类，用到构造、拷贝构造、拷贝赋值</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  <span class="function">Empty <span class="title">e2</span><span class="params">(e1)</span></span>;</span><br><span class="line">  e2 = e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty(const Empty &amp;) noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty &amp; operator=(const Empty &amp;) noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1 = <span class="built_in">Empty</span>();</span><br><span class="line">  Empty e2 = <span class="built_in">Empty</span>(e1);</span><br><span class="line">  e2.<span class="keyword">operator</span>=(e1);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="空类，只用到默认构造、拷贝赋值"><a href="#空类，只用到默认构造、拷贝赋值" class="headerlink" title="空类，只用到默认构造、拷贝赋值"></a>空类，只用到默认构造、拷贝赋值</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  Empty e2 = e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty(const Empty &amp;) noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  Empty e2 = <span class="built_in">Empty</span>(e1);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
       
     </div>
 
