@@ -491,95 +491,6 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/glibc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/linux/glibc/" class="post-title-link" itemprop="url">Linux glibc</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>1.6k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>3 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="编译glibc"><a href="#编译glibc" class="headerlink" title="编译glibc"></a>编译glibc</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git://sourceware.org/git/glibc.git</span><br><span class="line"><span class="built_in">cd</span> glibc</span><br><span class="line">git checkout glibc-2.32</span><br><span class="line"><span class="built_in">mkdir</span> build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line"><span class="built_in">export</span> glibc_install=<span class="string">&quot;<span class="subst">$(pwd)</span>/install&quot;</span></span><br><span class="line">../configure --prefix <span class="string">&quot;<span class="variable">$glibc_install</span>&quot;</span></span><br><span class="line">make -j `<span class="built_in">nproc</span>`</span><br><span class="line">make install -j `<span class="built_in">nproc</span>`</span><br></pre></td></tr></table></figure>
-
-<h2 id="用linux自带的gcc编译程序并链接glibc"><a href="#用linux自带的gcc编译程序并链接glibc" class="headerlink" title="用linux自带的gcc编译程序并链接glibc"></a>用linux自带的gcc编译程序并链接glibc</h2><p>test_glibc.c</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;assert.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;gnu/libc-version.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdatomic.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;threads.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">atomic_int</span> acnt;</span><br><span class="line"><span class="type">int</span> cnt;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">f</span><span class="params">(<span class="type">void</span>* thr_data)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> n = <span class="number">0</span>; n &lt; <span class="number">1000</span>; ++n) &#123;</span><br><span class="line">        ++cnt;</span><br><span class="line">        ++acnt;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span> &#123;</span><br><span class="line">    <span class="comment">/* Basic library version check. */</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;gnu_get_libc_version() = %s\n&quot;</span>, gnu_get_libc_version());</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Exercise thrd_create from -pthread,</span></span><br><span class="line"><span class="comment">     * which is not present in glibc 2.27 in Ubuntu 18.04.</span></span><br><span class="line"><span class="comment">     * https://stackoverflow.com/questions/56810/how-do-i-start-threads-in-plain-c/52453291#52453291 */</span></span><br><span class="line">    <span class="type">thrd_t</span> thr[<span class="number">10</span>];</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> n = <span class="number">0</span>; n &lt; <span class="number">10</span>; ++n)</span><br><span class="line">        thrd_create(&amp;thr[n], f, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> n = <span class="number">0</span>; n &lt; <span class="number">10</span>; ++n)</span><br><span class="line">        thrd_join(thr[n], <span class="literal">NULL</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;The atomic counter is %u\n&quot;</span>, acnt);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;The non-atomic counter is %u\n&quot;</span>, cnt);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>test_glibc.sh</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env bash</span></span><br><span class="line"><span class="built_in">set</span> -eux</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> glibc_install=<span class="string">&quot;<span class="subst">$(pwd)</span>/build/install&quot;</span></span><br><span class="line"></span><br><span class="line">gcc \</span><br><span class="line">  -L <span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/lib&quot;</span> \</span><br><span class="line">  -I <span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/include&quot;</span> \</span><br><span class="line">  -Wl,--rpath=<span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/lib&quot;</span> \</span><br><span class="line">  -Wl,--dynamic-linker=<span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/lib/ld-linux-x86-64.so.2&quot;</span> \</span><br><span class="line">  -std=c11 \</span><br><span class="line">  -o test_glibc.out \</span><br><span class="line">  -v \</span><br><span class="line">  test_glibc.c \</span><br><span class="line">  -pthread \</span><br><span class="line">;</span><br><span class="line">ldd ./test_glibc.out</span><br><span class="line">./test_glibc.out</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/inode/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -677,6 +588,95 @@
 
 <p><a target="_blank" rel="noopener" href="https://stackoverflow.com/a/51019769/11850070">ext4也复用</a></p>
 
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/glibc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/linux/glibc/" class="post-title-link" itemprop="url">Linux glibc</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.6k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="编译glibc"><a href="#编译glibc" class="headerlink" title="编译glibc"></a>编译glibc</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git://sourceware.org/git/glibc.git</span><br><span class="line"><span class="built_in">cd</span> glibc</span><br><span class="line">git checkout glibc-2.32</span><br><span class="line"><span class="built_in">mkdir</span> build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line"><span class="built_in">export</span> glibc_install=<span class="string">&quot;<span class="subst">$(pwd)</span>/install&quot;</span></span><br><span class="line">../configure --prefix <span class="string">&quot;<span class="variable">$glibc_install</span>&quot;</span></span><br><span class="line">make -j `<span class="built_in">nproc</span>`</span><br><span class="line">make install -j `<span class="built_in">nproc</span>`</span><br></pre></td></tr></table></figure>
+
+<h2 id="用linux自带的gcc编译程序并链接glibc"><a href="#用linux自带的gcc编译程序并链接glibc" class="headerlink" title="用linux自带的gcc编译程序并链接glibc"></a>用linux自带的gcc编译程序并链接glibc</h2><p>test_glibc.c</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;assert.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;gnu/libc-version.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdatomic.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;threads.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">atomic_int</span> acnt;</span><br><span class="line"><span class="type">int</span> cnt;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">f</span><span class="params">(<span class="type">void</span>* thr_data)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> n = <span class="number">0</span>; n &lt; <span class="number">1000</span>; ++n) &#123;</span><br><span class="line">        ++cnt;</span><br><span class="line">        ++acnt;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span> &#123;</span><br><span class="line">    <span class="comment">/* Basic library version check. */</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;gnu_get_libc_version() = %s\n&quot;</span>, gnu_get_libc_version());</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Exercise thrd_create from -pthread,</span></span><br><span class="line"><span class="comment">     * which is not present in glibc 2.27 in Ubuntu 18.04.</span></span><br><span class="line"><span class="comment">     * https://stackoverflow.com/questions/56810/how-do-i-start-threads-in-plain-c/52453291#52453291 */</span></span><br><span class="line">    <span class="type">thrd_t</span> thr[<span class="number">10</span>];</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> n = <span class="number">0</span>; n &lt; <span class="number">10</span>; ++n)</span><br><span class="line">        thrd_create(&amp;thr[n], f, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> n = <span class="number">0</span>; n &lt; <span class="number">10</span>; ++n)</span><br><span class="line">        thrd_join(thr[n], <span class="literal">NULL</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;The atomic counter is %u\n&quot;</span>, acnt);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;The non-atomic counter is %u\n&quot;</span>, cnt);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>test_glibc.sh</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env bash</span></span><br><span class="line"><span class="built_in">set</span> -eux</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> glibc_install=<span class="string">&quot;<span class="subst">$(pwd)</span>/build/install&quot;</span></span><br><span class="line"></span><br><span class="line">gcc \</span><br><span class="line">  -L <span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/lib&quot;</span> \</span><br><span class="line">  -I <span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/include&quot;</span> \</span><br><span class="line">  -Wl,--rpath=<span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/lib&quot;</span> \</span><br><span class="line">  -Wl,--dynamic-linker=<span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/lib/ld-linux-x86-64.so.2&quot;</span> \</span><br><span class="line">  -std=c11 \</span><br><span class="line">  -o test_glibc.out \</span><br><span class="line">  -v \</span><br><span class="line">  test_glibc.c \</span><br><span class="line">  -pthread \</span><br><span class="line">;</span><br><span class="line">ldd ./test_glibc.out</span><br><span class="line">./test_glibc.out</span><br></pre></td></tr></table></figure>
       
     </div>
 
