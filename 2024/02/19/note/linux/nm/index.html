@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="nm的使用按地址升序打印并demangle12-C demangle symbols-n 按地址升序  12345678910$ nm -n -C demo                 U __cxa_atexit@@GLIBC_2.2.5                 w __gmon_start__                 U __libc_start_main@@GLIBC_2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux nm">
+<meta property="og:url" content="http://example.com/2024/02/19/note/linux/nm/index.html">
+<meta property="og:site_name" content="折纸飞向麦田的博客">
+<meta property="og:description" content="nm的使用按地址升序打印并demangle12-C demangle symbols-n 按地址升序  12345678910$ nm -n -C demo                 U __cxa_atexit@@GLIBC_2.2.5                 w __gmon_start__                 U __libc_start_main@@GLIBC_2">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-02-19T12:08:28.148Z">
+<meta property="article:modified_time" content="2024-02-19T12:08:28.148Z">
+<meta property="article:author" content="折纸飞向麦田">
+<meta property="article:tag" content="c++">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2024/02/19/note/linux/nm/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/02/19/note/linux/nm/","path":"2024/02/19/note/linux/nm/","title":"linux nm"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>linux nm | 折纸飞向麦田的博客</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?81afe862f494d24a95a49966a87c3b00"></script>
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">折纸飞向麦田的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#nm%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">nm的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%89%E5%9C%B0%E5%9D%80%E5%8D%87%E5%BA%8F%E6%89%93%E5%8D%B0%E5%B9%B6demangle"><span class="nav-number">1.1.</span> <span class="nav-text">按地址升序打印并demangle</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90C-vtable%E5%86%85%E5%AE%B9"><span class="nav-number">1.2.</span> <span class="nav-text">分析C++ vtable内容</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#nm%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">nm原理</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">折纸飞向麦田</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/nm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="linux nm | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux nm
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5.6k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>9 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="nm的使用"><a href="#nm的使用" class="headerlink" title="nm的使用"></a>nm的使用</h1><h2 id="按地址升序打印并demangle"><a href="#按地址升序打印并demangle" class="headerlink" title="按地址升序打印并demangle"></a>按地址升序打印并demangle</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-C demangle symbols</span><br><span class="line">-n 按地址升序</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ nm -n -C demo</span><br><span class="line">                 U __cxa_atexit@@GLIBC_2.2.5</span><br><span class="line">                 w __gmon_start__</span><br><span class="line">                 U __libc_start_main@@GLIBC_2.2.5</span><br><span class="line">                 U std::ios_base::Init::Init()@@GLIBCXX_3.4</span><br><span class="line">0000000000400708 T _init</span><br><span class="line">00000000004007c0 T _start</span><br><span class="line">...</span><br><span class="line">0000000000601171 b std::__ioinit</span><br><span class="line">0000000000601178 B _end</span><br></pre></td></tr></table></figure>
+
+<h2 id="分析C-vtable内容"><a href="#分析C-vtable内容" class="headerlink" title="分析C++ vtable内容"></a>分析C++ vtable内容</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> </span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;A::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span> : <span class="keyword">public</span> A</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;B::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span> : <span class="keyword">public</span> B</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;C::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	C c;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>先用objdump取出vtable内若干符号的地址，然后用nm找出地址对应的符号</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -C demangle</span></span><br><span class="line"><span class="comment"># -d disassemble</span></span><br><span class="line">[root@ZLPC-wangqingjia demo]<span class="comment"># objdump -C -d --section=.rodata demo</span></span><br><span class="line"></span><br><span class="line">demo:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line">Disassembly of section .rodata:</span><br><span class="line"></span><br><span class="line">00000000004009b0 &lt;_IO_stdin_used&gt;:</span><br><span class="line">  4009b0:       01 00 02 00 00 00 00 00                             ........        </span><br><span class="line"></span><br><span class="line">00000000004009b8 &lt;__dso_handle&gt;:</span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">00000000004009c0 &lt;std::piecewise_construct&gt;:</span><br><span class="line">  4009c0:       00 43 3a 3a 66 6f 6f 00                             .C::foo.        </span><br><span class="line"></span><br><span class="line">00000000004009c8 &lt;vtable <span class="keyword">for</span> C&gt;:</span><br><span class="line">        ...</span><br><span class="line">  4009d0:       e0 09 40 00 00 00 00 00 fa 08 40 00 00 00 00 00     ..@.......@.....</span><br><span class="line"></span><br><span class="line">00000000004009e0 &lt;typeinfo <span class="keyword">for</span> C&gt;:</span><br><span class="line">  4009e0:       b0 0d 60 00 00 00 00 00 f8 09 40 00 00 00 00 00     ..`.......@.....</span><br><span class="line">  4009f0:       00 0a 40 00 00 00 00 00                             ..@.....        </span><br><span class="line"></span><br><span class="line">00000000004009f8 &lt;typeinfo name <span class="keyword">for</span> C&gt;:</span><br><span class="line">  4009f8:       31 43 00 00 00 00 00 00                             1C......        </span><br><span class="line"></span><br><span class="line">0000000000400a00 &lt;typeinfo <span class="keyword">for</span> B&gt;:</span><br><span class="line">  400a00:       b0 0d 60 00 00 00 00 00 18 0a 40 00 00 00 00 00     ..`.......@.....</span><br><span class="line">  400a10:       20 0a 40 00 00 00 00 00                              .@.....        </span><br><span class="line"></span><br><span class="line">0000000000400a18 &lt;typeinfo name <span class="keyword">for</span> B&gt;:</span><br><span class="line">  400a18:       31 42 00 00 00 00 00 00                             1B......        </span><br><span class="line"></span><br><span class="line">0000000000400a20 &lt;typeinfo <span class="keyword">for</span> A&gt;:</span><br><span class="line">  400a20:       50 0d 60 00 00 00 00 00 30 0a 40 00 00 00 00 00     P.`.....0.@.....</span><br><span class="line"></span><br><span class="line">0000000000400a30 &lt;typeinfo name <span class="keyword">for</span> A&gt;:</span><br><span class="line">  400a30:       31 41 00                                            1A.</span><br><span class="line"></span><br><span class="line"><span class="comment"># 小端存储，数值低位在低地址</span></span><br><span class="line">[root@ZLPC-wangqingjia demo]<span class="comment"># nm -n -C demo | grep 4009e0</span></span><br><span class="line">00000000004009e0 V typeinfo <span class="keyword">for</span> C</span><br><span class="line">[root@ZLPC-wangqingjia demo]<span class="comment"># nm -n -C demo | grep 4008fa</span></span><br><span class="line">00000000004008fa W C::foo()</span><br></pre></td></tr></table></figure>
+
+<p>而用 g++ -S 生成的反汇编为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">vtable for C:</span><br><span class="line">	.quad	0</span><br><span class="line">	.quad	typeinfo for C</span><br><span class="line">	.quad	C::foo()</span><br><span class="line">	.weak	typeinfo for C</span><br><span class="line">	.section	.rodata._ZTI1C,&quot;aG&quot;,@progbits,typeinfo for C,comdat</span><br><span class="line">	.align 8</span><br><span class="line">	.type	typeinfo for C, @object</span><br><span class="line">	.size	typeinfo for C, 24</span><br></pre></td></tr></table></figure>
+
+<p>每一列代表什么意思？</p>
+<ul>
+<li>符号值，即地址</li>
+<li>符号类型, 一般小写是local，大写是global(external), 例外是：”u”,”v”,”w” 这三个小写的是global的。<ul>
+<li>A - The symbol’s value is absolute, and will not be changed by further linking.</li>
+<li>B&#x2F;b - The symbol is in the uninitialized data section (known as BSS).</li>
+<li>C - The symbol is common.  Common symbols are uninitialized data.  When linking, multiple common symbols may appear with the same name.  If the symbol is defined anywhere, the common symbols are treated as undefined references. (没理解)</li>
+<li>D&#x2F;d - The symbol is in the initialized data section.</li>
+<li>G&#x2F;g - The symbol is in an initialized data section for small objects.  Some object file formats permit more efficient access to small data objects, such as a global int variable as opposed to a large global array.</li>
+<li>I - The symbol is an indirect reference to another symbol.</li>
+<li>i - For ELF format files this indicates that the symbol is an indirect function.  This is a GNU extension to the standard set of ELF symbol types.  It indicates a symbol which if referenced by a relocation does not evaluate to its address, but instead must be invoked at runtime. The runtime execution will then return the value to be used in the relocation.</li>
+<li>N - The symbol is a debugging symbol.</li>
+<li>p - The symbols is in a stack unwind section. (没理解)</li>
+<li>R&#x2F;r - The symbol is in a read only data section.</li>
+<li>S&#x2F;s - The symbol is in an uninitialized data section for small objects.</li>
+<li>T&#x2F;t - The symbol is in the text (code) section.</li>
+<li>U - The symbol is undefined.</li>
+<li>u - The symbol is a unique global symbol.  This is a GNU extension to the standard set of ELF symbol bindings.  For such a symbol the dynamic linker will make sure that in the entire process there is just one symbol with this name and type in use.</li>
+<li>V&#x2F;v - The symbol is a weak object.  When a weak defined symbol is linked with a normal defined symbol, the normal defined symbol is used with no error.  When a weak undefined symbol is linked and the symbol is not defined, the value of the weak symbol becomes zero with no error.  On some systems, uppercase indicates that a default value has been specified.</li>
+<li>W&#x2F;w - The symbol is a weak symbol that has not been specifically tagged as a weak object symbol.</li>
+<li>‘-‘ - The symbol is a stabs symbol in an a.out object file.  In this case, the next values printed are the stabs other field, the stabs desc field, and the stab type.  Stabs symbols are used to hold debugging information.</li>
+<li>‘?’ - The symbol type is unknown, or object file format specific.</li>
+</ul>
+</li>
+<li>符号名</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]# nm a.out -C | grep &quot;std::_Sp_counted_base&quot;</span><br><span class="line">0000000000400e40 W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::_M_destroy()</span><br><span class="line">0000000000400d48 W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::_M_release()</span><br><span class="line">0000000000400dc4 W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::_M_add_ref_copy()</span><br><span class="line">0000000000401370 W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::_Sp_counted_base()</span><br><span class="line">0000000000401370 W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::_Sp_counted_base()</span><br><span class="line">0000000000400eee W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::~_Sp_counted_base()</span><br><span class="line">0000000000400ed6 W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::~_Sp_counted_base()</span><br><span class="line">0000000000400ed6 W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::~_Sp_counted_base()</span><br><span class="line">00000000004018a8 V typeinfo for std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;</span><br><span class="line">00000000004018c0 V typeinfo name for std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;</span><br><span class="line">00000000004017f8 V vtable for std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="nm原理"><a href="#nm原理" class="headerlink" title="nm原理"></a>nm原理</h1><p>我很好奇 <code>nm</code> 怎么从elf目标文件中获取的符号信息。</p>
+<p>用GDB跟一下，其实是调用 BFD 接口获取符号表。</p>
+<blockquote>
+<p>The first use is to read an object file. The object file readers are programs like ‘gdb’, ‘nm’, ‘objdump’, and ‘objcopy’. These programs use BFD to view an object file in a generic form. The official BFD interface is normally fully adequate for these programs. - bfd&#x2F;doc&#x2F;bfdint.texi</p>
+</blockquote>
+<p>gas、ld、nm、objdump、objcopy 这些工具，均借助BFD读写二进制目标文件。</p>
+<p>所以要看BFD怎么从elf目标文件中获取符号表。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/c/" rel="tag"># c++</a>
+              <a href="/tags/linux/" rel="tag"># linux</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/02/19/note/linux/objdump/" rel="prev" title="Linux objdump">
+                  <i class="fa fa-angle-left"></i> Linux objdump
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/02/19/note/linux/linux%20tee%20cmd/" rel="next" title="Linux tee cmd">
+                  Linux tee cmd <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">折纸飞向麦田</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">197k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:29</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

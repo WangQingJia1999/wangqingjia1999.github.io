@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="备忘Linux下 AT&amp;T 汇编语法。 GAS文档 操作数的顺序从左向右 1movq %rsp, %rbp &#x2F;&#x2F; copy %rsp to %rbp  其他一些特点 mnemonic suffixes indicate the size of the operands (q for quad, etc.) registers are prefixed with % and immediat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux GAS">
+<meta property="og:url" content="http://example.com/2024/02/19/note/linux/gas/index.html">
+<meta property="og:site_name" content="折纸飞向麦田的博客">
+<meta property="og:description" content="备忘Linux下 AT&amp;T 汇编语法。 GAS文档 操作数的顺序从左向右 1movq %rsp, %rbp &#x2F;&#x2F; copy %rsp to %rbp  其他一些特点 mnemonic suffixes indicate the size of the operands (q for quad, etc.) registers are prefixed with % and immediat">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/assets/2023-10-29-22-46-18-image.png">
+<meta property="og:image" content="http://example.com/assets/2023-10-29-22-48-19-image.png">
+<meta property="og:image" content="http://example.com/assets/image-13.png">
+<meta property="article:published_time" content="2024-02-19T12:08:28.146Z">
+<meta property="article:modified_time" content="2024-02-19T12:09:39.447Z">
+<meta property="article:author" content="折纸飞向麦田">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="asm">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/assets/2023-10-29-22-46-18-image.png">
+
+
+<link rel="canonical" href="http://example.com/2024/02/19/note/linux/gas/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/02/19/note/linux/gas/","path":"2024/02/19/note/linux/gas/","title":"Linux GAS"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Linux GAS | 折纸飞向麦田的博客</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?81afe862f494d24a95a49966a87c3b00"></script>
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">折纸飞向麦田的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E6%95%B0%E7%9A%84%E9%A1%BA%E5%BA%8F"><span class="nav-number">1.</span> <span class="nav-text">操作数的顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E4%B8%80%E4%BA%9B%E7%89%B9%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text">其他一些特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%86%E6%8B%AC%E5%8F%B7"><span class="nav-number">3.</span> <span class="nav-text">圆括号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Symbol-%E7%AC%A6%E5%8F%B7"><span class="nav-number">4.</span> <span class="nav-text">Symbol 符号</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7%E5%90%8D"><span class="nav-number">4.1.</span> <span class="nav-text">符号名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#label"><span class="nav-number">4.2.</span> <span class="nav-text">label</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#String-%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">5.</span> <span class="nav-text">String 字符串</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#string"><span class="nav-number">5.1.</span> <span class="nav-text">.string</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ascii"><span class="nav-number">5.2.</span> <span class="nav-text">.ascii</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#L"><span class="nav-number">6.</span> <span class="nav-text">.L</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LFB-LFE-LBB-LBE"><span class="nav-number">7.</span> <span class="nav-text">.LFB, .LFE, .LBB, .LBE</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Section"><span class="nav-number"></span> <span class="nav-text">Section</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Directive-%E6%8C%87%E7%A4%BA%E7%AC%A6"><span class="nav-number"></span> <span class="nav-text">Directive 指示符</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#quad"><span class="nav-number">1.</span> <span class="nav-text">.quad</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#movq-movl-movw"><span class="nav-number"></span> <span class="nav-text">movq, movl, movw</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#call"><span class="nav-number"></span> <span class="nav-text">call</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Effective-Address"><span class="nav-number"></span> <span class="nav-text">Effective Address</span></a></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">折纸飞向麦田</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/gas/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Linux GAS | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux GAS
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-02-19 20:08:28 / 修改时间：20:09:39" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>5 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>备忘Linux下 AT&amp;T 汇编语法。</p>
+<p><a target="_blank" rel="noopener" href="https://sourceware.org/binutils/docs/as/">GAS文档</a></p>
+<h2 id="操作数的顺序"><a href="#操作数的顺序" class="headerlink" title="操作数的顺序"></a>操作数的顺序</h2><p>从左向右</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">movq %rsp, %rbp <span class="comment">// copy %rsp to %rbp</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="其他一些特点"><a href="#其他一些特点" class="headerlink" title="其他一些特点"></a>其他一些特点</h2><ul>
+<li>mnemonic suffixes indicate the size of the operands (<code>q</code> for quad, etc.)</li>
+<li>registers are prefixed with <code>%</code> and immediate values with <code>$</code></li>
+<li>effective addresses are in the form <code>DISP(BASE, INDEX, SCALE)</code> (DISP + BASE + INDEX * SCALE)</li>
+<li>Indirect jump&#x2F;call operands indicated with * (as opposed to direct).</li>
+</ul>
+<h2 id="圆括号"><a href="#圆括号" class="headerlink" title="圆括号"></a>圆括号</h2><p>如下代码中圆括号的含义？</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov (%rax), %eax</span><br></pre></td></tr></table></figure>
+
+<p>解释：<br>从 <code>rax</code> 寄存器中保存的内存地址读出4字节，复制到 <code>eax</code> 寄存器。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/41232333/what-is-the-difference-between-mov-rax-eax-and-mov-rax-eax">详见 stackoverflow</a></li>
+</ul>
+<p>如下代码含义？</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov %rcx, %rax</span><br></pre></td></tr></table></figure>
+
+<p>解释：复制 <code>rcx</code> 中8字节到 <code>rax</code> 中</p>
+<p>因此，圆括号表示解引用。</p>
+<p>如果反过来，则是将 <code>rax</code> 中的8字节，拷贝到 <code>rbx</code> 所指的8字节内存中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov %rax,(%rbx)</span><br></pre></td></tr></table></figure>
+
+<p>等价于c中的（<code>rax</code> 中是 value，<code>rbx</code> 中是 ptr）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*ptr = value;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Symbol-符号"><a href="#Symbol-符号" class="headerlink" title="Symbol 符号"></a>Symbol 符号</h2><blockquote>
+<p>Symbols are a central concept: the programmer uses symbols to name things, the linker uses symbols to link, and the debugger uses symbols to debug.</p>
+</blockquote>
+<h3 id="符号名"><a href="#符号名" class="headerlink" title="符号名"></a>符号名</h3><ul>
+<li>区分大小写，foo !&#x3D; Foo</li>
+<li>符号名首个字符可以是 字母、英文句号、短下划线或者$</li>
+<li>后面跟若干数字、字母、$</li>
+</ul>
+<h3 id="label"><a href="#label" class="headerlink" title="label"></a>label</h3><p>符号名+’:’</p>
+<h2 id="String-字符串"><a href="#String-字符串" class="headerlink" title="String 字符串"></a>String 字符串</h2><h3 id="string"><a href="#string" class="headerlink" title=".string"></a>.string</h3><p>末尾加一个字节，值为0</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.data</span><br><span class="line">s3:</span><br><span class="line">    .string &quot;ccc&quot;</span><br><span class="line">    .ascii &quot;ccc&quot;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ as demo.s &amp;&amp; objdump -sD</span><br><span class="line"></span><br><span class="line">a.out:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line">Contents of section .data:</span><br><span class="line"> 0000 63636300 636363                      ccc.ccc         </span><br><span class="line"></span><br><span class="line">Disassembly of section .data:</span><br><span class="line"></span><br><span class="line">0000000000000000 &lt;s3&gt;:</span><br><span class="line">   0:   63 63 63                movslq 0x63(%rbx),%esp</span><br><span class="line">   3:   00 63 63                add    %ah,0x63(%rbx)</span><br><span class="line">   6:   63                      .byte 0x63</span><br></pre></td></tr></table></figure>
+
+<h3 id="ascii"><a href="#ascii" class="headerlink" title=".ascii"></a>.ascii</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">.data</span><br><span class="line">.s1:</span><br><span class="line">    .ascii &quot;aaa&quot;</span><br><span class="line">s2:</span><br><span class="line">    .ascii &quot;bbb&quot;</span><br><span class="line"></span><br><span class="line">.text</span><br><span class="line">s3:</span><br><span class="line">    .ascii &quot;ccc&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ as demo.s &amp;&amp; objdump -s a.out </span><br><span class="line"></span><br><span class="line">a.out:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line">Contents of section .text:</span><br><span class="line"> 0000 636363                               ccc             </span><br><span class="line">Contents of section .data:</span><br><span class="line"> 0000 61616162 6262                        aaabbb          </span><br></pre></td></tr></table></figure>
+
+<h2 id="L"><a href="#L" class="headerlink" title=".L"></a>.L</h2><p>GCC uses the .L for local labels.</p>
+<h2 id="LFB-LFE-LBB-LBE"><a href="#LFB-LFE-LBB-LBE" class="headerlink" title=".LFB, .LFE, .LBB, .LBE"></a>.LFB, .LFE, .LBB, .LBE</h2><p>They are all defined under <a target="_blank" rel="noopener" href="https://github.com/gcc-mirror/gcc/blob/releases/gcc-4.8.2/gcc/dwarf2out.c">gcc&#x2F;dwarf2out.c</a> on GCC 4.8.2.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> FUNC_BEGIN_LABEL  <span class="string">&quot;LFB&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FUNC_END_LABEL    <span class="string">&quot;LFE&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BLOCK_BEGIN_LABEL <span class="string">&quot;LBB&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BLOCK_END_LABEL   <span class="string">&quot;LBE&quot;</span></span></span><br><span class="line">ASM_GENERATE_INTERNAL_LABEL (loclabel, <span class="string">&quot;LVL&quot;</span>, loclabel_num);</span><br></pre></td></tr></table></figure>
+
+<h1 id="Section"><a href="#Section" class="headerlink" title="Section"></a>Section</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">                      +-----+----+--+</span><br><span class="line">partial program # 1:  |ttttt|dddd|00|</span><br><span class="line">                      +-----+----+--+</span><br><span class="line"></span><br><span class="line">                      text   data bss</span><br><span class="line">                      seg.   seg. seg.</span><br><span class="line"></span><br><span class="line">                      +---+---+---+</span><br><span class="line">partial program # 2:  |TTT|DDD|000|</span><br><span class="line">                      +---+---+---+</span><br><span class="line"></span><br><span class="line">                      +--+---+-----+--+----+---+-----+~~</span><br><span class="line">linked program:       |  |TTT|ttttt|  |dddd|DDD|00000|</span><br><span class="line">                      +--+---+-----+--+----+---+-----+~~</span><br><span class="line"></span><br><span class="line">    addresses:        0 …</span><br></pre></td></tr></table></figure>
+
+<p>TODO: section group 是什么？</p>
+<h1 id="Directive-指示符"><a href="#Directive-指示符" class="headerlink" title="Directive 指示符"></a>Directive 指示符</h1><p>All assembler directives have names that begin with a period <code>.</code></p>
+<p>The rest of the name is letters, usually in lower case.</p>
+<blockquote>
+<p>用途</p>
+</blockquote>
+<p>In AT&amp;T assembly syntax, a directive is a command that is used to instruct the assembler on how to process the information in the assembly source code. Unlike instructions, which tell the CPU what to do, directives tell the assembler how to process the information. </p>
+<h2 id="quad"><a href="#quad" class="headerlink" title=".quad"></a>.quad</h2><p><a target="_blank" rel="noopener" href="https://sourceware.org/binutils/docs/as/Quad.html">填充8字节</a></p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://sourceware.org/binutils/docs-2.18/as/LNS-directives.html#LNS-directives">.loc</a> </p>
+</blockquote>
+<p>a debugging directive, and it only appears in GCC if you tell the compiler to generate debugging information with -ggdb or -g.</p>
+<h1 id="movq-movl-movw"><a href="#movq-movl-movw" class="headerlink" title="movq, movl, movw"></a>movq, movl, movw</h1><ol>
+<li><strong><code>movw</code></strong>: move a word (16 bits)</li>
+<li><strong><code>movl</code></strong>: move a long word (32 bits)</li>
+<li><strong><code>movq</code></strong>: move a quadword (64 bits)</li>
+</ol>
+<h1 id="call"><a href="#call" class="headerlink" title="call"></a>call</h1><p>执行后，将 <code>rip</code> 放入栈顶，然后调新函数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">.global main</span><br><span class="line"></span><br><span class="line">foo:</span><br><span class="line">    pushq %rax</span><br><span class="line">    movq %rax, %rbp</span><br><span class="line"></span><br><span class="line">main:    </span><br><span class="line">    call foo // 调用foo之前，将rip入栈</span><br><span class="line"></span><br><span class="line">    movq $60, %rax  # syscall: exit</span><br><span class="line">    xorq %rdi, %rdi # status: 0</span><br><span class="line">    syscall</span><br></pre></td></tr></table></figure>
+
+<p>编译</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc call.s -g -o call</span><br></pre></td></tr></table></figure>
+
+<p>用GDB调试</p>
+<p><img src="/../assets/2023-10-29-22-46-18-image.png"></p>
+<p>进入foo之后，打印栈顶8字节，正是rip的值。同时发现，rip指向栈顶元素（8个字节中最低位一个字节 0x02，因小端存储）</p>
+<p><img src="/../assets/2023-10-29-22-48-19-image.png"></p>
+<h1 id="Effective-Address"><a href="#Effective-Address" class="headerlink" title="Effective Address"></a>Effective Address</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[base + index*scale + disp]      # Intel, including GAS .<span class="function">intel_syntax noprefix</span></span><br><span class="line"><span class="function"><span class="title">disp</span><span class="params">(base, index, scale)</span>         # AT&amp;T</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/../assets/image-13.png" alt="Alt text"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/linux/" rel="tag"># linux</a>
+              <a href="/tags/asm/" rel="tag"># asm</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/02/19/note/linux/Linux%20kernel%20compiling/" rel="prev" title="编译Linux内核">
+                  <i class="fa fa-angle-left"></i> 编译Linux内核
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/02/19/note/linux/ftrace/" rel="next" title="Linux Ftrace">
+                  Linux Ftrace <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">折纸飞向麦田</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">197k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:29</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
