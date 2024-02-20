@@ -176,6 +176,173 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/gas/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/linux/gas/" class="post-title-link" itemprop="url">Linux GAS</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-02-19 20:08:28 / 修改时间：20:09:39" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>5 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>备忘Linux下 AT&amp;T 汇编语法。</p>
+<p><a target="_blank" rel="noopener" href="https://sourceware.org/binutils/docs/as/">GAS文档</a></p>
+<h2 id="操作数的顺序"><a href="#操作数的顺序" class="headerlink" title="操作数的顺序"></a>操作数的顺序</h2><p>从左向右</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">movq %rsp, %rbp <span class="comment">// copy %rsp to %rbp</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="其他一些特点"><a href="#其他一些特点" class="headerlink" title="其他一些特点"></a>其他一些特点</h2><ul>
+<li>mnemonic suffixes indicate the size of the operands (<code>q</code> for quad, etc.)</li>
+<li>registers are prefixed with <code>%</code> and immediate values with <code>$</code></li>
+<li>effective addresses are in the form <code>DISP(BASE, INDEX, SCALE)</code> (DISP + BASE + INDEX * SCALE)</li>
+<li>Indirect jump&#x2F;call operands indicated with * (as opposed to direct).</li>
+</ul>
+<h2 id="圆括号"><a href="#圆括号" class="headerlink" title="圆括号"></a>圆括号</h2><p>如下代码中圆括号的含义？</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov (%rax), %eax</span><br></pre></td></tr></table></figure>
+
+<p>解释：<br>从 <code>rax</code> 寄存器中保存的内存地址读出4字节，复制到 <code>eax</code> 寄存器。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/41232333/what-is-the-difference-between-mov-rax-eax-and-mov-rax-eax">详见 stackoverflow</a></li>
+</ul>
+<p>如下代码含义？</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov %rcx, %rax</span><br></pre></td></tr></table></figure>
+
+<p>解释：复制 <code>rcx</code> 中8字节到 <code>rax</code> 中</p>
+<p>因此，圆括号表示解引用。</p>
+<p>如果反过来，则是将 <code>rax</code> 中的8字节，拷贝到 <code>rbx</code> 所指的8字节内存中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov %rax,(%rbx)</span><br></pre></td></tr></table></figure>
+
+<p>等价于c中的（<code>rax</code> 中是 value，<code>rbx</code> 中是 ptr）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*ptr = value;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Symbol-符号"><a href="#Symbol-符号" class="headerlink" title="Symbol 符号"></a>Symbol 符号</h2><blockquote>
+<p>Symbols are a central concept: the programmer uses symbols to name things, the linker uses symbols to link, and the debugger uses symbols to debug.</p>
+</blockquote>
+<h3 id="符号名"><a href="#符号名" class="headerlink" title="符号名"></a>符号名</h3><ul>
+<li>区分大小写，foo !&#x3D; Foo</li>
+<li>符号名首个字符可以是 字母、英文句号、短下划线或者$</li>
+<li>后面跟若干数字、字母、$</li>
+</ul>
+<h3 id="label"><a href="#label" class="headerlink" title="label"></a>label</h3><p>符号名+’:’</p>
+<h2 id="String-字符串"><a href="#String-字符串" class="headerlink" title="String 字符串"></a>String 字符串</h2><h3 id="string"><a href="#string" class="headerlink" title=".string"></a>.string</h3><p>末尾加一个字节，值为0</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.data</span><br><span class="line">s3:</span><br><span class="line">    .string &quot;ccc&quot;</span><br><span class="line">    .ascii &quot;ccc&quot;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ as demo.s &amp;&amp; objdump -sD</span><br><span class="line"></span><br><span class="line">a.out:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line">Contents of section .data:</span><br><span class="line"> 0000 63636300 636363                      ccc.ccc         </span><br><span class="line"></span><br><span class="line">Disassembly of section .data:</span><br><span class="line"></span><br><span class="line">0000000000000000 &lt;s3&gt;:</span><br><span class="line">   0:   63 63 63                movslq 0x63(%rbx),%esp</span><br><span class="line">   3:   00 63 63                add    %ah,0x63(%rbx)</span><br><span class="line">   6:   63                      .byte 0x63</span><br></pre></td></tr></table></figure>
+
+<h3 id="ascii"><a href="#ascii" class="headerlink" title=".ascii"></a>.ascii</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">.data</span><br><span class="line">.s1:</span><br><span class="line">    .ascii &quot;aaa&quot;</span><br><span class="line">s2:</span><br><span class="line">    .ascii &quot;bbb&quot;</span><br><span class="line"></span><br><span class="line">.text</span><br><span class="line">s3:</span><br><span class="line">    .ascii &quot;ccc&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ as demo.s &amp;&amp; objdump -s a.out </span><br><span class="line"></span><br><span class="line">a.out:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line">Contents of section .text:</span><br><span class="line"> 0000 636363                               ccc             </span><br><span class="line">Contents of section .data:</span><br><span class="line"> 0000 61616162 6262                        aaabbb          </span><br></pre></td></tr></table></figure>
+
+<h2 id="L"><a href="#L" class="headerlink" title=".L"></a>.L</h2><p>GCC uses the .L for local labels.</p>
+<h2 id="LFB-LFE-LBB-LBE"><a href="#LFB-LFE-LBB-LBE" class="headerlink" title=".LFB, .LFE, .LBB, .LBE"></a>.LFB, .LFE, .LBB, .LBE</h2><p>They are all defined under <a target="_blank" rel="noopener" href="https://github.com/gcc-mirror/gcc/blob/releases/gcc-4.8.2/gcc/dwarf2out.c">gcc&#x2F;dwarf2out.c</a> on GCC 4.8.2.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> FUNC_BEGIN_LABEL  <span class="string">&quot;LFB&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FUNC_END_LABEL    <span class="string">&quot;LFE&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BLOCK_BEGIN_LABEL <span class="string">&quot;LBB&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BLOCK_END_LABEL   <span class="string">&quot;LBE&quot;</span></span></span><br><span class="line">ASM_GENERATE_INTERNAL_LABEL (loclabel, <span class="string">&quot;LVL&quot;</span>, loclabel_num);</span><br></pre></td></tr></table></figure>
+
+<h1 id="Section"><a href="#Section" class="headerlink" title="Section"></a>Section</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">                      +-----+----+--+</span><br><span class="line">partial program # 1:  |ttttt|dddd|00|</span><br><span class="line">                      +-----+----+--+</span><br><span class="line"></span><br><span class="line">                      text   data bss</span><br><span class="line">                      seg.   seg. seg.</span><br><span class="line"></span><br><span class="line">                      +---+---+---+</span><br><span class="line">partial program # 2:  |TTT|DDD|000|</span><br><span class="line">                      +---+---+---+</span><br><span class="line"></span><br><span class="line">                      +--+---+-----+--+----+---+-----+~~</span><br><span class="line">linked program:       |  |TTT|ttttt|  |dddd|DDD|00000|</span><br><span class="line">                      +--+---+-----+--+----+---+-----+~~</span><br><span class="line"></span><br><span class="line">    addresses:        0 …</span><br></pre></td></tr></table></figure>
+
+<p>TODO: section group 是什么？</p>
+<h1 id="Directive-指示符"><a href="#Directive-指示符" class="headerlink" title="Directive 指示符"></a>Directive 指示符</h1><p>All assembler directives have names that begin with a period <code>.</code></p>
+<p>The rest of the name is letters, usually in lower case.</p>
+<blockquote>
+<p>用途</p>
+</blockquote>
+<p>In AT&amp;T assembly syntax, a directive is a command that is used to instruct the assembler on how to process the information in the assembly source code. Unlike instructions, which tell the CPU what to do, directives tell the assembler how to process the information. </p>
+<h2 id="quad"><a href="#quad" class="headerlink" title=".quad"></a>.quad</h2><p><a target="_blank" rel="noopener" href="https://sourceware.org/binutils/docs/as/Quad.html">填充8字节</a></p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://sourceware.org/binutils/docs-2.18/as/LNS-directives.html#LNS-directives">.loc</a> </p>
+</blockquote>
+<p>a debugging directive, and it only appears in GCC if you tell the compiler to generate debugging information with -ggdb or -g.</p>
+<h1 id="movq-movl-movw"><a href="#movq-movl-movw" class="headerlink" title="movq, movl, movw"></a>movq, movl, movw</h1><ol>
+<li><strong><code>movw</code></strong>: move a word (16 bits)</li>
+<li><strong><code>movl</code></strong>: move a long word (32 bits)</li>
+<li><strong><code>movq</code></strong>: move a quadword (64 bits)</li>
+</ol>
+<h1 id="call"><a href="#call" class="headerlink" title="call"></a>call</h1><p>执行后，将 <code>rip</code> 放入栈顶，然后调新函数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">.global main</span><br><span class="line"></span><br><span class="line">foo:</span><br><span class="line">    pushq %rax</span><br><span class="line">    movq %rax, %rbp</span><br><span class="line"></span><br><span class="line">main:    </span><br><span class="line">    call foo // 调用foo之前，将rip入栈</span><br><span class="line"></span><br><span class="line">    movq $60, %rax  # syscall: exit</span><br><span class="line">    xorq %rdi, %rdi # status: 0</span><br><span class="line">    syscall</span><br></pre></td></tr></table></figure>
+
+<p>编译</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc call.s -g -o call</span><br></pre></td></tr></table></figure>
+
+<p>用GDB调试</p>
+<p><img src="/../assets/2023-10-29-22-46-18-image.png"></p>
+<p>进入foo之后，打印栈顶8字节，正是rip的值。同时发现，rip指向栈顶元素（8个字节中最低位一个字节 0x02，因小端存储）</p>
+<p><img src="/../assets/2023-10-29-22-48-19-image.png"></p>
+<h1 id="Effective-Address"><a href="#Effective-Address" class="headerlink" title="Effective Address"></a>Effective Address</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[base + index*scale + disp]      # Intel, including GAS .<span class="function">intel_syntax noprefix</span></span><br><span class="line"><span class="function"><span class="title">disp</span><span class="params">(base, index, scale)</span>         # AT&amp;T</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/../assets/image-13.png" alt="Alt text"></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/Linux%20kernel%20compiling/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -350,95 +517,6 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建一个200MB的文件</span></span><br><span class="line">wqj@ubuntu-server:~/demo$ <span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=bigfile bs=1M count=200</span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ ll -h</span><br><span class="line">total 201M</span><br><span class="line">drwxrwxr-x  2 wqj wqj 4.0K Oct 16 09:51 ./</span><br><span class="line">drwxr-xr-x 12 wqj wqj 4.0K Oct 16 09:40 ../</span><br><span class="line">-rw-rw-r--  1 wqj wqj 200M Oct 16 09:43 bigfile      <span class="comment"># 有一个200M的文件</span></span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ fincore bigfile <span class="comment"># 没有生成pagecache</span></span><br><span class="line">RES PAGES  SIZE FILE</span><br><span class="line"> 0B     0  200M bigfile</span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ time <span class="built_in">cat</span> bigfile &gt; /dev/null <span class="comment"># 读这个文件（生成pagecache）</span></span><br><span class="line"></span><br><span class="line">real    0m0.242s</span><br><span class="line">user    0m0.011s</span><br><span class="line">sys     0m0.203s</span><br><span class="line">wqj@ubuntu-server:~/demo$ fincore bigfile <span class="comment"># 验证生成pagecache</span></span><br><span class="line">  RES PAGES  SIZE FILE</span><br><span class="line"> 200M 51200  200M bigfile</span><br><span class="line"></span><br><span class="line"><span class="comment"># 再次读这个文件，读的是pagecache，速度提升 0.242/0.032=7.56倍</span></span><br><span class="line">wqj@ubuntu-server:~/demo$ time <span class="built_in">cat</span> bigfile &gt; /dev/null </span><br><span class="line"></span><br><span class="line">real    0m0.032s</span><br><span class="line">user    0m0.000s</span><br><span class="line">sys     0m0.032s</span><br></pre></td></tr></table></figure>
 
 <h1 id="pcstat"><a href="#pcstat" class="headerlink" title="pcstat"></a>pcstat</h1><p><a target="_blank" rel="noopener" href="https://github.com/tobert/pcstat">https://github.com/tobert/pcstat</a></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/bfd/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/linux/bfd/" class="post-title-link" itemprop="url">Linux bfd</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>573</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>1 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><h2 id="arelent"><a href="#arelent" class="headerlink" title="arelent"></a>arelent</h2><blockquote>
-<p>BFD represents a relocation as a pointer to the ‘arelent’ type. A relocation describes an action which the linker must take to modify the section contents. Relocations have a symbol, an address, an addend, and a pointer to a howto structure which describes how to perform the relocation. </p>
-</blockquote>
-<blockquote>
-<p>In BFD, each section has an array of ‘arelent’ structures. Each structure has a pointer to a symbol, an address within the section, an addend, and a pointer to a ‘reloc_howto_struct’ structure. The howto structure has a bunch of fields describing the reloc, including a type field. The type field is specific to the object file format backend; none of the generic code in BFD examines it.</p>
-</blockquote>
 
       
     </div>

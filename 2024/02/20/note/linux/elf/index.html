@@ -21,31 +21,31 @@
     <meta name="description" content="In computing, the Executable and Linkable Format[2] (ELF, formerly named Extensible Linking Format), is a common standard file format for executable files, object code, shared libraries, and core dum">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux ELF文件分析">
-<meta property="og:url" content="http://example.com/2024/02/19/note/linux/elf/index.html">
+<meta property="og:url" content="http://example.com/2024/02/20/note/linux/elf/index.html">
 <meta property="og:site_name" content="折纸飞向麦田的博客">
 <meta property="og:description" content="In computing, the Executable and Linkable Format[2] (ELF, formerly named Extensible Linking Format), is a common standard file format for executable files, object code, shared libraries, and core dum">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/assets/image-20231028195226909.png">
-<meta property="og:image" content="http://example.com/assets/image-20231028104927399.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102711.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102739.png">
 <meta property="og:image" content="http://example.com/assets/image-20231028162640052.png">
-<meta property="og:image" content="http://example.com/assets/2023-10-29-15-50-16-image.png">
-<meta property="og:image" content="http://example.com/assets/image-20231029233741911.png">
-<meta property="og:image" content="http://example.com/assets/plt_before.png">
-<meta property="og:image" content="http://example.com/assets/image-20231030080446860.png">
-<meta property="og:image" content="http://example.com/assets/plt_after.png">
-<meta property="article:published_time" content="2024-02-19T12:08:28.146Z">
-<meta property="article:modified_time" content="2024-02-19T12:08:28.146Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102811.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102847.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102952.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220103009.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220103030.png">
+<meta property="article:published_time" content="2024-02-20T02:24:13.981Z">
+<meta property="article:modified_time" content="2024-02-20T02:30:35.845Z">
 <meta property="article:author" content="折纸飞向麦田">
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/assets/image-20231028195226909.png">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102711.png">
 
 
-<link rel="canonical" href="http://example.com/2024/02/19/note/linux/elf/">
+<link rel="canonical" href="http://example.com/2024/02/20/note/linux/elf/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/02/19/note/linux/elf/","path":"2024/02/19/note/linux/elf/","title":"Linux ELF文件分析"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/02/20/note/linux/elf/","path":"2024/02/20/note/linux/elf/","title":"Linux ELF文件分析"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>Linux ELF文件分析 | 折纸飞向麦田的博客</title>
@@ -192,7 +192,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/elf/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/20/note/linux/elf/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -220,8 +220,9 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
+      
 
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+      <time title="创建时间：2024-02-20 10:24:13 / 修改时间：10:30:35" itemprop="dateCreated datePublished" datetime="2024-02-20T10:24:13+08:00">2024-02-20</time>
     </span>
 
   
@@ -252,8 +253,8 @@
 <p>In <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Computing">computing</a>, the <strong>Executable and Linkable Format</strong>[<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#cite_note-linuxfoundation-elf-2">2]</a> (<strong>ELF</strong>, formerly named <strong>Extensible Linking Format</strong>), is a common standard <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/File_format">file format</a> for <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Executable">executable</a> files, <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Object_code">object code</a>, <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Shared_library">shared libraries</a>, and <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Core_dump">core dumps</a>. – wikipedia</p>
 </blockquote>
 <p>本文分析ELF文件内容，以备日后查询。</p>
-<h1 id="Object-File-Format"><a href="#Object-File-Format" class="headerlink" title="Object File Format"></a>Object File Format</h1><p><img src="/../assets/image-20231028195226909.png" alt="image-20231028195226909"></p>
-<h1 id="ELF-Format-Overview"><a href="#ELF-Format-Overview" class="headerlink" title="ELF Format Overview"></a>ELF Format Overview</h1><p><img src="/../assets/image-20231028104927399.png" alt="image-20231028104927399"></p>
+<h1 id="Object-File-Format"><a href="#Object-File-Format" class="headerlink" title="Object File Format"></a>Object File Format</h1><p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102711.png" alt="image.png"></p>
+<h1 id="ELF-Format-Overview"><a href="#ELF-Format-Overview" class="headerlink" title="ELF Format Overview"></a>ELF Format Overview</h1><p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102739.png" alt="image.png"></p>
 <h1 id="Section"><a href="#Section" class="headerlink" title="Section"></a>Section</h1><blockquote>
 <p>Strictly speaking, the division into sections is intended to provide a convenient organization for use by the linker. Sections are intended to provide a view for the linker only.</p>
 </blockquote>
@@ -375,7 +376,7 @@
 </ul>
 <h4 id="rela-text"><a href="#rela-text" class="headerlink" title=".rela.text"></a>.rela.text</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  Elf64_Addr    r_offset;        <span class="comment">/* Address */</span></span><br><span class="line">  Elf64_Xword    r_info;            <span class="comment">/* Relocation type and symbol index */</span></span><br><span class="line">  Elf64_Sxword    r_addend;        <span class="comment">/* Addend */</span></span><br><span class="line">&#125; Elf64_Rela;</span><br></pre></td></tr></table></figure>
 
-<p><img src="/../assets/2023-10-29-15-50-16-image.png"></p>
+<p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102811.png" alt="image.png"></p>
 <h4 id="dynamic"><a href="#dynamic" class="headerlink" title=".dynamic"></a>.dynamic</h4><p>专门用于动态链接</p>
 <p>动态链接ELF中<code>最重要的结构</code>应该是 **<code>.dynamic</code>**，这个节里面保存了<code>动态链接器</code>所需要的<code>基本信息</code>，比如依赖于哪些<code>共享对象</code>、<code>动态链接符号表</code>的位置、<code>动态链接重定位表</code>的位置、<code>共享对象初始化代码</code>的地址等。</p>
 <p>使用<code>readelf</code>工具可以查看<code>“.dynamic”节</code>的内容：</p>
@@ -498,7 +499,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">LD_LIBRARY_PATH=<span class="variable">$LD_LIBRARY_PATH</span>:. gdb dataonlymain</span></span><br><span class="line">(gdb) b ml_func</span><br></pre></td></tr></table></figure>
 
 <p>从 .got 中取得 myglob 的绝对地址，.got中的绝对地址是 ld-linux.so 将 libmlpic_dataonly.so 加载后立刻解析出填充的。</p>
-<p><img src="/../assets/image-20231029233741911.png" alt="image-20231029233741911"></p>
+<p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102847.png"></p>
 <p>.got 是静态链接器和动态连接器协商的结果，静态链接器将所有对 myglob 的访问都改成从.got取绝对地址，动态链接器加载动态库时，填充对应的绝对地址。</p>
 <h3 id="PIC-Function-Lazy-Binding"><a href="#PIC-Function-Lazy-Binding" class="headerlink" title="PIC Function (Lazy Binding)"></a>PIC Function (Lazy Binding)</h3><p>PIC函数符号的绝对地址不是像PIC变量一样直接填充到<code>.got</code>，而是通过 lazy binding 实现，又多绕一层。首先，动态库中函数比全局变量多，开销更大；其次，有很多动态库函数，比如处理错误的，有可能在运行时根本不会调用到。为优化效率，PIC函数借助PLT实现lazy binding。</p>
 <blockquote>
@@ -508,11 +509,11 @@
 </blockquote>
 <p>由<code>.plt</code> + <code>.got.plt</code> 两个section配合实现。</p>
 <p>函数首次调用时：</p>
-<p><img src="/../assets/plt_before.png" alt="img"></p>
+<p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102952.png" alt="image.png"></p>
 <p>上图的 GOT 是 <code>.got.plt</code></p>
-<p><img src="/../assets/image-20231030080446860.png" alt="image-20231030080446860"></p>
+<p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220103009.png" alt="image.png"></p>
 <p>后续的函数调用：</p>
-<p><img src="/../assets/plt_after.png" alt="img"></p>
+<p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220103030.png" alt="image.png"></p>
 <h4 id="Example-PIC函数"><a href="#Example-PIC函数" class="headerlink" title="Example - PIC函数"></a>Example - PIC函数</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> myglob = <span class="number">42</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">ml_util_func</span><span class="params">(<span class="type">int</span> a)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> a + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">ml_func</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> c = b + ml_util_func(a);</span><br><span class="line">    myglob += c;</span><br><span class="line">    <span class="keyword">return</span> b + myglob;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>dynamic linker 听好了，你找到 ml_util_func 的绝对地址后，给我写入 0x2008 这个地址。</p>
@@ -549,14 +550,11 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2024/02/19/note/linux/epoll/" rel="prev" title="Linux epoll 学习">
-                  <i class="fa fa-angle-left"></i> Linux epoll 学习
+                <a href="/2024/02/20/note/linux/bfd/" rel="prev" title="Linux bfd">
+                  <i class="fa fa-angle-left"></i> Linux bfd
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2024/02/19/note/linux/linux%20firewall/" rel="next" title="Linux防火墙配置">
-                  Linux防火墙配置 <i class="fa fa-angle-right"></i>
-                </a>
             </div>
           </div>
     </footer>

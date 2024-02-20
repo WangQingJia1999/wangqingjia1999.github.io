@@ -176,6 +176,464 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/20/note/linux/elf/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/20/note/linux/elf/" class="post-title-link" itemprop="url">Linux ELF文件分析</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-02-20 10:24:13 / 修改时间：10:30:35" itemprop="dateCreated datePublished" datetime="2024-02-20T10:24:13+08:00">2024-02-20</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>23k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>38 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>In <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Computing">computing</a>, the <strong>Executable and Linkable Format</strong>[<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#cite_note-linuxfoundation-elf-2">2]</a> (<strong>ELF</strong>, formerly named <strong>Extensible Linking Format</strong>), is a common standard <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/File_format">file format</a> for <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Executable">executable</a> files, <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Object_code">object code</a>, <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Shared_library">shared libraries</a>, and <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Core_dump">core dumps</a>. – wikipedia</p>
+</blockquote>
+<p>本文分析ELF文件内容，以备日后查询。</p>
+<h1 id="Object-File-Format"><a href="#Object-File-Format" class="headerlink" title="Object File Format"></a>Object File Format</h1><p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102711.png" alt="image.png"></p>
+<h1 id="ELF-Format-Overview"><a href="#ELF-Format-Overview" class="headerlink" title="ELF Format Overview"></a>ELF Format Overview</h1><p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102739.png" alt="image.png"></p>
+<h1 id="Section"><a href="#Section" class="headerlink" title="Section"></a>Section</h1><blockquote>
+<p>Strictly speaking, the division into sections is intended to provide a convenient organization for use by the linker. Sections are intended to provide a view for the linker only.</p>
+</blockquote>
+<p>由 <code>section header table</code> 定义 sections.</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">wqj@WQJ:/home/cpp/build/self_mutate$ readelf --sections --wide demo</span><br><span class="line">There are 31 section headers, starting at offset 0x3ac8:</span><br><span class="line"></span><br><span class="line">Section Headers:</span><br><span class="line">  [Nr] Name              Type            Address          Off    Size   ES Flg Lk Inf Al</span><br><span class="line">  [ 0]                   NULL            0000000000000000 000000 000000 00      0   0  0</span><br><span class="line">  [ 1] .interp           PROGBITS        00000000004002a8 0002a8 00001c 00   A  0   0  1</span><br><span class="line">  [ 2] .note.gnu.build-id NOTE            00000000004002c4 0002c4 000024 00   A  0   0  4</span><br><span class="line">  [ 3] .note.ABI-tag     NOTE            00000000004002e8 0002e8 000020 00   A  0   0  4</span><br><span class="line">  [ 4] .gnu.hash         GNU_HASH        0000000000400308 000308 00001c 00   A  5   0  8</span><br><span class="line">  [ 5] .dynsym           DYNSYM          0000000000400328 000328 000048 18   A  6   1  8</span><br><span class="line">  [ 6] .dynstr           STRTAB          0000000000400370 000370 000038 00   A  0   0  1</span><br><span class="line">  [ 7] .gnu.version      VERSYM          00000000004003a8 0003a8 000006 02   A  5   0  2</span><br><span class="line">  [ 8] .gnu.version_r    VERNEED         00000000004003b0 0003b0 000020 00   A  6   1  8</span><br><span class="line">  [ 9] .rela.dyn         RELA            00000000004003d0 0003d0 000030 18   A  5   0  8</span><br><span class="line">  [10] .init             PROGBITS        0000000000401000 001000 00001b 00  AX  0   0  4</span><br><span class="line">  [11] .text             PROGBITS        0000000000401020 001020 0001a5 00  AX  0   0 16</span><br><span class="line">  [12] .fini             PROGBITS        00000000004011c8 0011c8 00000d 00  AX  0   0  4</span><br><span class="line">  [13] .rodata           PROGBITS        0000000000402000 002000 000004 04  AM  0   0  4</span><br><span class="line">  [14] .eh_frame_hdr     PROGBITS        0000000000402004 002004 00002c 00   A  0   0  4</span><br><span class="line">  [15] .eh_frame         PROGBITS        0000000000402030 002030 0000a0 00   A  0   0  8</span><br><span class="line">  [16] .init_array       INIT_ARRAY      0000000000403e50 002e50 000008 08  WA  0   0  8</span><br><span class="line">  [17] .fini_array       FINI_ARRAY      0000000000403e58 002e58 000008 08  WA  0   0  8</span><br><span class="line">  [18] .dynamic          DYNAMIC         0000000000403e60 002e60 000190 10  WA  6   0  8</span><br><span class="line">  [19] .got              PROGBITS        0000000000403ff0 002ff0 000010 08  WA  0   0  8</span><br><span class="line">  [20] .got.plt          PROGBITS        0000000000404000 003000 000018 08  WA  0   0  8</span><br><span class="line">  [21] .data             PROGBITS        0000000000404018 003018 000010 00  WA  0   0  8</span><br><span class="line">  [22] .bss              NOBITS          0000000000404028 003028 000008 00  WA  0   0  1</span><br><span class="line">  [23] .comment          PROGBITS        0000000000000000 003028 00002b 01  MS  0   0  1</span><br><span class="line">  [24] .debug_aranges    PROGBITS        0000000000000000 003053 000030 00      0   0  1</span><br><span class="line">  [25] .debug_info       PROGBITS        0000000000000000 003083 0000b2 00      0   0  1</span><br><span class="line">  [26] .debug_abbrev     PROGBITS        0000000000000000 003135 000028 00      0   0  1</span><br><span class="line">  [27] .debug_line       PROGBITS        0000000000000000 00315d 000054 00      0   0  1</span><br><span class="line">  [28] .symtab           SYMTAB          0000000000000000 0031b8 000600 18     29  47  8</span><br><span class="line">  [29] .strtab           STRTAB          0000000000000000 0037b8 0001e1 00      0   0  1</span><br><span class="line">  [30] .shstrtab         STRTAB          0000000000000000 003999 00012e 00      0   0  1</span><br><span class="line">Key to Flags:</span><br><span class="line">  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),</span><br><span class="line">  L (link order), O (extra OS processing required), G (group), T (TLS),</span><br><span class="line">  C (compressed), x (unknown), o (OS specific), E (exclude),</span><br><span class="line">  l (large), p (processor specific)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Section-Header-Table"><a href="#Section-Header-Table" class="headerlink" title="Section Header Table"></a>Section Header Table</h2><table>
+<thead>
+<tr>
+<th>typedef struct {</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>uint32_t sh_name;  &#x2F;* Section name (string tbl index) *&#x2F;</td>
+</tr>
+<tr>
+<td>uint32_t sh_type;  &#x2F;* Section type  *&#x2F;</td>
+</tr>
+<tr>
+<td>uint64_t sh_flags;  &#x2F;* Section flags  *&#x2F;</td>
+</tr>
+<tr>
+<td>uint64_t sh_addr;  &#x2F;* Section virtual addr at execution *&#x2F;</td>
+</tr>
+<tr>
+<td>uint64_t sh_offset;  &#x2F;* Section file offset  *&#x2F;</td>
+</tr>
+<tr>
+<td>uint64_t sh_size;  &#x2F;* Section size in bytes  *&#x2F;</td>
+</tr>
+<tr>
+<td>uint32_t sh_link;  &#x2F;* Link to another section  *&#x2F;</td>
+</tr>
+<tr>
+<td>uint32_t sh_info;  &#x2F;* Additional section information  *&#x2F;</td>
+</tr>
+<tr>
+<td>uint64_t sh_addralign;  &#x2F;* Section alignment  *&#x2F;</td>
+</tr>
+<tr>
+<td>uint64_t sh_entsize;  &#x2F;* Entry size if section holds table *&#x2F;</td>
+</tr>
+<tr>
+<td>} Elf64_Shdr;</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> Files used during linking must have a section header table; </p>
+</blockquote>
+<h3 id="sh-name"><a href="#sh-name" class="headerlink" title="sh_name"></a>sh_name</h3><p>If set, it contains an index into the string table. If the index is zero, it means the section doesn’t have a name.</p>
+<blockquote>
+<p>a special section called .shstrtab, which<br>contains an array of NULL-terminated strings, one for every section name.<br>The index of the section header describing the string table is given in the<br>e_shstrndx field of the executable header. This allows tools like readelf to<br>easily find the .shstrtab section and then index it with the sh_name field of<br>every section header (including the header of .shstrtab) to find the string<br>describing the name of the section in question. This allows a human analyst<br>to easily identify the purpose of each section.2</p>
+</blockquote>
+<p>TODO: test above </p>
+<h3 id="sh-type"><a href="#sh-type" class="headerlink" title="sh_type"></a>sh_type</h3><p><code>sh_type</code> tells the linker something about the structure of a section’s contents. </p>
+<p><img src="/./assets/image-20231028162640052.png" alt="image-20231028162640052"></p>
+<h4 id="SHT-PROGBITS"><a href="#SHT-PROGBITS" class="headerlink" title="SHT_PROGBITS"></a>SHT_PROGBITS</h4><blockquote>
+<p>Sections with type SHT_PROGBITS contain program data, such as machine<br>instructions or constants. These sections have no particular structure for the<br>linker to parse.</p>
+</blockquote>
+<h4 id="SHT-SYMTAB"><a href="#SHT-SYMTAB" class="headerlink" title="SHT_SYMTAB"></a>SHT_SYMTAB</h4><p>static symbol tables. Symbol tables contain symbols in a well-defined format (struct Elf64_Sym in elf.h)</p>
+<h4 id="SHT-DYNSYM"><a href="#SHT-DYNSYM" class="headerlink" title="SHT_DYNSYM"></a>SHT_DYNSYM</h4><p>symbol tables used by the dynamic linker.</p>
+<h4 id="SHT-STRTAB"><a href="#SHT-STRTAB" class="headerlink" title="SHT_STRTAB"></a>SHT_STRTAB</h4><p>string tables, which simply contain an array of NULL-terminated strings, with the first byte in the string table set to NULL by convention.</p>
+<h4 id="SHT-REL-SHT-RELA"><a href="#SHT-REL-SHT-RELA" class="headerlink" title="SHT_REL &#x2F; SHT_RELA"></a>SHT_REL &#x2F; SHT_RELA</h4><blockquote>
+<p>Sections with type SHT_REL or SHT_RELA are particularly important for<br>the linker because they contain relocation entries in a well-defined format<br>(struct Elf64_Rel and struct Elf64_Rela in elf.h), which the linker can parse<br>to perform the necessary relocations in other sections. Each relocation entry<br>tells the linker about a particular location in the binary where a relocation is<br>needed and which symbol the relocation should be resolved to.</p>
+</blockquote>
+<h4 id="SHT-DYNAMIC"><a href="#SHT-DYNAMIC" class="headerlink" title="SHT_DYNAMIC"></a>SHT_DYNAMIC</h4><blockquote>
+<p>Sections of type SHT_DYNAMIC contain information needed for dynamic<br>linking. This information is formatted using struct Elf64_Dyn as specified<br>in elf.h.</p>
+</blockquote>
+<h3 id="sh-flags"><a href="#sh-flags" class="headerlink" title="sh_flags"></a>sh_flags</h3><h4 id="SHF-WRITE"><a href="#SHF-WRITE" class="headerlink" title="SHF_WRITE"></a>SHF_WRITE</h4><p>SHF_WRITE indicates that the section is writable at runtime. </p>
+<h4 id="SHF-ALLOC"><a href="#SHF-ALLOC" class="headerlink" title="SHF_ALLOC"></a>SHF_ALLOC</h4><blockquote>
+<p>The SHF_ALLOC flag indicates that the contents of the section are to be loaded into virtual memory when executing the binary (though the actual loading happens using the segment view of the binary, not the section view).</p>
+</blockquote>
+<h4 id="SHF-EXECINSTR"><a href="#SHF-EXECINSTR" class="headerlink" title="SHF_EXECINSTR"></a>SHF_EXECINSTR</h4><blockquote>
+<p>SHF_EXECINSTR tells you that the section contains executable instructions, which is useful to know when disassembling a binary.</p>
+</blockquote>
+<h3 id="sh-addr"><a href="#sh-addr" class="headerlink" title="sh_addr"></a>sh_addr</h3><p>virtual address of section.</p>
+<blockquote>
+<p>the linker sometimes needs to know at which addresses partic-<br>ular pieces of code and data will end up at runtime to do relocations. The<br>sh_addr field provides this information. Sections that aren’t intended to be<br>loaded into virtual memory when setting up the process have an sh_addr<br>value of zero.</p>
+</blockquote>
+<h3 id="sh-offset"><a href="#sh-offset" class="headerlink" title="sh_offset"></a>sh_offset</h3><p>file offset (in bytes from the start of the file)</p>
+<h3 id="sh-size"><a href="#sh-size" class="headerlink" title="sh_size"></a>sh_size</h3><p>size (in bytes) of the section</p>
+<h3 id="sh-info"><a href="#sh-info" class="headerlink" title="sh_info"></a>sh_info</h3><blockquote>
+<p>The sh_info field contains additional information about the section. The<br>meaning of the additional information varies depending on the section type.<br>For instance, for relocation sections, sh_info denotes the index of the section<br>to which the relocations are to be applied.</p>
+</blockquote>
+<h3 id="sh-addralign"><a href="#sh-addralign" class="headerlink" title="sh_addralign"></a>sh_addralign</h3><blockquote>
+<p>Some sections may need to be aligned in memory in a particular way for effi-<br>ciency of memory accesses. For example, a section may need to be loaded<br>at some address that is a multiple of 8 bytes or 16 bytes. These alignment<br>requirements are specified in the sh_addralign field. For instance, if this field<br>is set to 16, it means the base address of the section (as chosen by the linker)<br>must be some multiple of 16. The values 0 and 1 are reserved to indicate no<br>special alignment needs.</p>
+</blockquote>
+<h3 id="sh-entsize"><a href="#sh-entsize" class="headerlink" title="sh_entsize"></a>sh_entsize</h3><blockquote>
+<p>Some sections, such as symbol tables or relocation tables, contain a table<br>of well-defined data structures (such as Elf64_Sym or Elf64_Rela). For such<br>sections, the sh_entsize field indicates the size in bytes of each entry in the<br>table. When the field is unused, it is set to zero</p>
+</blockquote>
+<h2 id="Sections"><a href="#Sections" class="headerlink" title="Sections"></a>Sections</h2><h4 id="data"><a href="#data" class="headerlink" title=".data"></a>.data</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Section Headers:</span><br><span class="line">  [Nr] Name              Type            Address          Off    Size   ES Flg Lk Inf Al</span><br><span class="line">  [24] .data             PROGBITS        0000000000002000 001000 000010 00  WA  0   0  8</span><br></pre></td></tr></table></figure>
+
+<h4 id="plt"><a href="#plt" class="headerlink" title=".plt"></a>.plt</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Section Headers:</span><br><span class="line">  [Nr] Name              Type            Address          Off    Size   ES Flg Lk Inf Al</span><br><span class="line">  [13] .plt              PROGBITS        0000000000000550 000550 000050 10  AX  0   0 16</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">Disassembly of section .plt:</span><br><span class="line"></span><br><span class="line">0000000000000550 &lt;.plt&gt;:</span><br><span class="line"> 550:    ff 35 8a 1a 00 00        pushq  0x1a8a(%rip)        # 1fe0 &lt;_GLOBAL_OFFSET_TABLE_+0x8&gt;</span><br><span class="line"> 556:    f2 ff 25 8b 1a 00 00     bnd jmpq *0x1a8b(%rip)        # 1fe8 &lt;_GLOBAL_OFFSET_TABLE_+0x10&gt;</span><br><span class="line"> 55d:    0f 1f 00                 nopl   (%rax)</span><br><span class="line"> 560:    f3 0f 1e fa              endbr64 </span><br><span class="line"> 564:    68 00 00 00 00           pushq  $0x0</span><br><span class="line"> 569:    f2 e9 e1 ff ff ff        bnd jmpq 550 &lt;_init+0x28&gt;</span><br><span class="line"> 56f:    90                       nop</span><br><span class="line"> 570:    f3 0f 1e fa              endbr64 </span><br><span class="line"> 574:    68 01 00 00 00           pushq  $0x1</span><br><span class="line"> 579:    f2 e9 d1 ff ff ff        bnd jmpq 550 &lt;_init+0x28&gt;</span><br><span class="line"> 57f:    90                       nop</span><br><span class="line"> 580:    f3 0f 1e fa              endbr64 </span><br><span class="line"> 584:    f2 ff 25 65 1a 00 00     bnd jmpq *0x1a65(%rip)        # 1ff0 &lt;__cxa_finalize@GLIBC_2.2.5&gt;</span><br><span class="line"> 58b:    0f 1f 04 00              nopl   (%rax,%rax,1)</span><br><span class="line"> 58f:    90                       nop</span><br><span class="line"> 590:    f3 0f 1e fa              endbr64 </span><br><span class="line"> 594:    f2 ff 25 5d 1a 00 00     bnd jmpq *0x1a5d(%rip)        # 1ff8 &lt;putchar@GLIBC_2.2.5&gt;</span><br><span class="line"> 59b:    0f 1f 04 00              nopl   (%rax,%rax,1)</span><br><span class="line"> 59f:    90                       nop</span><br></pre></td></tr></table></figure>
+
+<h4 id="got"><a href="#got" class="headerlink" title=".got"></a>.got</h4><p>A GOT is simply a table of addresses, residing in the data section. The GOT entry, in turn, will contain the absolute address of the variable:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Section Headers:</span><br><span class="line">  [Nr] Name              Type            Address          Off    Size   ES Flg Lk Inf Al</span><br><span class="line">  [22] .got              PROGBITS        0000000000001fb0 000fb0 000028 00  WA  0   0  8</span><br></pre></td></tr></table></figure>
+
+<h4 id="got-plt"><a href="#got-plt" class="headerlink" title=".got.plt"></a>.got.plt</h4><p><code>.got.plt</code> 的前三项是有特殊意义的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GOT[0]：保存的是“.dynamic”节的地址，这个节描述了本模块动态链接相关的信息</span><br><span class="line">GOT[1]：保存的是本模块的link_map结构的地址，动态链接器利用该地址来对符号进行解析。</span><br><span class="line">GOT[2]：保存的是_dl_runtime_resolve()的地址。</span><br></pre></td></tr></table></figure>
+
+<p>其中第二项和第三项由动态链接器在装载共享模块的时候负责将它们初始化。</p>
+<p><code>.got.plt</code>的其余项分别对应每个外部函数的引用</p>
+<p><code>.got.plt</code> contains the addresses of the external <em>functions</em> used by the program.</p>
+<p>PLT(Procedure Linkage Table) which is, put simply, used to call external procedures&#x2F;functions whose address isn’t known in the time of linking, and is left to be resolved by the dynamic linker at run time.</p>
+<p>for code, things are a bit more complicated.</p>
+<p>Whenever a function from a shared library is called, the linker makes us jump to an address in the PLT.</p>
+<p>The first time the function is called, the PLT code uses offsets stored in the GOT to decide the actual final location of the function, and then:</p>
+<ul>
+<li>stores this pre-calculated value</li>
+<li>jumps there</li>
+</ul>
+<p>The next times the function is called, the value has already been calculated, so it just jumps there directly.</p>
+<p>Due to this lazy resolution mechanism:</p>
+<ul>
+<li>programs can start running quickly even if the shared libraries have a lot of symbols</li>
+<li>we can replace functions on the fly by playing with the <code>LD_PRELOAD</code> variable</li>
+</ul>
+<h4 id="rela-text"><a href="#rela-text" class="headerlink" title=".rela.text"></a>.rela.text</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  Elf64_Addr    r_offset;        <span class="comment">/* Address */</span></span><br><span class="line">  Elf64_Xword    r_info;            <span class="comment">/* Relocation type and symbol index */</span></span><br><span class="line">  Elf64_Sxword    r_addend;        <span class="comment">/* Addend */</span></span><br><span class="line">&#125; Elf64_Rela;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102811.png" alt="image.png"></p>
+<h4 id="dynamic"><a href="#dynamic" class="headerlink" title=".dynamic"></a>.dynamic</h4><p>专门用于动态链接</p>
+<p>动态链接ELF中<code>最重要的结构</code>应该是 **<code>.dynamic</code>**，这个节里面保存了<code>动态链接器</code>所需要的<code>基本信息</code>，比如依赖于哪些<code>共享对象</code>、<code>动态链接符号表</code>的位置、<code>动态链接重定位表</code>的位置、<code>共享对象初始化代码</code>的地址等。</p>
+<p>使用<code>readelf</code>工具可以查看<code>“.dynamic”节</code>的内容：</p>
+<ul>
+<li><blockquote>
+<p>-d –dynamic           Display the dynamic section (if present)</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">$ readelf -d a.out</span><br><span class="line"></span><br><span class="line">Dynamic section at offset 0x750 contains 25 entries:</span><br><span class="line">  Tag        Type                         Name/Value</span><br><span class="line"> 0x00000001 (NEEDED)                     Shared library: [libc.so.6]</span><br><span class="line"> 0x0000000c (INIT)                       0x8048328</span><br><span class="line"> 0x0000000d (FINI)                       0x8048650</span><br><span class="line"> 0x00000019 (INIT_ARRAY)                 0x8049744</span><br><span class="line"> 0x0000001b (INIT_ARRAYSZ)               4 (bytes)</span><br><span class="line"> 0x0000001a (FINI_ARRAY)                 0x8049748</span><br><span class="line"> 0x0000001c (FINI_ARRAYSZ)               4 (bytes)</span><br><span class="line"> 0x00000004 (HASH)                       0x804818c</span><br><span class="line"> 0x6ffffef5 (GNU_HASH)                   0x80481c0</span><br><span class="line"> 0x00000005 (STRTAB)                     0x8048260</span><br><span class="line"> 0x00000006 (SYMTAB)                     0x80481e0</span><br><span class="line"> 0x0000000a (STRSZ)                      95 (bytes)</span><br><span class="line"> 0x0000000b (SYMENT)                     16 (bytes)</span><br><span class="line"> 0x00000015 (DEBUG)                      0x0</span><br><span class="line"> 0x00000003 (PLTGOT)                     0x8049844</span><br><span class="line"> 0x00000002 (PLTRELSZ)                   48 (bytes)</span><br><span class="line"> 0x00000014 (PLTREL)                     REL</span><br><span class="line"> 0x00000017 (JMPREL)                     0x80482f8</span><br><span class="line"> 0x00000011 (REL)                        0x80482f0</span><br><span class="line"> 0x00000012 (RELSZ)                      8 (bytes)</span><br><span class="line"> 0x00000013 (RELENT)                     8 (bytes)</span><br><span class="line"> 0x6ffffffe (VERNEED)                    0x80482d0</span><br><span class="line"> 0x6fffffff (VERNEEDNUM)                 1</span><br><span class="line"> 0x6ffffff0 (VERSYM)                     0x80482c0</span><br><span class="line"> 0x00000000 (NULL)                       0x0</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="Segment"><a href="#Segment" class="headerlink" title="Segment"></a>Segment</h1><blockquote>
+<p>segments, which are used at execution time (as opposed to sections, which are used at link time).</p>
+</blockquote>
+<blockquote>
+<p>The program header table provides a segment view of the binary, as opposed to<br>the section view provided by the section header table. The section view of an<br>ELF binary, which I discussed earlier, is meant for static linking purposes<br>only. In contrast, the segment view, which I’ll discuss next, is used by the<br>operating system and dynamic linker when loading an ELF into a process for<br>execution to locate the relevant code and data and decide what to load into<br>virtual memory.</p>
+</blockquote>
+<p>由 <code>program header table</code> 定义 segments。由于 segment 提供运行时视角，因此只有可执行目标文件才有这个，不可执行的目标文件没有。</p>
+<h2 id="Program-Header-Table"><a href="#Program-Header-Table" class="headerlink" title="Program Header Table"></a>Program Header Table</h2><table>
+<thead>
+<tr>
+<th>typedef struct {</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>uint32_t p_type;  &#x2F;* Segment type  *&#x2F;</td>
+</tr>
+<tr>
+<td>uint32_t p_flags;  &#x2F;* Segment flags  *&#x2F;</td>
+</tr>
+<tr>
+<td>uint64_t p_offset; &#x2F;* Segment file offset  *&#x2F;</td>
+</tr>
+<tr>
+<td>uint64_t p_vaddr;  &#x2F;* Segment virtual address  *&#x2F;</td>
+</tr>
+<tr>
+<td>uint64_t p_paddr;  &#x2F;* Segment physical address *&#x2F;</td>
+</tr>
+<tr>
+<td>uint64_t p_filesz; &#x2F;* Segment size in file  *&#x2F;</td>
+</tr>
+<tr>
+<td>uint64_t p_memsz;  &#x2F;* Segment size in memory  *&#x2F;</td>
+</tr>
+<tr>
+<td>uint64_t p_align;  &#x2F;* Segment alignment  *&#x2F;</td>
+</tr>
+<tr>
+<td>} Elf64_Phdr;</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>A program header table, if present, tells the system how to create a process image.</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">wqj@WQJ:/home/cpp/build/self_mutate$ readelf --wide --segments demo</span><br><span class="line"></span><br><span class="line">Elf file type is EXEC (Executable file)</span><br><span class="line">Entry point 0x401020</span><br><span class="line">There are 11 program headers, starting at offset 64</span><br><span class="line"></span><br><span class="line">Program Headers:</span><br><span class="line">  Type           Offset   VirtAddr           PhysAddr           FileSiz  MemSiz   Flg Align</span><br><span class="line">  PHDR           0x000040 0x0000000000400040 0x0000000000400040 0x000268 0x000268 R   0x8</span><br><span class="line">  INTERP         0x0002a8 0x00000000004002a8 0x00000000004002a8 0x00001c 0x00001c R   0x1</span><br><span class="line">      [Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]</span><br><span class="line">  LOAD           0x000000 0x0000000000400000 0x0000000000400000 0x000400 0x000400 R   0x1000</span><br><span class="line">  LOAD           0x001000 0x0000000000401000 0x0000000000401000 0x0001d5 0x0001d5 R E 0x1000</span><br><span class="line">  LOAD           0x002000 0x0000000000402000 0x0000000000402000 0x0000d0 0x0000d0 R   0x1000</span><br><span class="line">  LOAD           0x002e50 0x0000000000403e50 0x0000000000403e50 0x0001d8 0x0001e0 RW  0x1000</span><br><span class="line">  DYNAMIC        0x002e60 0x0000000000403e60 0x0000000000403e60 0x000190 0x000190 RW  0x8</span><br><span class="line">  NOTE           0x0002c4 0x00000000004002c4 0x00000000004002c4 0x000044 0x000044 R   0x4</span><br><span class="line">  GNU_EH_FRAME   0x002004 0x0000000000402004 0x0000000000402004 0x00002c 0x00002c R   0x4</span><br><span class="line">  GNU_STACK      0x000000 0x0000000000000000 0x0000000000000000 0x000000 0x000000 RWE 0x10</span><br><span class="line">  GNU_RELRO      0x002e50 0x0000000000403e50 0x0000000000403e50 0x0001b0 0x0001b0 R   0x1</span><br><span class="line"></span><br><span class="line"> Section to Segment mapping:</span><br><span class="line">  Segment Sections...</span><br><span class="line">   00     </span><br><span class="line">   01     .interp </span><br><span class="line">   02     .interp .note.gnu.build-id .note.ABI-tag .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rela.dyn </span><br><span class="line">   03     .init .text .fini </span><br><span class="line">   04     .rodata .eh_frame_hdr .eh_frame </span><br><span class="line">   05     .init_array .fini_array .dynamic .got .got.plt .data .bss </span><br><span class="line">   06     .dynamic </span><br><span class="line">   07     .note.gnu.build-id .note.ABI-tag </span><br><span class="line">   08     .eh_frame_hdr </span><br><span class="line">   09     </span><br><span class="line">   10     .init_array .fini_array .dynamic .got </span><br></pre></td></tr></table></figure>
+
+<h3 id="p-type"><a href="#p-type" class="headerlink" title="p_type"></a>p_type</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># /usr/include/elf.h</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Legal values for p_type (segment type).  */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>    PT_NULL        0        <span class="comment">/* Program header table entry unused */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_LOAD        1        <span class="comment">/* Loadable program segment */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_DYNAMIC    2        <span class="comment">/* Dynamic linking information */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_INTERP    3        <span class="comment">/* Program interpreter */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_NOTE        4        <span class="comment">/* Auxiliary information */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_SHLIB    5        <span class="comment">/* Reserved */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_PHDR        6        <span class="comment">/* Entry for header table itself */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_TLS        7        <span class="comment">/* Thread-local storage segment */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>    PT_NUM        8        <span class="comment">/* Number of defined types */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_LOOS        0x60000000    <span class="comment">/* Start of OS-specific */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_GNU_EH_FRAME    0x6474e550    <span class="comment">/* GCC .eh_frame_hdr segment */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_GNU_STACK    0x6474e551    <span class="comment">/* Indicates stack executability */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_GNU_RELRO    0x6474e552    <span class="comment">/* Read-only after relocation */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_LOSUNW    0x6ffffffa</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_SUNWBSS    0x6ffffffa    <span class="comment">/* Sun Specific segment */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_SUNWSTACK    0x6ffffffb    <span class="comment">/* Stack segment */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_HISUNW    0x6fffffff</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_HIOS        0x6fffffff    <span class="comment">/* End of OS-specific */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_LOPROC    0x70000000    <span class="comment">/* Start of processor-specific */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_HIPROC    0x7fffffff    <span class="comment">/* End of processor-specific */</span></span></span><br></pre></td></tr></table></figure>
+
+<h4 id="PT-PHDR"><a href="#PT-PHDR" class="headerlink" title="PT_PHDR"></a>PT_PHDR</h4><blockquote>
+<p>PT_PHDR segment, which encompasses the program header table.</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Program Headers:</span><br><span class="line">  Type           Offset   VirtAddr           PhysAddr           FileSiz  MemSiz   Flg Align</span><br><span class="line">  PHDR           0x000040 0x0000000000400040 0x0000000000400040 0x000268 0x000268 R   0x8</span><br><span class="line"></span><br><span class="line">Section to Segment mapping:</span><br><span class="line">  Segment Sections...</span><br><span class="line">   00     </span><br></pre></td></tr></table></figure>
+
+<h4 id="PT-LOAD"><a href="#PT-LOAD" class="headerlink" title="PT_LOAD"></a>PT_LOAD</h4><blockquote>
+<p>Segments of type PT_LOAD, as the name implies, are intended to be loaded<br>into memory when setting up the process. The size of the loadable chunk<br>and the address to load it at are described in the rest of the program header.<br>As you can see in the readelf output, there are usually at least two PT_LOAD<br>segments—one encompassing the nonwritable sections and one containing<br>the writable data sections.</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">Program Headers:</span><br><span class="line">  Type           Offset   VirtAddr           PhysAddr           FileSiz  MemSiz   Flg Align</span><br><span class="line">  PHDR           0x000040 0x0000000000400040 0x0000000000400040 0x000268 0x000268 R   0x8</span><br><span class="line">  INTERP         0x0002a8 0x00000000004002a8 0x00000000004002a8 0x00001c 0x00001c R   0x1</span><br><span class="line">      [Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]</span><br><span class="line">  LOAD           0x000000 0x0000000000400000 0x0000000000400000 0x000400 0x000400 R   0x1000</span><br><span class="line">  LOAD           0x001000 0x0000000000401000 0x0000000000401000 0x0001d5 0x0001d5 R E 0x1000</span><br><span class="line">  LOAD           0x002000 0x0000000000402000 0x0000000000402000 0x0000d0 0x0000d0 R   0x1000</span><br><span class="line">  LOAD           0x002e50 0x0000000000403e50 0x0000000000403e50 0x0001d8 0x0001e0 RW  0x1000</span><br><span class="line">  DYNAMIC        0x002e60 0x0000000000403e60 0x0000000000403e60 0x000190 0x000190 RW  0x8</span><br><span class="line">  NOTE           0x0002c4 0x00000000004002c4 0x00000000004002c4 0x000044 0x000044 R   0x4</span><br><span class="line">  GNU_EH_FRAME   0x002004 0x0000000000402004 0x0000000000402004 0x00002c 0x00002c R   0x4</span><br><span class="line">  GNU_STACK      0x000000 0x0000000000000000 0x0000000000000000 0x000000 0x000000 RWE 0x10</span><br><span class="line">  GNU_RELRO      0x002e50 0x0000000000403e50 0x0000000000403e50 0x0001b0 0x0001b0 R   0x1</span><br><span class="line"></span><br><span class="line"> Section to Segment mapping:</span><br><span class="line">  Segment Sections...</span><br><span class="line">   00     </span><br><span class="line">   01     .interp </span><br><span class="line">   02     .interp .note.gnu.build-id .note.ABI-tag .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rela.dyn </span><br><span class="line">   03     .init .text .fini </span><br><span class="line">   04     .rodata .eh_frame_hdr .eh_frame </span><br><span class="line">   05     .init_array .fini_array .dynamic .got .got.plt .data .bss </span><br><span class="line">   06     .dynamic </span><br><span class="line">   07     .note.gnu.build-id .note.ABI-tag </span><br><span class="line">   08     .eh_frame_hdr </span><br><span class="line">   09     </span><br><span class="line">   10     .init_array .fini_array .dynamic .got </span><br></pre></td></tr></table></figure>
+
+<h4 id="PT-DYNAMIC"><a href="#PT-DYNAMIC" class="headerlink" title="PT_DYNAMIC"></a>PT_DYNAMIC</h4><blockquote>
+<p>PT_DYNAMIC segment contains the .dynamic section, which tells the interpreter how to parse and prepare the binary for execution. </p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">wqj@WQJ:/home/cpp/build/self_mutate$ readelf --wide --segments demo</span><br><span class="line"></span><br><span class="line">Elf file type is EXEC (Executable file)</span><br><span class="line">Entry point 0x401020</span><br><span class="line">There are 11 program headers, starting at offset 64</span><br><span class="line"></span><br><span class="line">Program Headers:</span><br><span class="line">  Type           Offset   VirtAddr           PhysAddr           FileSiz  MemSiz   Flg Align</span><br><span class="line">  PHDR           0x000040 0x0000000000400040 0x0000000000400040 0x000268 0x000268 R   0x8       0</span><br><span class="line">  INTERP         0x0002a8 0x00000000004002a8 0x00000000004002a8 0x00001c 0x00001c R   0x1       1</span><br><span class="line">      [Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]</span><br><span class="line">  LOAD           0x000000 0x0000000000400000 0x0000000000400000 0x000400 0x000400 R   0x1000    2</span><br><span class="line">  LOAD           0x001000 0x0000000000401000 0x0000000000401000 0x0001d5 0x0001d5 R E 0x1000    3</span><br><span class="line">  LOAD           0x002000 0x0000000000402000 0x0000000000402000 0x0000d0 0x0000d0 R   0x1000    4</span><br><span class="line">  LOAD           0x002e50 0x0000000000403e50 0x0000000000403e50 0x0001d8 0x0001e0 RW  0x1000    5</span><br><span class="line"></span><br><span class="line">  DYNAMIC        0x002e60 0x0000000000403e60 0x0000000000403e60 0x000190 0x000190 RW  0x8       6</span><br><span class="line"></span><br><span class="line">  NOTE           0x0002c4 0x00000000004002c4 0x00000000004002c4 0x000044 0x000044 R   0x4</span><br><span class="line">  GNU_EH_FRAME   0x002004 0x0000000000402004 0x0000000000402004 0x00002c 0x00002c R   0x4</span><br><span class="line">  GNU_STACK      0x000000 0x0000000000000000 0x0000000000000000 0x000000 0x000000 RWE 0x10</span><br><span class="line">  GNU_RELRO      0x002e50 0x0000000000403e50 0x0000000000403e50 0x0001b0 0x0001b0 R   0x1</span><br><span class="line"></span><br><span class="line"> Section to Segment mapping:</span><br><span class="line">  Segment Sections...</span><br><span class="line">   00     </span><br><span class="line">   01     .interp </span><br><span class="line">   02     .interp .note.gnu.build-id .note.ABI-tag .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rela.dyn </span><br><span class="line">   03     .init .text .fini </span><br><span class="line">   04     .rodata .eh_frame_hdr .eh_frame </span><br><span class="line">   05     .init_array .fini_array .dynamic .got .got.plt .data .bss </span><br><span class="line"></span><br><span class="line">   06     .dynamic </span><br><span class="line"></span><br><span class="line">   07     .note.gnu.build-id .note.ABI-tag </span><br><span class="line">   08     .eh_frame_hdr </span><br><span class="line">   09     </span><br><span class="line">   10     .init_array .fini_array .dynamic .got </span><br></pre></td></tr></table></figure>
+
+<h4 id="PT-INTERP"><a href="#PT-INTERP" class="headerlink" title="PT_INTERP"></a>PT_INTERP</h4><blockquote>
+<p>The PT_INTERP segment contains the .interp section, which provides the name of the interpreter that is to be used to load the binary.</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Program Headers:</span><br><span class="line">  Type           Offset   VirtAddr           PhysAddr           FileSiz  MemSiz   Flg Align</span><br><span class="line">  PHDR           0x000040 0x0000000000400040 0x0000000000400040 0x000268 0x000268 R   0x8</span><br><span class="line">  INTERP         0x0002a8 0x00000000004002a8 0x00000000004002a8 0x00001c 0x00001c R   0x1</span><br><span class="line">      [Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"> Section to Segment mapping:</span><br><span class="line">  Segment Sections...</span><br><span class="line">   00     </span><br><span class="line">   01     .interp </span><br></pre></td></tr></table></figure>
+
+<h3 id="p-flag"><a href="#p-flag" class="headerlink" title="p_flag"></a>p_flag</h3><p>The flags specify the runtime access permissions for the segment.</p>
+<h4 id="PF-X"><a href="#PF-X" class="headerlink" title="PF_X"></a>PF_X</h4><p>The PF_X flag indicates that the segment is executable and is set for code segments (readelf displays it as an E rather than an X in the Flg column</p>
+<h4 id="PF-W"><a href="#PF-W" class="headerlink" title="PF_W"></a>PF_W</h4><p>The PF_W flag means that the segment is writable, and it is normally set only for writable data segments, never for code segments.</p>
+<h4 id="PF-R"><a href="#PF-R" class="headerlink" title="PF_R"></a>PF_R</h4><p>PF_R means that the segment is readable, as is normally the case for both code and data segments.</p>
+<h3 id="p-offset-p-vaddr-and-p-filesz"><a href="#p-offset-p-vaddr-and-p-filesz" class="headerlink" title="p_offset, p_vaddr, and p_filesz"></a>p_offset, p_vaddr, and p_filesz</h3><p>They specify the file offset at which the segment starts, the virtual address at which it is to be loaded, and the file size of the segment, respectively. </p>
+<h3 id="p-paddr"><a href="#p-paddr" class="headerlink" title="p_paddr"></a>p_paddr</h3><p>On modern operating systems such as Linux, this field is unused and set to zero since they execute all binaries in virtual memory.</p>
+<h3 id="p-memsz"><a href="#p-memsz" class="headerlink" title="p_memsz"></a>p_memsz</h3><p><code>p_filesz</code> is the file size of the segment and <code>p_memsz</code> is the size in memory. To understand this, recall that some sections only indicate the need to allocate some bytes in memory but don’t actually occupy these bytes in the binary file. For instance, the <code>.bss</code> section contains zero-initialized data. Since all data in this section is known to be zero anyway, there’s no need to actually include all these zeros in the binary. However, when loading the segment containing <code>.bss</code> into virtual memory, all the bytes in <code>.bss</code> should be allocated. Thus, it’s possible for <code>p_memsz</code> to be larger than <code>p_filesz</code>. When this happens, the loader adds the extra bytes at the end of the segment when loading the binary and initializes them to zero.</p>
+<h3 id="p-align"><a href="#p-align" class="headerlink" title="p_align"></a>p_align</h3><p>It indicates the required memory alignment (in bytes) for the segment. An alignment value of 0 or 1 indicates that no particular alignment is required. If <code>p_align</code> isn’t set to 0 or 1, then its value must be a power of 2, and <code>p_vaddr</code> must be equal to <code>p_offset</code>, modulo p_align.</p>
+<h1 id="Relocation"><a href="#Relocation" class="headerlink" title="Relocation"></a>Relocation</h1><p>主要参考这篇文章：</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://eli.thegreenplace.net/2011/11/03/position-independent-code-pic-in-shared-libraries/">Position Independent Code (PIC) in shared libraries - Eli Bendersky’s website</a></p>
+</blockquote>
+<blockquote>
+<p>Relocation is the process of connecting symbolic references with symbolic definitions. For<br>example, when a program calls a function, the associated call instruction must transfer control<br>to the proper destination address at execution. In other words, relocatable files must have<br>information that describes how to modify their section contents, thus allowing executable and<br>shared object files to hold the right information for a process’s program image. Relocation<br>entries are these data.</p>
+</blockquote>
+<p>Transform a relocatable file into either an executable or a shared object file. The link editor merges one or more relocatable files to form the output. It first decides how to combine and locate the input files, then updates the symbol values, and finally performs the relocation. Relocations applied to executable or shared object files are similar and accomplish the same result.</p>
+<p><em>relocations</em> are entries in binaries that are left to be filled in later – at link time by the toolchain linker or at runtime by the dynamic linker.</p>
+<blockquote>
+<p>Briefly, when the linker creates a shared library, it doesn’t know in advance where it might be loaded.</p>
+<p>There are two main approaches to solve this problem in Linux ELF shared libraries:</p>
+<ol>
+<li>Load-time relocation</li>
+<li>Position independent code (PIC)</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://eli.thegreenplace.net/2011/11/03/position-independent-code-pic-in-shared-libraries/">Position Independent Code (PIC) in shared libraries - Eli Bendersky’s website</a></p>
+</blockquote>
+<h2 id="Static-Relocation"><a href="#Static-Relocation" class="headerlink" title="Static Relocation"></a>Static Relocation</h2><p>静态链接器</p>
+<h2 id="Dynamic-Relocation"><a href="#Dynamic-Relocation" class="headerlink" title="Dynamic Relocation"></a>Dynamic Relocation</h2><p>动态链接器 <code>/lib/ld-linux.so</code> 重定位程序对共享库中符号的引用的过程。</p>
+<h3 id="PIC-Variable"><a href="#PIC-Variable" class="headerlink" title="PIC Variable"></a>PIC Variable</h3><p>单独由 <code>.got</code> section实现。</p>
+<h4 id="Example-PIC变量"><a href="#Example-PIC变量" class="headerlink" title="Example - PIC变量"></a>Example - PIC变量</h4><p>读取动态库中的全局变量。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// dataonly.h</span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">int</span> myglob;</span><br><span class="line"><span class="type">int</span> <span class="title function_">ml_func</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// dataonly.c</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> myglob = <span class="number">42</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">ml_func</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> myglob + a + b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;dataonly.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    ml_func(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcc -fpic -shared -m32 -o libmlpic_dataonly.so dataonly.c</span><br><span class="line">gcc -m32 -o dataonlymain dataonlymain.c -L. -lmlpic_dataonly -g</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">LD_LIBRARY_PATH=<span class="variable">$LD_LIBRARY_PATH</span>:. gdb dataonlymain</span></span><br><span class="line">(gdb) b ml_func</span><br></pre></td></tr></table></figure>
+
+<p>从 .got 中取得 myglob 的绝对地址，.got中的绝对地址是 ld-linux.so 将 libmlpic_dataonly.so 加载后立刻解析出填充的。</p>
+<p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102847.png"></p>
+<p>.got 是静态链接器和动态连接器协商的结果，静态链接器将所有对 myglob 的访问都改成从.got取绝对地址，动态链接器加载动态库时，填充对应的绝对地址。</p>
+<h3 id="PIC-Function-Lazy-Binding"><a href="#PIC-Function-Lazy-Binding" class="headerlink" title="PIC Function (Lazy Binding)"></a>PIC Function (Lazy Binding)</h3><p>PIC函数符号的绝对地址不是像PIC变量一样直接填充到<code>.got</code>，而是通过 lazy binding 实现，又多绕一层。首先，动态库中函数比全局变量多，开销更大；其次，有很多动态库函数，比如处理错误的，有可能在运行时根本不会调用到。为优化效率，PIC函数借助PLT实现lazy binding。</p>
+<blockquote>
+<p>When a shared library refers to some function, the real address of that function is not known until load time. Resolving this address is called <em>binding</em>, and it’s something the dynamic loader does when it loads the shared library into the process’s memory space. This binding process is non-trivial, since the loader has to actually <em>look up</em> the function symbol in special tables <a target="_blank" rel="noopener" href="https://eli.thegreenplace.net/2011/11/03/position-independent-code-pic-in-shared-libraries/#id13">[5]</a>.</p>
+<p>So, resolving each function takes time. Not a lot of time, but it adds up since the amount of functions in libraries is typically much larger than the amount of global variables. Moreover, most of these resolutions are done in vain, because in a typical run of a program only a fraction of functions actually get called (think about various functions handling error and special conditions, which typically don’t get called at all).</p>
+<p>So, to speed up this process, a clever lazy binding scheme was devised. “Lazy” is a generic name for a family of optimizations in computer programming, where work is delayed until the last moment when it’s actually needed, with the intention of avoiding doing this work if its results are never required during a specific run of a program. Good examples of laziness are <a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/Copy-on-write">copy-on-write</a> and <a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/Lazy_evaluation">lazy evaluation</a>.</p>
+</blockquote>
+<p>由<code>.plt</code> + <code>.got.plt</code> 两个section配合实现。</p>
+<p>函数首次调用时：</p>
+<p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220102952.png" alt="image.png"></p>
+<p>上图的 GOT 是 <code>.got.plt</code></p>
+<p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220103009.png" alt="image.png"></p>
+<p>后续的函数调用：</p>
+<p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240220103030.png" alt="image.png"></p>
+<h4 id="Example-PIC函数"><a href="#Example-PIC函数" class="headerlink" title="Example - PIC函数"></a>Example - PIC函数</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> myglob = <span class="number">42</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">ml_util_func</span><span class="params">(<span class="type">int</span> a)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> a + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">ml_func</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> c = b + ml_util_func(a);</span><br><span class="line">    myglob += c;</span><br><span class="line">    <span class="keyword">return</span> b + myglob;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>dynamic linker 听好了，你找到 ml_util_func 的绝对地址后，给我写入 0x2008 这个地址。</p>
+<blockquote>
+<p>The last line means that the dynamic loader should place the value (address) of symbol ml_util_func into 0x2008 (which, recall, is the GOT entry for this function).</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">&gt; </span><span class="language-bash">readelf -r libmlpic.so</span></span><br><span class="line">[...] snip output</span><br><span class="line"></span><br><span class="line">Relocation section &#x27;.rel.plt&#x27; at offset 0x328 contains 3 entries:</span><br><span class="line"> Offset     Info    Type            Sym.Value  Sym. Name</span><br><span class="line">00002000  00000107 R_386_JUMP_SLOT   00000000   __cxa_finalize</span><br><span class="line">00002004  00000207 R_386_JUMP_SLOT   00000000   __gmon_start__</span><br><span class="line">00002008  00000707 R_386_JUMP_SLOT   0000046c   ml_util_func</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h1 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h1><ul>
+<li><p><a target="_blank" rel="noopener" href="https://refspecs.linuxbase.org/elf/elf.pdf">ELF标准定义文档</a></p>
+</li>
+<li><p>动态链接详解 - 你说起一个什么名的文章 - 知乎<br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/263094043">https://zhuanlan.zhihu.com/p/263094043</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/gnuemacs/p/14523720.html">https://www.cnblogs.com/gnuemacs/p/14523720.html</a></p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/20/note/linux/bfd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/20/note/linux/bfd/" class="post-title-link" itemprop="url">Linux bfd</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-20 10:20:04" itemprop="dateCreated datePublished" datetime="2024-02-20T10:20:04+08:00">2024-02-20</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>573</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>1 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><h2 id="arelent"><a href="#arelent" class="headerlink" title="arelent"></a>arelent</h2><blockquote>
+<p>BFD represents a relocation as a pointer to the ‘arelent’ type. A relocation describes an action which the linker must take to modify the section contents. Relocations have a symbol, an address, an addend, and a pointer to a howto structure which describes how to perform the relocation. </p>
+</blockquote>
+<blockquote>
+<p>In BFD, each section has an array of ‘arelent’ structures. Each structure has a pointer to a symbol, an address within the section, an addend, and a pointer to a ‘reloc_howto_struct’ structure. The howto structure has a bunch of fields describing the reloc, including a type field. The type field is specific to the object file format backend; none of the generic code in BFD examines it.</p>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/redis/redis%E5%BA%95%E5%B1%82%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1988,359 +2446,6 @@ zset-max-ziplist-value 64
 </blockquote>
 <p>gas、ld、nm、objdump、objcopy 这些工具，均借助BFD读写二进制目标文件。</p>
 <p>所以要看BFD怎么从elf目标文件中获取符号表。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/objdump/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/linux/objdump/" class="post-title-link" itemprop="url">Linux objdump</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>7.1k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>12 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="objdump"><a href="#objdump" class="headerlink" title="objdump"></a>objdump</h1><p><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man1/objdump.1.html">https://man7.org/linux/man-pages/man1/objdump.1.html</a></p>
-<h1 id="disassemble-all-sections-of-an-exe"><a href="#disassemble-all-sections-of-an-exe" class="headerlink" title="disassemble all sections of an exe"></a>disassemble all sections of an exe</h1><p>问题：.rodata等数据段也被解释成指令了</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">objdump -C -S -D demo &gt; demo.exe.s</span><br><span class="line"></span><br><span class="line">-C demangle</span><br><span class="line">-S 插入源码</span><br><span class="line">-D 反汇编所有段</span><br></pre></td></tr></table></figure>
-
-<h1 id="Dump-all-symbols-Dump-symbol-table"><a href="#Dump-all-symbols-Dump-symbol-table" class="headerlink" title="Dump all symbols &#x2F; Dump symbol table"></a>Dump all symbols &#x2F; Dump symbol table</h1><p>-t 选项</p>
-<p>Display the contents of the symbol table(s)</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]<span class="meta"># objdump -C -t demo | grep vtable</span></span><br><span class="line"><span class="number">0000000000400</span>ac8  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> A</span><br><span class="line"><span class="number">0000000000600</span>d40  w    O .data.rel.ro   <span class="number">0000000000000058</span>              vtable <span class="keyword">for</span> __cxxabiv1::__class_type_info@@CXXABI_1<span class="number">.3</span></span><br><span class="line"><span class="number">0000000000400</span>a98  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> C</span><br><span class="line"><span class="number">0000000000600</span>da0  w    O .data.rel.ro   <span class="number">0000000000000058</span>              vtable <span class="keyword">for</span> __cxxabiv1::__si_class_type_info@@CXXABI_1<span class="number">.3</span></span><br><span class="line"><span class="number">0000000000400</span>ab0  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> B</span><br></pre></td></tr></table></figure>
-
-<ol>
-<li><p><strong>Address Column (e.g., <code>0000000000400238</code>):</strong></p>
-<ul>
-<li>This column shows the memory address where the symbol is located.</li>
-</ul>
-</li>
-<li><p><strong>Scope Column (e.g., <code>l</code>):</strong></p>
-<ul>
-<li>The symbol is a local (l), global (g), unique global (u),<br> neither global nor local (a space) or both global and<br> local (!).</li>
-</ul>
-</li>
-<li><p><strong>Section Type Column (e.g., <code>d</code>):</strong></p>
- <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&quot;w&quot; The symbol is weak (w) or strong (a space).</span><br><span class="line">    </span><br><span class="line">&quot;C&quot; The symbol denotes a constructor (C) or an ordinary</span><br><span class="line">    symbol (a space).</span><br><span class="line">    </span><br><span class="line">&quot;W&quot; The symbol is a warning (W) or a normal symbol (a space).</span><br><span class="line">    A warning symbol&#x27;s name is a message to be displayed if</span><br><span class="line">    the symbol following the warning symbol is ever</span><br><span class="line">    referenced.</span><br><span class="line">    </span><br><span class="line">&quot;I&quot;</span><br><span class="line">&quot;i&quot; The symbol is an indirect reference to another symbol</span><br><span class="line">    (I), a function to be evaluated during reloc processing</span><br><span class="line">    (i) or a normal symbol (a space).</span><br><span class="line">    </span><br><span class="line">&quot;d&quot;</span><br><span class="line">&quot;D&quot; The symbol is a debugging symbol (d) or a dynamic symbol</span><br><span class="line">    (D) or a normal symbol (a space).</span><br><span class="line">    </span><br><span class="line">&quot;F&quot;</span><br><span class="line">&quot;f&quot;</span><br><span class="line">&quot;O&quot; The symbol is the name of a function (F) or a file (f) or</span><br><span class="line">    an object (O) or just a normal symbol (a space).</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>Section Name Column (e.g., <code>.interp</code>):</strong></p>
-<ul>
-<li>This column shows the name of the section in which the symbol is defined.</li>
-</ul>
-</li>
-<li><p><strong>Size Column (e.g., <code>0000000000000000</code>):</strong></p>
-<ul>
-<li>For common symbols is the alignment and for other symbol is<br> the size.</li>
-<li>e.g. 对象</li>
-</ul>
- <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0000000000400</span>ae0 &lt;typeinfo <span class="keyword">for</span> C&gt;:</span><br><span class="line">  <span class="number">400</span>ae0:       b0 <span class="number">0</span>d <span class="number">60</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> f8 <span class="number">0</span>a <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ..`.......@.....</span><br><span class="line">  <span class="number">400</span>af0:       <span class="number">00</span> <span class="number">0b</span> <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>                             ..@.....</span><br><span class="line"></span><br><span class="line"><span class="number">0000000000400</span>ae0  w    O .rodata	<span class="number">0000000000000018</span>              typeinfo <span class="keyword">for</span> C</span><br><span class="line"></span><br><span class="line"><span class="number">0x18</span> = <span class="number">16</span>+<span class="number">8</span> = <span class="number">24B</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>e.g. 函数</li>
-</ul>
- <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0000000000400968</span> &lt;A::<span class="built_in">foo</span>()&gt;:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;A::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">  <span class="number">400968</span>:	<span class="number">55</span>                   	push   %rbp</span><br><span class="line">  <span class="number">400969</span>:	<span class="number">48</span> <span class="number">89</span> e5             	mov    %rsp,%rbp</span><br><span class="line">  <span class="number">40096</span>c:	<span class="number">48</span> <span class="number">83</span> ec <span class="number">10</span>          	sub    $<span class="number">0x10</span>,%rsp</span><br><span class="line">  <span class="number">400970</span>:	<span class="number">48</span> <span class="number">89</span> <span class="number">7</span>d f8          	mov    %rdi,<span class="number">-0x8</span>(%rbp)</span><br><span class="line">  <span class="number">400974</span>:	be b1 <span class="number">0</span>a <span class="number">40</span> <span class="number">00</span>       	mov    $<span class="number">0x400ab1</span>,%esi</span><br><span class="line">  <span class="number">400979</span>:	bf <span class="number">60</span> <span class="number">20</span> <span class="number">60</span> <span class="number">00</span>       	mov    $<span class="number">0x602060</span>,%edi</span><br><span class="line">  <span class="number">40097</span>e:	e8 <span class="number">0</span>d fe ff ff       	callq  <span class="number">400790</span> &lt;std::basic_ostream&lt;<span class="type">char</span>, std::char_traits&lt;<span class="type">char</span>&gt; &gt;&amp; std::<span class="keyword">operator</span>&lt;&lt; &lt;std::char_traits&lt;<span class="type">char</span>&gt; &gt;(std::basic_ostream&lt;<span class="type">char</span>, std::char_traits&lt;<span class="type">char</span>&gt; &gt;&amp;, <span class="type">char</span> <span class="type">const</span>*)@plt&gt;</span><br><span class="line">  <span class="number">400983</span>:	be b0 <span class="number">07</span> <span class="number">40</span> <span class="number">00</span>       	mov    $<span class="number">0x4007b0</span>,%esi</span><br><span class="line">  <span class="number">400988</span>:	<span class="number">48</span> <span class="number">89</span> c7             	mov    %rax,%rdi</span><br><span class="line">  <span class="number">40098b</span>:	e8 <span class="number">10</span> fe ff ff       	callq  <span class="number">4007</span>a0 &lt;std::ostream::<span class="keyword">operator</span>&lt;&lt;(std::ostream&amp; (*)(std::ostream&amp;))@plt&gt;</span><br><span class="line">  <span class="number">400990</span>:	<span class="number">90</span>                   	nop</span><br><span class="line">  <span class="number">400991</span>:	c9                   	leaveq </span><br><span class="line">  <span class="number">400992</span>:	c3                   	retq   </span><br><span class="line">  <span class="number">400993</span>:	<span class="number">90</span>                   	nop</span><br><span class="line"></span><br><span class="line"><span class="number">0000000000400968</span>  w    F .text	<span class="number">000000000000002b</span>              A::<span class="built_in">foo</span>()</span><br><span class="line"></span><br><span class="line"><span class="number">0x400993</span><span class="number">-0x400968</span> = <span class="number">0x2b</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>Symbol Name Column (e.g., <code>.interp</code>):</strong></p>
-<ul>
-<li>This column lists the name of the symbol.</li>
-</ul>
-</li>
-</ol>
-<h1 id="Dump-all-symbols-inside-a-section"><a href="#Dump-all-symbols-inside-a-section" class="headerlink" title="Dump all symbols inside a section"></a>Dump all symbols inside a section</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]<span class="meta"># objdump -C -t -j .rodata demo </span></span><br><span class="line"></span><br><span class="line">demo:     file format elf64-x86<span class="number">-64</span></span><br><span class="line"></span><br><span class="line">SYMBOL TABLE:</span><br><span class="line"><span class="number">0000000000400</span>a70 l    d  .rodata        <span class="number">0000000000000000</span>              .rodata</span><br><span class="line"><span class="number">0000000000400</span>a80 l     O .rodata        <span class="number">0000000000000001</span>              std::piecewise_construct</span><br><span class="line"><span class="number">0000000000400</span>af8  w    O .rodata        <span class="number">0000000000000003</span>              typeinfo name <span class="keyword">for</span> C</span><br><span class="line"><span class="number">0000000000400</span>ac8  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> A</span><br><span class="line"><span class="number">0000000000400</span>ae0  w    O .rodata        <span class="number">0000000000000018</span>              typeinfo <span class="keyword">for</span> C</span><br><span class="line"><span class="number">0000000000400</span>a70 g     O .rodata        <span class="number">0000000000000004</span>              _IO_stdin_used</span><br><span class="line"><span class="number">0000000000400b</span>30  w    O .rodata        <span class="number">0000000000000003</span>              typeinfo name <span class="keyword">for</span> A</span><br><span class="line"><span class="number">0000000000400</span>a78 g     O .rodata        <span class="number">0000000000000000</span>              .hidden __dso_handle</span><br><span class="line"><span class="number">0000000000400</span>a98  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> C</span><br><span class="line"><span class="number">0000000000400b</span>20  w    O .rodata        <span class="number">0000000000000010</span>              typeinfo <span class="keyword">for</span> A</span><br><span class="line"><span class="number">0000000000400b</span>18  w    O .rodata        <span class="number">0000000000000003</span>              typeinfo name <span class="keyword">for</span> B</span><br><span class="line"><span class="number">0000000000400</span>ab0  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> B</span><br><span class="line"><span class="number">0000000000400b</span>00  w    O .rodata        <span class="number">0000000000000018</span>              typeinfo <span class="keyword">for</span> B</span><br></pre></td></tr></table></figure>
-
-<h1 id="list-all-sections-info"><a href="#list-all-sections-info" class="headerlink" title="list all sections info"></a>list all sections info</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]# objdump -h demo</span><br><span class="line">demo:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line">Sections:</span><br><span class="line">Idx Name          Size      VMA               LMA               File off  Algn     </span><br><span class="line">  0 .interp       0000001c  0000000000400238  0000000000400238  00000238  2**0     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  1 .note.ABI-tag 00000020  0000000000400254  0000000000400254  00000254  2**2     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  2 .note.gnu.build-id 00000024  0000000000400274  0000000000400274  00000274  2**2</span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  3 .gnu.hash     00000038  0000000000400298  0000000000400298  00000298  2**3     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  4 .dynsym       00000120  00000000004002d0  00000000004002d0  000002d0  2**3     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  5 .dynstr       00000190  00000000004003f0  00000000004003f0  000003f0  2**0     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  6 .gnu.version  00000018  0000000000400580  0000000000400580  00000580  2**1     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  7 .gnu.version_r 00000050  0000000000400598  0000000000400598  00000598  2**3    </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  8 .rela.dyn     00000060  00000000004005e8  00000000004005e8  000005e8  2**3     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  9 .rela.plt     000000c0  0000000000400648  0000000000400648  00000648  2**3     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
-
-<h1 id="disassemble-a-section"><a href="#disassemble-a-section" class="headerlink" title="disassemble a section"></a>disassemble a section</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-s </span><br><span class="line">		打印section内所有内容</span><br><span class="line">-j xxx 或者 --section=xxx</span><br><span class="line">		只打印xxx段</span><br><span class="line">-d </span><br><span class="line">		反汇编</span><br><span class="line">-C </span><br><span class="line">		demangle输出</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]# objdump -C -j .rodata -d demo</span><br><span class="line"></span><br><span class="line">demo:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line">Disassembly of section .rodata:</span><br><span class="line"></span><br><span class="line">0000000000400a70 &lt;_IO_stdin_used&gt;:</span><br><span class="line">  400a70:       01 00 02 00 00 00 00 00                             ........</span><br><span class="line"></span><br><span class="line">0000000000400a78 &lt;__dso_handle&gt;:</span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">0000000000400a80 &lt;std::piecewise_construct&gt;:</span><br><span class="line">  400a80:       00 41 3a 3a 66 6f 6f 00 42 3a 3a 66 6f 6f 00 43     .A::foo.B::foo.C</span><br><span class="line">  400a90:       3a 3a 66 6f 6f 00 00 00                             ::foo...</span><br><span class="line"></span><br><span class="line">0000000000400a98 &lt;vtable for C&gt;:</span><br><span class="line">        ...</span><br><span class="line">  400aa0:       e0 0a 40 00 00 00 00 00 c0 09 40 00 00 00 00 00     ..@.......@.....</span><br><span class="line"></span><br><span class="line">0000000000400ab0 &lt;vtable for B&gt;:</span><br><span class="line">        ...</span><br><span class="line">  400ab8:       00 0b 40 00 00 00 00 00 94 09 40 00 00 00 00 00     ..@.......@.....</span><br><span class="line"></span><br><span class="line">0000000000400ac8 &lt;vtable for A&gt;:</span><br><span class="line">        ...</span><br><span class="line">  400ad0:       20 0b 40 00 00 00 00 00 68 09 40 00 00 00 00 00      .@.....h.@.....</span><br><span class="line"></span><br><span class="line">0000000000400ae0 &lt;typeinfo for C&gt;:</span><br><span class="line">  400ae0:       b0 0d 60 00 00 00 00 00 f8 0a 40 00 00 00 00 00     ..`.......@.....</span><br><span class="line">  400af0:       00 0b 40 00 00 00 00 00                             ..@.....</span><br><span class="line"></span><br><span class="line">0000000000400af8 &lt;typeinfo name for C&gt;:</span><br><span class="line">  400af8:       31 43 00 00 00 00 00 00                             1C......</span><br><span class="line"></span><br><span class="line">0000000000400b00 &lt;typeinfo for B&gt;:</span><br><span class="line">  400b00:       b0 0d 60 00 00 00 00 00 18 0b 40 00 00 00 00 00     ..`.......@.....</span><br><span class="line">  400b10:       20 0b 40 00 00 00 00 00                              .@.....</span><br><span class="line"></span><br><span class="line">0000000000400b18 &lt;typeinfo name for B&gt;:</span><br><span class="line">  400b18:       31 42 00 00 00 00 00 00                             1B......</span><br><span class="line"></span><br><span class="line">0000000000400b20 &lt;typeinfo for A&gt;:</span><br><span class="line">  400b20:       50 0d 60 00 00 00 00 00 30 0b 40 00 00 00 00 00     P.`.....0.@.....</span><br><span class="line"></span><br><span class="line">0000000000400b30 &lt;typeinfo name for A&gt;:</span><br><span class="line">  400b30:       31 41 00                                            1A.</span><br></pre></td></tr></table></figure>
-
-<h1 id="反汇编某个data-section"><a href="#反汇编某个data-section" class="headerlink" title="反汇编某个data section"></a>反汇编某个data section</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">wqj@WQJ:~/demo$ objdump -C -S -z -j .data.rel.ro.local a.out </span><br><span class="line"></span><br><span class="line">a.out:     file format elf64-x86<span class="number">-64</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Disassembly of section .data.rel.ro.local:</span><br><span class="line"></span><br><span class="line"><span class="number">0000000000001</span>d28 &lt;vtable <span class="keyword">for</span> Derived&gt;:</span><br><span class="line">    <span class="number">1</span>d28:       <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">78</span> <span class="number">1</span>d <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ........x.......</span><br><span class="line">    <span class="number">1</span>d38:       dc <span class="number">08</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> cc <span class="number">08</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ................</span><br><span class="line"></span><br><span class="line"><span class="number">0000000000001</span>d48 &lt;vtable <span class="keyword">for</span> Base&gt;:</span><br><span class="line">    <span class="number">1</span>d48:       <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">90</span> <span class="number">1</span>d <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ................</span><br><span class="line">    <span class="number">1</span>d58:       bc <span class="number">08</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> cc <span class="number">08</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ................</span><br></pre></td></tr></table></figure>
-
-<h1 id="disassemble-text-and-rodata-sections"><a href="#disassemble-text-and-rodata-sections" class="headerlink" title="disassemble .text and .rodata sections"></a>disassemble .text and .rodata sections</h1><p>分析虚函数表用到</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">objdump -C -j .rodata -j .text -z -S demo</span><br><span class="line"></span><br><span class="line">-d 反汇编会略去<span class="number">0</span></span><br><span class="line">-z 反汇编显示<span class="number">0</span></span><br></pre></td></tr></table></figure>
-
-<h1 id="d-vs-z"><a href="#d-vs-z" class="headerlink" title="-d vs -z"></a>-d vs -z</h1><p>-d 把 [0x400b50, 400b57] 8B的全0给省略了，带来困扰</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0000000000400b</span>50 &lt;vtable <span class="keyword">for</span> C&gt;:</span><br><span class="line">	...</span><br><span class="line">  <span class="number">400b</span>58:	b0 <span class="number">0b</span> <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">02</span> <span class="number">0</span>a <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ..@.......@.....</span><br><span class="line">  <span class="number">400b</span>68:	aa <span class="number">09</span> <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>                             ..@.....</span><br></pre></td></tr></table></figure>
-
-<p>-z</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0000000000400b</span>50 &lt;vtable <span class="keyword">for</span> C&gt;:</span><br><span class="line">  <span class="number">400b</span>50:	<span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> b0 <span class="number">0b</span> <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ..........@.....</span><br><span class="line">  <span class="number">400b</span>60:	<span class="number">02</span> <span class="number">0</span>a <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> aa <span class="number">09</span> <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ..@.......@.....</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/sar/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/linux/sar/" class="post-title-link" itemprop="url">Linux sar</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>10k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>17 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>sar &#x3D; <strong>s</strong>ystem <strong>a</strong>ctivity <strong>r</strong>eport</p>
-<p>sar是一套组件，监控Linux系统整体各项运行参数（CPU，内存等），同时支持以文件形式保留过去N天的历史记录以备后续查看。</p>
-<ul>
-<li>sar(system activity reporter) - 收集、存储与展示各项参数</li>
-<li>sadc(system activity data collector) - 收集各项参数，是sar背后的数据来源</li>
-<li><a target="_blank" rel="noopener" href="https://github.com/sysstat/sysstat/blob/master/sa1.in">sa1</a> - 是封装了sadc的shell脚本（<code>vim /usr/lib64/sa/sa1</code>查看实现），特别适配了跨天等特殊情况，专门用于cron定时任务</li>
-<li><a target="_blank" rel="noopener" href="https://github.com/sysstat/sysstat/blob/master/sa2.in">sa2</a> - 是封装了sar的shell脚本（<code>vim /usr/lib64/sa/sa2</code>），同sa1，专门用于cron</li>
-<li>sadf(system activity data formatter) displays data collected by sar in multiple formats (CSV, XML, JSON, etc.)</li>
-</ul>
-<p>是否装了</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">which</span> sar</span></span><br><span class="line">/usr/bin/sar</span><br></pre></td></tr></table></figure>
-
-<p>如果没有，安装命令（sar包含在sysstat工具中）:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install sysstat</span><br></pre></td></tr></table></figure>
-
-<h1 id="命令说明"><a href="#命令说明" class="headerlink" title="命令说明"></a>命令说明</h1><h2 id="sar"><a href="#sar" class="headerlink" title="sar"></a>sar</h2><p>集收集、存储与展示与一体，输出为人可直接读格式。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sar [options] [interval] [count]</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>有interval则取实时数据，无则读取当天的 <code>/var/log/sa/sadd</code> 历史数据，或者-f指明读取那个文件</p>
-</li>
-<li><p>有count则执行count次，无count则按interval持续采样</p>
-</li>
-</ul>
-<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><p>只列出大部分常见的选项，完整选项及输出中各列的含义参考：<code>man sar</code></p>
-<h4 id="CPU"><a href="#CPU" class="headerlink" title="CPU"></a>CPU</h4><blockquote>
-<p>-u    Report CPU utilization.</p>
-</blockquote>
-<p>间隔1秒，实时采样cpu利用率</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# sar -u 1</span><br><span class="line">Linux 3.10.0-957.21.2.el7.x86_64 (localhost.localdomain)        11/28/2023      _x86_64_        (8 CPU)</span><br><span class="line"></span><br><span class="line">02:01:31 PM     CPU     %user     %nice   %system   %iowait    %steal     %idle</span><br><span class="line">02:01:32 PM     all      0.00      0.00      0.00      0.00      0.00    100.00</span><br><span class="line">02:01:33 PM     all      0.00      0.00      0.00      0.12      0.00     99.88</span><br><span class="line">02:01:34 PM     all      0.00      0.00      0.00      0.00      0.00    100.00</span><br><span class="line">Average:        all      0.00      0.00      0.00      0.04      0.00     99.96</span><br></pre></td></tr></table></figure>
-
-<h4 id="内存"><a href="#内存" class="headerlink" title="内存"></a>内存</h4><blockquote>
-<p>-r     Report memory utilization statistics.</p>
-<p>-R     Report memory statistics. </p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 release]$ sar -r 1</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">03:41:09 PM kbmemfree kbmemused  %memused kbbuffers  kbcached  kbcommit   %commit  kbactive   kbinact   kbdirty</span><br><span class="line">03:41:10 PM    245456  32532996     99.25     52744  15628984  33275528    101.52  22506656   8187572       632</span><br><span class="line">03:41:11 PM    248036  32530416     99.24     52744  15629016  33276372    101.52  22506524   8187576       816</span><br><span class="line">03:41:12 PM    332940  32445512     98.98     52760  15561484  33257372    101.46  22454672   8154880       748</span><br><span class="line">03:41:13 PM    328256  32450196     99.00     52760  15562648  33260864    101.47  22457052   8155832       780</span><br><span class="line">03:41:14 PM    330184  32448268     98.99     52760  15562676  33260168    101.47  22457036   8155836       876</span><br><span class="line">03:41:15 PM    329732  32448720     98.99     52760  15562708  33258960    101.47  22455684   8155836       948</span><br></pre></td></tr></table></figure>
-
-<h4 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h4><blockquote>
-<p>-n Report network statistics.</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 glinkd]$ sar -n TCP 1</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">03:55:51 PM  active/s passive/s    iseg/s    oseg/s</span><br><span class="line">03:55:52 PM      3.00      0.00   8188.00  10050.00</span><br><span class="line">03:55:53 PM      3.00      0.00   9427.00  11465.00</span><br><span class="line">03:55:54 PM      5.00      0.00   7342.00   8941.00</span><br></pre></td></tr></table></figure>
-
-<h4 id="I-O"><a href="#I-O" class="headerlink" title="I&#x2F;O"></a>I&#x2F;O</h4><blockquote>
-<p>-b     Report I&#x2F;O and transfer rate statistics. </p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 glinkd]$ sar -b 1</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">03:59:49 PM       tps      rtps      wtps   bread/s   bwrtn/s</span><br><span class="line">03:59:50 PM    134.00      0.00    134.00      0.00    588.00</span><br><span class="line">03:59:51 PM    123.00      0.00    123.00      0.00    543.00</span><br><span class="line">03:59:52 PM     94.00      0.00     94.00      0.00    407.00</span><br><span class="line">03:59:53 PM    150.00      0.00    150.00      0.00    659.00</span><br></pre></td></tr></table></figure>
-
-<h4 id="块设备"><a href="#块设备" class="headerlink" title="块设备"></a>块设备</h4><blockquote>
-<p>-d     Report activity for each block device. </p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 glinkd]$ sar -d 1</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">04:00:25 PM       DEV       tps  rd_sec/s  wr_sec/s  avgrq-sz  avgqu-sz     await     svctm     %util</span><br><span class="line">04:00:26 PM  dev253-0      3.00      0.00    160.00     53.33      0.00      1.33      1.00      0.30</span><br><span class="line">04:00:26 PM dev253-16    202.00      0.00   2488.00     12.32      0.65      3.50      1.51     30.50</span><br><span class="line"></span><br><span class="line">04:00:26 PM       DEV       tps  rd_sec/s  wr_sec/s  avgrq-sz  avgqu-sz     await     svctm     %util</span><br><span class="line">04:00:27 PM  dev253-0      1.00      0.00      8.00      8.00      0.00      1.00      1.00      0.10</span><br><span class="line">04:00:27 PM dev253-16    108.00      0.00    499.00      4.62      0.09      2.07      0.75      8.10</span><br></pre></td></tr></table></figure>
-
-<h4 id="页面系统"><a href="#页面系统" class="headerlink" title="页面系统"></a>页面系统</h4><blockquote>
-<p>-B     Report paging statistics. </p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 glinkd]$ sar 1 -B</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">03:50:01 PM  pgpgin/s pgpgout/s   fault/s  majflt/s  pgfree/s pgscank/s pgscand/s pgsteal/s    %vmeff</span><br><span class="line">03:50:02 PM      0.00    142.00  13400.00      0.00   9255.00      0.00      0.00      0.00      0.00</span><br><span class="line">03:50:03 PM      0.00    250.00  18728.00      0.00  12830.00      0.00      0.00      0.00      0.00</span><br><span class="line">03:50:04 PM      0.00    344.00  14404.00      0.00  10405.00      0.00      0.00      0.00      0.00</span><br><span class="line">03:50:05 PM      0.00    218.00  58759.00      0.00  22695.00      0.00      0.00      0.00      0.00</span><br></pre></td></tr></table></figure>
-
-<h4 id="任务创建与调度"><a href="#任务创建与调度" class="headerlink" title="任务创建与调度"></a>任务创建与调度</h4><blockquote>
-<p>-w     Report task creation and system switching activity.</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 glinkd]$ sar -w 1</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">04:03:15 PM    proc/s   cswch/s</span><br><span class="line">04:03:16 PM      6.00 157005.00</span><br><span class="line">04:03:17 PM      8.00 154067.00</span><br><span class="line">04:03:18 PM     11.00 158563.00</span><br><span class="line">04:03:19 PM      7.00 154540.00</span><br><span class="line">04:03:20 PM      8.00 149415.00</span><br><span class="line">04:03:21 PM     10.00 153150.00</span><br><span class="line">04:03:22 PM      7.00 153668.00</span><br></pre></td></tr></table></figure>
-
-<h4 id="任务队列负载"><a href="#任务队列负载" class="headerlink" title="任务队列负载"></a>任务队列负载</h4><blockquote>
-<p>-q Report queue length and load averages.</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 glinkd]$ sar -q 1</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">03:52:59 PM   runq-sz  plist-sz   ldavg-1   ldavg-5  ldavg-15   blocked</span><br><span class="line">03:53:00 PM         3      2451      6.25      8.25      9.51         0</span><br><span class="line">03:53:01 PM         8      2450      6.25      8.25      9.51         0</span><br><span class="line">03:53:02 PM        10      2453      6.25      8.25      9.51         0</span><br><span class="line">03:53:03 PM         3      2453      6.25      8.25      9.51         0</span><br></pre></td></tr></table></figure>
-
-<h4 id="swap"><a href="#swap" class="headerlink" title="swap"></a>swap</h4><blockquote>
-<p>-S     Report swap space utilization statistics. </p>
-<p>-W     Report swapping statistics.</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 glinkd]$ sar 1 -S</span><br><span class="line">Linux 3.10.0-1062.18.1.el7.x86_64 (vm10-245-65-72.cloud.local)  11/28/2023      _x86_64_        (16 CPU)</span><br><span class="line"></span><br><span class="line">03:52:08 PM kbswpfree kbswpused  %swpused  kbswpcad   %swpcad</span><br><span class="line">03:52:09 PM         0         0      0.00         0      0.00</span><br><span class="line">03:52:10 PM         0         0      0.00         0      0.00</span><br><span class="line">03:52:11 PM         0         0      0.00         0      0.00</span><br><span class="line">03:52:12 PM         0         0      0.00         0      0.00</span><br><span class="line">03:52:13 PM         0         0      0.00         0      0.00</span><br></pre></td></tr></table></figure>
-
-<h4 id="中断"><a href="#中断" class="headerlink" title="中断"></a>中断</h4><blockquote>
-<p>-I    Report  statistics  for a given interrupt.</p>
-</blockquote>
-<p>中断次数</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost demo]# sar -I ALL 1</span><br><span class="line">Linux 3.10.0-957.21.2.el7.x86_64 (localhost.localdomain)        11/28/2023      _x86_64_        (8 CPU)</span><br><span class="line"></span><br><span class="line">03:20:01 PM      INTR    intr/s</span><br><span class="line">03:20:03 PM         0      0.00</span><br><span class="line">03:20:03 PM         1      0.00</span><br><span class="line">03:20:03 PM         2      0.00</span><br><span class="line">03:20:03 PM         3      0.00</span><br><span class="line">03:20:03 PM         4      0.00</span><br><span class="line">03:20:03 PM         5      0.00</span><br><span class="line">03:20:03 PM         6      0.00</span><br><span class="line">03:20:03 PM         7      0.00</span><br><span class="line">03:20:03 PM         8      0.00</span><br><span class="line">03:20:03 PM         9      0.00</span><br><span class="line">03:20:03 PM        10      0.00</span><br><span class="line">03:20:03 PM        11      0.00</span><br><span class="line">03:20:03 PM        12      0.00</span><br><span class="line">03:20:03 PM        13      0.00</span><br><span class="line">03:20:03 PM        14      0.00</span><br><span class="line">03:20:03 PM        15      1.89</span><br></pre></td></tr></table></figure>
-
-<h2 id="sadc"><a href="#sadc" class="headerlink" title="sadc"></a>sadc</h2><p>专门用于收集运行参数，输出为二进制格式，人不可直接读，命令格式为：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/lib64/sa/sadc [options] [interval [count] &gt; &lt;sadc_outfile&gt;</span><br></pre></td></tr></table></figure>
-
-<h3 id="例子-1"><a href="#例子-1" class="headerlink" title="例子"></a>例子</h3><p>以1秒间隔，收集3次所有参数，结果存到sadc.out文件（二进制格式），需要用sar解析为可读格式</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/lib64/sa/sadc 1 3 &gt; sadc.out</span><br></pre></td></tr></table></figure>
-
-<p>用sar解析刚刚生成的sadc.out文件为可读格式</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sar -A -f &lt;sadc outfile&gt; &gt; &lt;sar outfile&gt;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>-A 所有运行参数</p>
-</li>
-<li><p>-f 指明二进制数据文件</p>
-</li>
-</ul>
-<p>输出到命令行：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost demo]# sar -A -f sadc.out</span><br><span class="line">Linux 3.10.0-957.21.2.el7.x86_64 (localhost.localdomain)        11/28/2023      _x86_64_        (8 CPU)</span><br><span class="line"></span><br><span class="line">02:21:15 PM     CPU      %usr     %nice      %sys   %iowait    %steal      %irq     %soft    %guest    %gnice     %idle</span><br><span class="line">02:21:16 PM     all      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00    100.00</span><br><span class="line">02:21:16 PM       0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00    100.00</span><br><span class="line">02:21:16 PM       1      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00    100.00</span><br><span class="line">02:21:16 PM       2      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00    100.00</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">02:21:15 PM    proc/s   cswch/s</span><br><span class="line">02:21:16 PM      1.00     37.00</span><br><span class="line">02:21:17 PM      0.00     34.00</span><br><span class="line">Average:         0.50     35.50</span><br><span class="line"></span><br><span class="line">02:21:15 PM  pswpin/s pswpout/s</span><br><span class="line">02:21:16 PM      0.00      0.00</span><br><span class="line">02:21:17 PM      0.00      0.00</span><br><span class="line">Average:         0.00      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM  pgpgin/s pgpgout/s   fault/s  majflt/s  pgfree/s pgscank/s pgscand/s pgsteal/s    %vmeff</span><br><span class="line">02:21:16 PM      0.00      0.00     22.00      0.00     27.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM      0.00      0.00     17.00      0.00     28.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:         0.00      0.00     19.50      0.00     27.50      0.00      0.00      0.00      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM       tps      rtps      wtps   bread/s   bwrtn/s</span><br><span class="line">02:21:16 PM      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:         0.00      0.00      0.00      0.00      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM   frmpg/s   bufpg/s   campg/s</span><br><span class="line">02:21:16 PM      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM     25.00      0.00     -1.00</span><br><span class="line">Average:        12.50      0.00     -0.50</span><br><span class="line"></span><br><span class="line">02:21:15 PM kbmemfree kbmemused  %memused kbbuffers  kbcached  kbcommit   %commit  kbactive   kbinact   kbdirty</span><br><span class="line">02:21:16 PM  11018224    969344      8.09      3140    408484    539808      3.83    303072    192240         0</span><br><span class="line">02:21:17 PM  11018324    969244      8.09      3140    408480    539808      3.83    303204    192240         8</span><br><span class="line">Average:     11018274    969294      8.09      3140    408482    539808      3.83    303138    192240         4</span><br><span class="line"></span><br><span class="line">02:21:15 PM kbswpfree kbswpused  %swpused  kbswpcad   %swpcad</span><br><span class="line">02:21:16 PM   2097148         0      0.00         0      0.00</span><br><span class="line">02:21:17 PM   2097148         0      0.00         0      0.00</span><br><span class="line">Average:      2097148         0      0.00         0      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM kbhugfree kbhugused  %hugused</span><br><span class="line">02:21:16 PM         0         0      0.00</span><br><span class="line">02:21:17 PM         0         0      0.00</span><br><span class="line">Average:            0         0      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM dentunusd   file-nr  inode-nr    pty-nr</span><br><span class="line">02:21:16 PM    108395      1760     91408         2</span><br><span class="line">02:21:17 PM    108395      1760     91408         2</span><br><span class="line">Average:       108395      1760     91408         2</span><br><span class="line"></span><br><span class="line">02:21:15 PM   runq-sz  plist-sz   ldavg-1   ldavg-5  ldavg-15   blocked</span><br><span class="line">02:21:16 PM         0       210      0.00      0.01      0.05         0</span><br><span class="line">02:21:17 PM         0       210      0.00      0.01      0.05         0</span><br><span class="line">Average:            0       210      0.00      0.01      0.05         0</span><br><span class="line"></span><br><span class="line">02:21:15 PM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s</span><br><span class="line">02:21:16 PM    enp0s3      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:16 PM        lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:16 PM virbr0-nic      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:16 PM    virbr0      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM    enp0s3      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM        lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM virbr0-nic      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM    virbr0      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:       enp0s3      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:    virbr0-nic      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:       virbr0      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM     IFACE   rxerr/s   txerr/s    coll/s  rxdrop/s  txdrop/s  txcarr/s  rxfram/s  rxfifo/s  txfifo/s</span><br><span class="line">02:21:16 PM    enp0s3      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:16 PM        lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:16 PM virbr0-nic      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:16 PM    virbr0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM    enp0s3      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM        lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM virbr0-nic      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM    virbr0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:       enp0s3      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:    virbr0-nic      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:       virbr0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM    call/s retrans/s    read/s   write/s  access/s  getatt/s</span><br><span class="line">02:21:16 PM      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:         0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM   scall/s badcall/s  packet/s     udp/s     tcp/s     hit/s    miss/s   sread/s  swrite/s saccess/s sgetatt/s</span><br><span class="line">02:21:16 PM      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">02:21:17 PM      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:         0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line"></span><br><span class="line">02:21:15 PM    totsck    tcpsck    udpsck    rawsck   ip-frag    tcp-tw</span><br><span class="line">02:21:16 PM       294        10         5         0         0         0</span><br><span class="line">02:21:17 PM       294        10         5         0         0         0</span><br><span class="line">Average:          294        10         5         0         0         0</span><br></pre></td></tr></table></figure>
-
-<h2 id="sa1-和-sa2"><a href="#sa1-和-sa2" class="headerlink" title="sa1 和 sa2"></a>sa1 和 sa2</h2><p>sa1和sa2分别是sadc和sar的定时任务版，特别适配了cron定时任务执行环境（如跨天等）。</p>
-<p><code>/usr/lib64/sa/sa1</code> 封装了 sadc，收集的数据，以二进制形式写入 <code>/var/log/sa/saDD</code> (DD是天数占位符)</p>
-<ul>
-<li>例如：2023&#x2F;11&#x2F;28的所有sa1结果都存到：&#x2F;var&#x2F;log&#x2F;sa&#x2F;sa28</li>
-</ul>
-<p><code>/usr/local/lib64/sa/sa2</code> 封装了sar，取今天的 <code>/var/log/sa/saDD</code> 解析为人可直接读格式，另存为 <code>/var/log/sa/sarDD</code> (文件名多了个 r)</p>
-<ul>
-<li>例如：2023&#x2F;11&#x2F;28 执行后，sa2读取 &#x2F;var&#x2F;log&#x2F;sa&#x2F;sa28，另存为人可读的：&#x2F;var&#x2F;log&#x2F;sa&#x2F;sar28</li>
-</ul>
-<h3 id="例子-2"><a href="#例子-2" class="headerlink" title="例子"></a>例子</h3><p>centos7 默认配置了每隔10分钟执行一次sadc，和每天 23:53:00 执行一次 sar 的定时任务。</p>
-<p>定时任务</p>
-<ul>
-<li><p><code>*/10 * * * * root /usr/lib64/sa/sa1 1 1</code> 每隔10分钟运行一次sa1(即sadc)，收集一次系统所有运行参数，结果保存至 <code>/var/log/sa/sadd</code> 文件(以二进制格式存储), dd是占位符，代表具体天数，取值 [01, 31]，比如 2023&#x2F;11&#x2F;28 的结果都存到文件: <code>/var/log/sa/sa28</code>。</p>
-</li>
-<li><p><code>53 23 * * * root /usr/lib64/sa/sa2 -A</code> 每天的 23:53:00 执行一次 sa2(即sar), 读上一步每隔10分钟收集一次的定时任务生成的当天的所有数据 <code>/var/log/sa/sadd</code>，用sar解析成可读的版本存到文件 <code>/var/log/sa/sardd</code>，例如 2023&#x2F;11&#x2F;28 日，23:53:00 读取 <code>/var/log/sa/sa28</code> 生成可读版本 <code>/var/log/sa/sar28</code></p>
-</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@vm10-245-65-72 ~]# cat /etc/cron.d/sysstat</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Run system activity accounting tool every 10 minutes</span></span><br><span class="line">*/10 * * * * root /usr/lib64/sa/sa1 1 1</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">0 * * * * root /usr/lib64/sa/sa1 600 6 &amp;</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Generate a daily summary of process accounting at 23:53</span></span><br><span class="line">53 23 * * * root /usr/lib64/sa/sa2 -A</span><br></pre></td></tr></table></figure>
-
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考:"></a>参考:</h1><ul>
-<li><p><a target="_blank" rel="noopener" href="https://linux.die.net/man/8/sadc">sadc(8) - Linux man page</a></p>
-</li>
-<li><p><a target="_blank" rel="noopener" href="http://www.lostpenguin.net/index.php/sar-sadc-sa1/">Sar, Sadc &amp; Sa1</a></p>
-</li>
-<li><p><a target="_blank" rel="noopener" href="https://luppeng.wordpress.com/2023/05/03/differences-between-sadc-and-sar-vs-sa1-and-sa2/">Differences Between sadc and sar, vs sa1 and sa2</a></p>
-</li>
-<li><p><a target="_blank" rel="noopener" href="https://www.thegeekstuff.com/2011/03/sar-examples/">10 Useful Sar (Sysstat) Examples for UNIX &#x2F; Linux Performance Monitoring</a></p>
-</li>
-</ul>
 
       
     </div>
