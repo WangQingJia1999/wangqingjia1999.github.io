@@ -144,7 +144,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-count">59</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -167,6 +167,101 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" class="post-title-link" itemprop="url">C++ 内存对齐</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>624</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>1 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>来源：<a target="_blank" rel="noopener" href="https://stackoverflow.com/a/17820362/11850070">https://stackoverflow.com/a/17820362/11850070</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">S1</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">char</span> c1;</span><br><span class="line">  <span class="type">double</span> d1;</span><br><span class="line">  <span class="type">char</span> c2;</span><br><span class="line">  <span class="type">double</span> d2;</span><br><span class="line">  <span class="type">char</span> c3;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">S2</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">double</span> d1;</span><br><span class="line">  <span class="type">double</span> d2;</span><br><span class="line">  <span class="type">char</span> c1;</span><br><span class="line">  <span class="type">char</span> c2;</span><br><span class="line">  <span class="type">char</span> c3;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;sizeof(S1)=&quot;</span> &lt;&lt; <span class="built_in">sizeof</span>(S1) &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;sizeof(S2)=&quot;</span> &lt;&lt; <span class="built_in">sizeof</span>(S2) &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sizeof</span>(S1)=<span class="number">40</span></span><br><span class="line"><span class="built_in">sizeof</span>(S2)=<span class="number">24</span></span><br></pre></td></tr></table></figure>
+
+<p>每个字符代表1B，对齐规则为:</p>
+<p>1.基本类型的对齐值就是其sizeof值;</p>
+<p>2.结构体的对齐值是其成员的最大对齐值;</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sizeof(S1) = 40B</span></span><br><span class="line">c*******ddddddddc*******ddddddddc*******</span><br><span class="line"></span><br><span class="line"><span class="comment">// sizeof(S2) = 24B</span></span><br><span class="line">ddddddddddddddddccc*****</span><br></pre></td></tr></table></figure>
+
+<p>因此总的原则是，按从类型从大到小的顺序依次声明成员变量。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -239,6 +334,101 @@
 <p>输出</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1 2 3 4 </span><br></pre></td></tr></table></figure>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">nums[j + <span class="number">1</span>] = nums[j--];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 1. 取 nums[j]，即 nums[0] = 1</span></span><br><span class="line"><span class="comment">// 2. j--，此时 j 为 -1</span></span><br><span class="line"><span class="comment">// 3. 将 1 赋值给 nums[j+1] = nums[-1+1] = nums[0]，所以是自己赋值给自己，数组没有任何变化</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E5%86%85%E8%81%94%E6%B1%87%E7%BC%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/%E5%86%85%E8%81%94%E6%B1%87%E7%BC%96/" class="post-title-link" itemprop="url">C++内联汇编</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.6k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><a target="_blank" rel="noopener" href="https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html">Extended Asm (Using the GNU Compiler Collection (GCC))</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> a = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> b = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> result;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Inline assembly to add &#x27;a&#x27; and &#x27;b&#x27; and store the result in &#x27;result&#x27;</span></span><br><span class="line"></span><br><span class="line">    __asm__(</span><br><span class="line"></span><br><span class="line">        <span class="string">&quot;add %1, %2\\n&quot;</span>     <span class="comment">// b = a + b</span></span><br><span class="line"></span><br><span class="line">        <span class="string">&quot;mov %2, %0\\n&quot;</span>     <span class="comment">// result = b</span></span><br><span class="line"></span><br><span class="line">        : <span class="string">&quot;=r&quot;</span>(result)       <span class="comment">// Output operand</span></span><br><span class="line"></span><br><span class="line">        : <span class="string">&quot;r&quot;</span>(a), <span class="string">&quot;r&quot;</span>(b)     <span class="comment">// Input operands</span></span><br><span class="line"></span><br><span class="line">        : <span class="string">&quot;cc&quot;</span>               <span class="comment">// The clobber &quot;cc&quot; informs the compiler that the assembly code may modify the condition codes (flags).</span></span><br><span class="line"></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Great example to help to understand RAX:RDX pair used in instructions like <code>MUL</code>.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstdint&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="type">uint64_t</span> a = <span class="number">0xFFFFFFFFFFFFFFFF</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">uint64_t</span> b = <span class="number">0x0000000000000002</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">uint64_t</span> result_low, result_high;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Multiply &#x27;a&#x27; and &#x27;b&#x27; using inline assembly and store the 128-bit result</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// in the RDX:RAX register pair</span></span><br><span class="line"></span><br><span class="line">    __asm__(</span><br><span class="line"></span><br><span class="line">        <span class="string">&quot;mulq %3&quot;</span>            <span class="comment">// Multiply RAX (implicitly) with &#x27;b&#x27;, result stored in RDX:RAX</span></span><br><span class="line"></span><br><span class="line">        : <span class="string">&quot;=a&quot;</span>(result_low),  <span class="comment">// Output operand for the lower 64 bits (RAX)</span></span><br><span class="line"></span><br><span class="line">          <span class="string">&quot;=d&quot;</span>(result_high)  <span class="comment">// Output operand for the upper 64 bits (RDX)</span></span><br><span class="line"></span><br><span class="line">        : <span class="string">&quot;0&quot;</span>(a),            <span class="comment">// Input operand for &#x27;a&#x27; (placed in RAX)</span></span><br><span class="line"></span><br><span class="line">          <span class="string">&quot;rm&quot;</span>(b)            <span class="comment">// Input operand for &#x27;b&#x27;</span></span><br><span class="line"></span><br><span class="line">        : <span class="string">&quot;cc&quot;</span>               <span class="comment">// Clobbers</span></span><br><span class="line"></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Result (high): 0x&quot;</span> &lt;&lt; std::hex &lt;&lt; result_high &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Result (low):  0x&quot;</span> &lt;&lt; std::hex &lt;&lt; result_low &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>cmpxchg8b m64<br>当 DA &#x3D;&#x3D; m64 时，把 BC 存入 m64</p>
+<ul>
+<li>m64 - 待比较和更新值的内存地址</li>
+<li>EDX:EAX - 如果EDX:EAX !&#x3D; m64, 则把m64存到EDX:EAX</li>
+<li>ECX:EBX - 如果EDX:EAX &#x3D;&#x3D; m64，则把该新值存入 m64</li>
+</ul>
 
       
     </div>
@@ -624,300 +814,6 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/make/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/make/" class="post-title-link" itemprop="url">未命名</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>2.2k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>4 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>The <code>make</code> command in Linux is a utility used to automate the compilation and building process of projects. It reads a file named <code>Makefile</code> that contains a set of directives about how to compile and link a program. Here’s a brief overview of the syntax and key concepts of a <code>Makefile</code>:</p>
-<h3 id="Basic-Structure"><a href="#Basic-Structure" class="headerlink" title="Basic Structure"></a>Basic Structure</h3><p>A <code>Makefile</code> typically consists of a set of rules. A rule is made up of three parts:</p>
-<ol>
-<li><strong>Target</strong>: The name of the file that the rule produces.</li>
-<li><strong>Prerequisites</strong>: The files that are used as input to create the target.</li>
-<li><strong>Recipe</strong>: The commands that will be executed to create the target from the prerequisites.</li>
-</ol>
-<p>The basic syntax of a rule is:</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">target: prerequisites</span></span><br><span class="line">    recipe</span><br></pre></td></tr></table></figure>
-
-<h3 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h3><p>Here’s a simple example of a <code>Makefile</code> that compiles a C program:</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Define the compiler</span></span><br><span class="line">CC=gcc</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the compiler flags</span></span><br><span class="line">CFLAGS=-Wall</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the target executable</span></span><br><span class="line">TARGET=myprogram</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the rule for the target</span></span><br><span class="line"><span class="variable">$(TARGET)</span>: <span class="variable">$(TARGET)</span>.c</span><br><span class="line">    <span class="variable">$(CC)</span> <span class="variable">$(CFLAGS)</span> -o <span class="variable">$(TARGET)</span> <span class="variable">$(TARGET)</span>.c</span><br></pre></td></tr></table></figure>
-
-<h3 id="Variables"><a href="#Variables" class="headerlink" title="Variables"></a>Variables</h3><p>You can define variables in a <code>Makefile</code> to make it more readable and maintainable. In the example above, <code>CC</code>, <code>CFLAGS</code>, and <code>TARGET</code> are variables.</p>
-<h3 id="Comments"><a href="#Comments" class="headerlink" title="Comments"></a>Comments</h3><p>Comments in a <code>Makefile</code> start with the <code>#</code> symbol. Anything following this symbol on a line is considered a comment.</p>
-<h3 id="Phony-Targets"><a href="#Phony-Targets" class="headerlink" title="Phony Targets"></a>Phony Targets</h3><p>By default, Makefile targets are “file targets” - they are used to build files from other files. Make assumes its target is a file, and this makes writing Makefiles relatively easy:</p>
-<p>In terms of Make, a phony target is simply a target that is always out-of-date, so whenever you ask make <phony_target>, it will run, independent from the state of the file system. Some common make targets that are often phony are: all, install, clean, distclean, TAGS, info, check.</p>
-<p>A phony target is one that does not represent a file. It’s used to avoid conflicts with files of the same name and to improve performance. You can declare phony targets using the <code>.PHONY</code> directive.</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"><span class="keyword">.PHONY</span>: clean</span></span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">    rm -f <span class="variable">$(TARGET)</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="Advanced-Features"><a href="#Advanced-Features" class="headerlink" title="Advanced Features"></a>Advanced Features</h3><ul>
-<li><strong>Pattern Rules</strong>: Allow you to define generic rules using <code>%</code> as a pattern matcher.</li>
-<li><strong>Automatic Variables</strong>: Variables like <code>$@</code> (the name of the target), <code>$&lt;</code> (the name of the first prerequisite), and <code>$^</code> (the names of all the prerequisites) are set automatically and can be used in recipes.</li>
-<li><strong>Conditional Execution</strong>: You can include conditionals in a <code>Makefile</code> to control the flow based on certain conditions.</li>
-</ul>
-<h3 id="Running-Make"><a href="#Running-Make" class="headerlink" title="Running Make"></a>Running Make</h3><p>To run <code>make</code>, simply type <code>make</code> in the terminal in the directory containing the <code>Makefile</code>. If you want to run a specific target, type <code>make &lt;target_name&gt;</code>.</p>
-<p>This overview covers the basics of <code>make</code> syntax. <code>make</code> is a powerful tool with many more features and capabilities to explore.</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/new-operator/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/new-operator/" class="post-title-link" itemprop="url">C++ placement new</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>2.3k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>4 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="placement-new"><a href="#placement-new" class="headerlink" title="placement new"></a>placement new</h1><p>在预先申请好的一片内存上构造对象。</p>
-<p>比如 vector 的 reserve()，先预先申请足够的内存，后续用 placement new按需构造对象。</p>
-<p>在内存池和垃圾回收器中经常用到。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> *buf  = <span class="keyword">new</span> <span class="type">char</span>[<span class="built_in">sizeof</span>(string)]; <span class="comment">// pre-allocated buffer</span></span><br><span class="line">string *p = <span class="built_in">new</span> (buf) <span class="built_in">string</span>(<span class="string">&quot;hi&quot;</span>);    <span class="comment">// placement new</span></span><br><span class="line">string *q = <span class="keyword">new</span> <span class="built_in">string</span>(<span class="string">&quot;hi&quot;</span>);          <span class="comment">// ordinary heap allocation</span></span><br></pre></td></tr></table></figure>
-
-<h1 id="那有-placement-delete-吗？"><a href="#那有-placement-delete-吗？" class="headerlink" title="那有 placement delete 吗？"></a>那有 placement delete 吗？</h1><p>没有</p>
-<h1 id="vector的placement-new"><a href="#vector的placement-new" class="headerlink" title="vector的placement new"></a>vector的placement new</h1><h2 id="allocate"><a href="#allocate" class="headerlink" title="allocate"></a>allocate</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">(gdb) bt</span><br><span class="line">#<span class="number">0</span>  __gnu_cxx::new_allocator&lt;S&gt;::<span class="built_in">allocate</span> (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __n=<span class="number">1</span>) at /usr/include/c++/<span class="number">9</span>/ext/new_allocator.h:<span class="number">114</span></span><br><span class="line">#<span class="number">1</span>  <span class="number">0x000055555555583a</span> in std::allocator_traits&lt;std::allocator&lt;S&gt; &gt;::<span class="built_in">allocate</span> (__a=..., __n=<span class="number">1</span>) at /usr/include/c++/<span class="number">9</span>/bits/alloc_traits.h:<span class="number">443</span></span><br><span class="line">#<span class="number">2</span>  <span class="number">0x000055555555569c</span> in std::_Vector_base&lt;S, std::allocator&lt;S&gt; &gt;::_M_allocate (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __n=<span class="number">1</span>) at /usr/include/c++/<span class="number">9</span>/bits/stl_vector.h:<span class="number">343</span></span><br><span class="line">#<span class="number">3</span>  <span class="number">0x00005555555551e7</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::_M_realloc_insert&lt;S&gt; (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __position=non-dereferenceable iterator <span class="keyword">for</span> std::vector) at /usr/include/c++/<span class="number">9</span>/bits/vector.tcc:<span class="number">440</span></span><br><span class="line">#<span class="number">4</span>  <span class="number">0x0000555555554ffa</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::<span class="built_in">emplace_back</span>&lt;S&gt; (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>) at /usr/include/c++/<span class="number">9</span>/bits/vector.tcc:<span class="number">121</span></span><br><span class="line">#<span class="number">5</span>  <span class="number">0x0000555555554e72</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::<span class="built_in">push_back</span> (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __x=...) at /usr/include/c++/<span class="number">9</span>/bits/stl_vector.h:<span class="number">1201</span></span><br><span class="line">#<span class="number">6</span>  <span class="number">0x0000555555554c0a</span> <span class="function">in <span class="title">main</span> <span class="params">()</span> at demo.cpp:<span class="number">29</span></span></span><br></pre></td></tr></table></figure>
-
-<h2 id="construct"><a href="#construct" class="headerlink" title="construct"></a>construct</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(gdb) bt</span><br><span class="line">#<span class="number">0</span>  __gnu_cxx::new_allocator&lt;S&gt;::<span class="built_in">construct</span>&lt;S, S&gt; (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __p=<span class="number">0x55555556aeb0</span>) at /usr/include/c++/<span class="number">9</span>/ext/new_allocator.h:<span class="number">146</span></span><br><span class="line">#<span class="number">1</span>  <span class="number">0x00005555555550b9</span> in std::allocator_traits&lt;std::allocator&lt;S&gt; &gt;::<span class="built_in">construct</span>&lt;S, S&gt; (__a=..., __p=<span class="number">0x55555556aeb0</span>) at /usr/include/c++/<span class="number">9</span>/bits/alloc_traits.h:<span class="number">483</span></span><br><span class="line">#<span class="number">2</span>  <span class="number">0x0000555555555224</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::_M_realloc_insert&lt;S&gt; (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __position=non-dereferenceable iterator <span class="keyword">for</span> std::vector) at /usr/include/c++/<span class="number">9</span>/bits/vector.tcc:<span class="number">449</span></span><br><span class="line">#<span class="number">3</span>  <span class="number">0x0000555555554ffa</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::<span class="built_in">emplace_back</span>&lt;S&gt; (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>) at /usr/include/c++/<span class="number">9</span>/bits/vector.tcc:<span class="number">121</span></span><br><span class="line">#<span class="number">4</span>  <span class="number">0x0000555555554e72</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::<span class="built_in">push_back</span> (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __x=...) at /usr/include/c++/<span class="number">9</span>/bits/stl_vector.h:<span class="number">1201</span></span><br><span class="line">#<span class="number">5</span>  <span class="number">0x0000555555554c0a</span> <span class="function">in <span class="title">main</span> <span class="params">()</span> at demo.cpp:<span class="number">29</span></span></span><br></pre></td></tr></table></figure>
-
-<h1 id="stl为什么用allocator而不是直接new？"><a href="#stl为什么用allocator而不是直接new？" class="headerlink" title="stl为什么用allocator而不是直接new？"></a>stl为什么用allocator而不是直接new？</h1><p>因为stl需要将对象构造拆分为两步，1. 申请内存; 2. 构造对象。同样析构也拆分为，1. 析构对象; 2. 释放内存；如果没有这个拆分的需求，new足矣。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/pahole/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/pahole/" class="post-title-link" itemprop="url">C++ pahole 查看对象成员内存布局</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>1.6k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>3 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>pahole: Poke-a-Hole</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get -y install dwarves</span><br></pre></td></tr></table></figure>
-
-<p>–show_private_classes 显示所有在namespace内部的类</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">wqj@WQJ:~/demo$ pahole ./a.out --show_private_classes | grep shared_ptr</span><br><span class="line">die__process_class: tag not supported 0x2f (template_type_parameter)!</span><br><span class="line">die__process_class: tag not supported 0x30 (template_value_parameter)!</span><br><span class="line">die__process_function: tag not supported 0x4107 (GNU_template_parameter_pack)!</span><br><span class="line">die__process_function: tag not supported 0x4108 (GNU_formal_parameter_pack)!</span><br><span class="line">class __shared_ptr_access&lt;int, (__gnu_cxx::_Lock_policy)2, false, false&gt; &#123;</span><br><span class="line">class __shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; : public __shared_ptr_access&lt;int, (__gnu_cxx::_Lock_policy)2, false, false&gt; &#123;</span><br><span class="line">        /* class __shared_ptr_access&lt;int, (__gnu_cxx::_Lock_policy)2, false, false&gt; &lt;ancestor&gt;; */ /*     0     0 */</span><br><span class="line">class shared_ptr&lt;int&gt; : public __shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; &#123;</span><br><span class="line">        /* class __shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; &lt;ancestor&gt;; */ /*     0    16 */</span><br></pre></td></tr></table></figure>
-
-<p>It doesn’t uses any source code files, just the DWARF2<br>information in ELF sections, inserted by ‘gcc -g’, to print out the<br>above information:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[acme@newtoy net-2.6]$ pahole kernel/sched.o task_struct</span><br><span class="line">/* include2/asm/system.h:11 */</span><br><span class="line">struct task_struct &#123;</span><br><span class="line">        volatile long int       state;          /*     0     4 */</span><br><span class="line">        struct thread_info *    thread_info;    /*     4     4 */</span><br><span class="line">        atomic_t                usage;          /*     8     4 */</span><br><span class="line">        long unsigned int       flags;          /*    12     4 */</span><br><span class="line"></span><br><span class="line">	&lt;SNIP&gt;</span><br><span class="line"></span><br><span class="line">        short unsigned int         ioprio;      /*    52     2 */</span><br><span class="line"></span><br><span class="line">        /* XXX 2 bytes hole, try to pack */</span><br><span class="line"></span><br><span class="line">        long unsigned int          sleep_avg;   /*    56     4 */ */</span><br><span class="line">        unsigned char              fpu_counter; /*   388     1 */</span><br><span class="line"></span><br><span class="line">        /* XXX 3 bytes hole, try to pack */</span><br><span class="line"></span><br><span class="line">        int                        oomkilladj;  /*   392     4 */</span><br><span class="line"></span><br><span class="line">	&lt;SNIP&gt;</span><br><span class="line"></span><br><span class="line">&#125;; /* size: 1312, sum members: 1287, holes: 3, sum holes: 13, padding: 12 */</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/std%20move%20std%20forward%20/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1037,7 +933,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/dynamic_cast/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/make/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1055,7 +951,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/dynamic_cast/" class="post-title-link" itemprop="url">C++ dynamic_cast</a>
+          <a href="/2024/02/19/note/cpp/make/" class="post-title-link" itemprop="url">未命名</a>
         </h2>
 
         <div class="post-meta-container">
@@ -1076,14 +972,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>1.9k</span>
+      <span>2.2k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>3 分钟</span>
+      <span>4 分钟</span>
     </span>
 </div>
 
@@ -1094,32 +990,34 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><code>dynamic_cast</code> is used primarily for polymorphism. When you have a pointer or reference to a base type, <code>dynamic_cast</code> helps in safely converting it to a derived type. Here’s a summary of the key points about <code>dynamic_cast</code>:</p>
+          <p>The <code>make</code> command in Linux is a utility used to automate the compilation and building process of projects. It reads a file named <code>Makefile</code> that contains a set of directives about how to compile and link a program. Here’s a brief overview of the syntax and key concepts of a <code>Makefile</code>:</p>
+<h3 id="Basic-Structure"><a href="#Basic-Structure" class="headerlink" title="Basic Structure"></a>Basic Structure</h3><p>A <code>Makefile</code> typically consists of a set of rules. A rule is made up of three parts:</p>
 <ol>
-<li><p><strong>Polymorphic Types</strong>: <code>dynamic_cast</code> is used with polymorphic types, i.e., classes with at least one virtual function. The presence of a virtual function enables RTTI (Run-Time Type Identification), which <code>dynamic_cast</code> relies on to safely cast between types.</p>
-</li>
-<li><p><strong>Safe Casting</strong>: Unlike other casting operators like <code>static_cast</code> or <code>reinterpret_cast</code>, <code>dynamic_cast</code> performs a runtime check to ensure that the object being cast actually is of the target type or can be safely cast to it. This makes <code>dynamic_cast</code> safer, but also a bit slower.</p>
-</li>
-<li><p><strong>Syntax</strong>:</p>
- <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dynamic_cast &lt;target-type&gt; (expression)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>Usage</strong>:</p>
- <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span> &#123;</span> virtual <span class="type">void</span> <span class="title function_">foo</span><span class="params">()</span> &#123;&#125; &#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span> :</span> public Base &#123;&#125;;</span><br><span class="line"></span><br><span class="line">Base* basePtr = new Derived;</span><br><span class="line">Derived* derivedPtr = dynamic_cast&lt;Derived*&gt;(basePtr);  <span class="comment">// Safe cast</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>Runtime Check</strong>:<br>If the cast is successful, <code>dynamic_cast</code> returns a pointer to the target type. If the cast fails and the expression is a pointer type, it returns <code>nullptr</code>. If the expression is a reference type and the cast fails, it throws a <code>std::bad_cast</code> exception.</p>
-</li>
-<li><p><strong>Performance</strong>:<br>Since <code>dynamic_cast</code> requires runtime checking, it is slower compared to other casting operators. It’s advisable to use it only when necessary, for example when dealing with polymorphic types and there’s a need to ensure the safety of the cast.</p>
-</li>
-<li><p>Upcasting with <strong><code>dynamic_cast</code></strong> is typically not necessary and is often seen as overkill, as upcasting is always safe in C++ and can be performed implicitly or using <strong><code>static_cast</code></strong>.</p>
-</li>
+<li><strong>Target</strong>: The name of the file that the rule produces.</li>
+<li><strong>Prerequisites</strong>: The files that are used as input to create the target.</li>
+<li><strong>Recipe</strong>: The commands that will be executed to create the target from the prerequisites.</li>
 </ol>
-<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span> &#123; <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;&#125; &#125;;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span> : <span class="keyword">public</span> Base &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Base* basePtr = <span class="keyword">new</span> Derived;</span><br><span class="line">    Derived* derivedPtr = <span class="built_in">dynamic_cast</span>&lt;Derived*&gt;(basePtr);  <span class="comment">// Safe downcast</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>The basic syntax of a rule is:</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">target: prerequisites</span></span><br><span class="line">    recipe</span><br></pre></td></tr></table></figure>
 
-<p>实际是调了编译器提供的一个函数</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/libsupc%2B%2B/dyncast.cc">https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/libsupc%2B%2B/dyncast.cc</a></li>
+<h3 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h3><p>Here’s a simple example of a <code>Makefile</code> that compiles a C program:</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Define the compiler</span></span><br><span class="line">CC=gcc</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the compiler flags</span></span><br><span class="line">CFLAGS=-Wall</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the target executable</span></span><br><span class="line">TARGET=myprogram</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the rule for the target</span></span><br><span class="line"><span class="variable">$(TARGET)</span>: <span class="variable">$(TARGET)</span>.c</span><br><span class="line">    <span class="variable">$(CC)</span> <span class="variable">$(CFLAGS)</span> -o <span class="variable">$(TARGET)</span> <span class="variable">$(TARGET)</span>.c</span><br></pre></td></tr></table></figure>
+
+<h3 id="Variables"><a href="#Variables" class="headerlink" title="Variables"></a>Variables</h3><p>You can define variables in a <code>Makefile</code> to make it more readable and maintainable. In the example above, <code>CC</code>, <code>CFLAGS</code>, and <code>TARGET</code> are variables.</p>
+<h3 id="Comments"><a href="#Comments" class="headerlink" title="Comments"></a>Comments</h3><p>Comments in a <code>Makefile</code> start with the <code>#</code> symbol. Anything following this symbol on a line is considered a comment.</p>
+<h3 id="Phony-Targets"><a href="#Phony-Targets" class="headerlink" title="Phony Targets"></a>Phony Targets</h3><p>By default, Makefile targets are “file targets” - they are used to build files from other files. Make assumes its target is a file, and this makes writing Makefiles relatively easy:</p>
+<p>In terms of Make, a phony target is simply a target that is always out-of-date, so whenever you ask make <phony_target>, it will run, independent from the state of the file system. Some common make targets that are often phony are: all, install, clean, distclean, TAGS, info, check.</p>
+<p>A phony target is one that does not represent a file. It’s used to avoid conflicts with files of the same name and to improve performance. You can declare phony targets using the <code>.PHONY</code> directive.</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"><span class="keyword">.PHONY</span>: clean</span></span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">    rm -f <span class="variable">$(TARGET)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Advanced-Features"><a href="#Advanced-Features" class="headerlink" title="Advanced Features"></a>Advanced Features</h3><ul>
+<li><strong>Pattern Rules</strong>: Allow you to define generic rules using <code>%</code> as a pattern matcher.</li>
+<li><strong>Automatic Variables</strong>: Variables like <code>$@</code> (the name of the target), <code>$&lt;</code> (the name of the first prerequisite), and <code>$^</code> (the names of all the prerequisites) are set automatically and can be used in recipes.</li>
+<li><strong>Conditional Execution</strong>: You can include conditionals in a <code>Makefile</code> to control the flow based on certain conditions.</li>
 </ul>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">movl    $<span class="number">0</span>, %ecx</span><br><span class="line">        movl    $typeinfo <span class="keyword">for</span> Derived, %edx</span><br><span class="line">        movl    $typeinfo <span class="keyword">for</span> Base, %esi</span><br><span class="line">        movq    %rax, %rdi</span><br><span class="line">        call    __dynamic_cast</span><br></pre></td></tr></table></figure>
+<h3 id="Running-Make"><a href="#Running-Make" class="headerlink" title="Running Make"></a>Running Make</h3><p>To run <code>make</code>, simply type <code>make</code> in the terminal in the directory containing the <code>Makefile</code>. If you want to run a specific target, type <code>make &lt;target_name&gt;</code>.</p>
+<p>This overview covers the basics of <code>make</code> syntax. <code>make</code> is a powerful tool with many more features and capabilities to explore.</p>
+
       
     </div>
 
@@ -1145,7 +1043,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/explicit/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/pahole/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1163,7 +1061,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/explicit/" class="post-title-link" itemprop="url">C++ explicit 关键字</a>
+          <a href="/2024/02/19/note/cpp/pahole/" class="post-title-link" itemprop="url">C++ pahole 查看对象成员内存布局</a>
         </h2>
 
         <div class="post-meta-container">
@@ -1184,14 +1082,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>536</span>
+      <span>1.6k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>1 分钟</span>
+      <span>3 分钟</span>
     </span>
 </div>
 
@@ -1202,12 +1100,108 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>加在哪: 只有一个参数的构造参数, 或者有多个参数，但只有一个没有默认值的构造函数声明前。<br>原则：默认全加上，除非能找出合适的转换情况。</p>
-<p>Constructors that take a single std::initializer_list parameter should also omit explicit, in order to support copy-initialization (e.g., MyType m &#x3D; {1, 2};).</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">String</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">String</span>(<span class="type">int</span> n) &#123;&#125;;</span><br><span class="line">    <span class="built_in">String</span>(<span class="type">const</span> <span class="type">char</span> *p) &#123;&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    String s1 = <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          <p>pahole: Poke-a-Hole</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get -y install dwarves</span><br></pre></td></tr></table></figure>
 
-<p>不加explict, 调的是 String(int n)</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">main:</span><br><span class="line">    pushq   %rbp</span><br><span class="line">    movq    %rsp, %rbp</span><br><span class="line">    subq    $16, %rsp</span><br><span class="line">    leaq    -1(%rbp), %rax</span><br><span class="line">    movl    $97, %esi</span><br><span class="line">    movq    %rax, %rdi</span><br><span class="line">    call    String::String(int) [complete object constructor]</span><br><span class="line">    movl    $0, %eax</span><br><span class="line">    leave</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure>
+<p>–show_private_classes 显示所有在namespace内部的类</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">wqj@WQJ:~/demo$ pahole ./a.out --show_private_classes | grep shared_ptr</span><br><span class="line">die__process_class: tag not supported 0x2f (template_type_parameter)!</span><br><span class="line">die__process_class: tag not supported 0x30 (template_value_parameter)!</span><br><span class="line">die__process_function: tag not supported 0x4107 (GNU_template_parameter_pack)!</span><br><span class="line">die__process_function: tag not supported 0x4108 (GNU_formal_parameter_pack)!</span><br><span class="line">class __shared_ptr_access&lt;int, (__gnu_cxx::_Lock_policy)2, false, false&gt; &#123;</span><br><span class="line">class __shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; : public __shared_ptr_access&lt;int, (__gnu_cxx::_Lock_policy)2, false, false&gt; &#123;</span><br><span class="line">        /* class __shared_ptr_access&lt;int, (__gnu_cxx::_Lock_policy)2, false, false&gt; &lt;ancestor&gt;; */ /*     0     0 */</span><br><span class="line">class shared_ptr&lt;int&gt; : public __shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; &#123;</span><br><span class="line">        /* class __shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; &lt;ancestor&gt;; */ /*     0    16 */</span><br></pre></td></tr></table></figure>
+
+<p>It doesn’t uses any source code files, just the DWARF2<br>information in ELF sections, inserted by ‘gcc -g’, to print out the<br>above information:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[acme@newtoy net-2.6]$ pahole kernel/sched.o task_struct</span><br><span class="line">/* include2/asm/system.h:11 */</span><br><span class="line">struct task_struct &#123;</span><br><span class="line">        volatile long int       state;          /*     0     4 */</span><br><span class="line">        struct thread_info *    thread_info;    /*     4     4 */</span><br><span class="line">        atomic_t                usage;          /*     8     4 */</span><br><span class="line">        long unsigned int       flags;          /*    12     4 */</span><br><span class="line"></span><br><span class="line">	&lt;SNIP&gt;</span><br><span class="line"></span><br><span class="line">        short unsigned int         ioprio;      /*    52     2 */</span><br><span class="line"></span><br><span class="line">        /* XXX 2 bytes hole, try to pack */</span><br><span class="line"></span><br><span class="line">        long unsigned int          sleep_avg;   /*    56     4 */ */</span><br><span class="line">        unsigned char              fpu_counter; /*   388     1 */</span><br><span class="line"></span><br><span class="line">        /* XXX 3 bytes hole, try to pack */</span><br><span class="line"></span><br><span class="line">        int                        oomkilladj;  /*   392     4 */</span><br><span class="line"></span><br><span class="line">	&lt;SNIP&gt;</span><br><span class="line"></span><br><span class="line">&#125;; /* size: 1312, sum members: 1287, holes: 3, sum holes: 13, padding: 12 */</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/new-operator/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/new-operator/" class="post-title-link" itemprop="url">C++ placement new</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="placement-new"><a href="#placement-new" class="headerlink" title="placement new"></a>placement new</h1><p>在预先申请好的一片内存上构造对象。</p>
+<p>比如 vector 的 reserve()，先预先申请足够的内存，后续用 placement new按需构造对象。</p>
+<p>在内存池和垃圾回收器中经常用到。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> *buf  = <span class="keyword">new</span> <span class="type">char</span>[<span class="built_in">sizeof</span>(string)]; <span class="comment">// pre-allocated buffer</span></span><br><span class="line">string *p = <span class="built_in">new</span> (buf) <span class="built_in">string</span>(<span class="string">&quot;hi&quot;</span>);    <span class="comment">// placement new</span></span><br><span class="line">string *q = <span class="keyword">new</span> <span class="built_in">string</span>(<span class="string">&quot;hi&quot;</span>);          <span class="comment">// ordinary heap allocation</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="那有-placement-delete-吗？"><a href="#那有-placement-delete-吗？" class="headerlink" title="那有 placement delete 吗？"></a>那有 placement delete 吗？</h1><p>没有</p>
+<h1 id="vector的placement-new"><a href="#vector的placement-new" class="headerlink" title="vector的placement new"></a>vector的placement new</h1><h2 id="allocate"><a href="#allocate" class="headerlink" title="allocate"></a>allocate</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">(gdb) bt</span><br><span class="line">#<span class="number">0</span>  __gnu_cxx::new_allocator&lt;S&gt;::<span class="built_in">allocate</span> (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __n=<span class="number">1</span>) at /usr/include/c++/<span class="number">9</span>/ext/new_allocator.h:<span class="number">114</span></span><br><span class="line">#<span class="number">1</span>  <span class="number">0x000055555555583a</span> in std::allocator_traits&lt;std::allocator&lt;S&gt; &gt;::<span class="built_in">allocate</span> (__a=..., __n=<span class="number">1</span>) at /usr/include/c++/<span class="number">9</span>/bits/alloc_traits.h:<span class="number">443</span></span><br><span class="line">#<span class="number">2</span>  <span class="number">0x000055555555569c</span> in std::_Vector_base&lt;S, std::allocator&lt;S&gt; &gt;::_M_allocate (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __n=<span class="number">1</span>) at /usr/include/c++/<span class="number">9</span>/bits/stl_vector.h:<span class="number">343</span></span><br><span class="line">#<span class="number">3</span>  <span class="number">0x00005555555551e7</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::_M_realloc_insert&lt;S&gt; (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __position=non-dereferenceable iterator <span class="keyword">for</span> std::vector) at /usr/include/c++/<span class="number">9</span>/bits/vector.tcc:<span class="number">440</span></span><br><span class="line">#<span class="number">4</span>  <span class="number">0x0000555555554ffa</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::<span class="built_in">emplace_back</span>&lt;S&gt; (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>) at /usr/include/c++/<span class="number">9</span>/bits/vector.tcc:<span class="number">121</span></span><br><span class="line">#<span class="number">5</span>  <span class="number">0x0000555555554e72</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::<span class="built_in">push_back</span> (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __x=...) at /usr/include/c++/<span class="number">9</span>/bits/stl_vector.h:<span class="number">1201</span></span><br><span class="line">#<span class="number">6</span>  <span class="number">0x0000555555554c0a</span> <span class="function">in <span class="title">main</span> <span class="params">()</span> at demo.cpp:<span class="number">29</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="construct"><a href="#construct" class="headerlink" title="construct"></a>construct</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(gdb) bt</span><br><span class="line">#<span class="number">0</span>  __gnu_cxx::new_allocator&lt;S&gt;::<span class="built_in">construct</span>&lt;S, S&gt; (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __p=<span class="number">0x55555556aeb0</span>) at /usr/include/c++/<span class="number">9</span>/ext/new_allocator.h:<span class="number">146</span></span><br><span class="line">#<span class="number">1</span>  <span class="number">0x00005555555550b9</span> in std::allocator_traits&lt;std::allocator&lt;S&gt; &gt;::<span class="built_in">construct</span>&lt;S, S&gt; (__a=..., __p=<span class="number">0x55555556aeb0</span>) at /usr/include/c++/<span class="number">9</span>/bits/alloc_traits.h:<span class="number">483</span></span><br><span class="line">#<span class="number">2</span>  <span class="number">0x0000555555555224</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::_M_realloc_insert&lt;S&gt; (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __position=non-dereferenceable iterator <span class="keyword">for</span> std::vector) at /usr/include/c++/<span class="number">9</span>/bits/vector.tcc:<span class="number">449</span></span><br><span class="line">#<span class="number">3</span>  <span class="number">0x0000555555554ffa</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::<span class="built_in">emplace_back</span>&lt;S&gt; (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>) at /usr/include/c++/<span class="number">9</span>/bits/vector.tcc:<span class="number">121</span></span><br><span class="line">#<span class="number">4</span>  <span class="number">0x0000555555554e72</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::<span class="built_in">push_back</span> (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __x=...) at /usr/include/c++/<span class="number">9</span>/bits/stl_vector.h:<span class="number">1201</span></span><br><span class="line">#<span class="number">5</span>  <span class="number">0x0000555555554c0a</span> <span class="function">in <span class="title">main</span> <span class="params">()</span> at demo.cpp:<span class="number">29</span></span></span><br></pre></td></tr></table></figure>
+
+<h1 id="stl为什么用allocator而不是直接new？"><a href="#stl为什么用allocator而不是直接new？" class="headerlink" title="stl为什么用allocator而不是直接new？"></a>stl为什么用allocator而不是直接new？</h1><p>因为stl需要将对象构造拆分为两步，1. 申请内存; 2. 构造对象。同样析构也拆分为，1. 析构对象; 2. 释放内存；如果没有这个拆分的需求，new足矣。</p>
+
       
     </div>
 
@@ -1248,13 +1242,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">197k</span>
+    <span title="站点总字数">211k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:29</span>
+    <span title="站点阅读时长">5:52</span>
   </span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动

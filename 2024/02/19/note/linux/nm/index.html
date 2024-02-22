@@ -18,18 +18,18 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="nm的使用按地址升序打印并demangle12-C demangle symbols-n 按地址升序  12345678910$ nm -n -C demo                 U __cxa_atexit@@GLIBC_2.2.5                 w __gmon_start__                 U __libc_start_main@@GLIBC_2">
+    <meta name="description" content="Options-D - Display the dynamic symbols rather than the normal symbols.  This is only meaningful for dynamic objects, such as certain types of shared libraries. nm的使用按地址升序打印并demangle12-C demangle symb">
 <meta property="og:type" content="article">
 <meta property="og:title" content="linux nm">
 <meta property="og:url" content="http://example.com/2024/02/19/note/linux/nm/index.html">
 <meta property="og:site_name" content="折纸飞向麦田的博客">
-<meta property="og:description" content="nm的使用按地址升序打印并demangle12-C demangle symbols-n 按地址升序  12345678910$ nm -n -C demo                 U __cxa_atexit@@GLIBC_2.2.5                 w __gmon_start__                 U __libc_start_main@@GLIBC_2">
+<meta property="og:description" content="Options-D - Display the dynamic symbols rather than the normal symbols.  This is only meaningful for dynamic objects, such as certain types of shared libraries. nm的使用按地址升序打印并demangle12-C demangle symb">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-02-19T12:08:28.148Z">
-<meta property="article:modified_time" content="2024-02-19T12:08:28.148Z">
+<meta property="article:modified_time" content="2024-02-21T12:16:47.977Z">
 <meta property="article:author" content="折纸飞向麦田">
-<meta property="article:tag" content="c++">
 <meta property="article:tag" content="linux">
+<meta property="article:tag" content="c++">
 <meta name="twitter:card" content="summary">
 
 
@@ -138,7 +138,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#nm%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">nm的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%89%E5%9C%B0%E5%9D%80%E5%8D%87%E5%BA%8F%E6%89%93%E5%8D%B0%E5%B9%B6demangle"><span class="nav-number">1.1.</span> <span class="nav-text">按地址升序打印并demangle</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90C-vtable%E5%86%85%E5%AE%B9"><span class="nav-number">1.2.</span> <span class="nav-text">分析C++ vtable内容</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#nm%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">nm原理</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Options"><span class="nav-number">1.</span> <span class="nav-text">Options</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#nm%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">nm的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%89%E5%9C%B0%E5%9D%80%E5%8D%87%E5%BA%8F%E6%89%93%E5%8D%B0%E5%B9%B6demangle"><span class="nav-number">2.1.</span> <span class="nav-text">按地址升序打印并demangle</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90C-vtable%E5%86%85%E5%AE%B9"><span class="nav-number">2.2.</span> <span class="nav-text">分析C++ vtable内容</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#nm%E5%8E%9F%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">nm原理</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -151,7 +151,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-count">59</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -215,6 +215,13 @@
 
       <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
     </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-21 20:16:47" itemprop="dateModified" datetime="2024-02-21T20:16:47+08:00">2024-02-21</time>
+    </span>
 
   
     <span class="post-meta-break"></span>
@@ -223,14 +230,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>5.6k</span>
+      <span>5.8k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>9 分钟</span>
+      <span>10 分钟</span>
     </span>
 </div>
 
@@ -240,7 +247,8 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="nm的使用"><a href="#nm的使用" class="headerlink" title="nm的使用"></a>nm的使用</h1><h2 id="按地址升序打印并demangle"><a href="#按地址升序打印并demangle" class="headerlink" title="按地址升序打印并demangle"></a>按地址升序打印并demangle</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-C demangle symbols</span><br><span class="line">-n 按地址升序</span><br></pre></td></tr></table></figure>
+    <div class="post-body" itemprop="articleBody"><h1 id="Options"><a href="#Options" class="headerlink" title="Options"></a>Options</h1><p><code>-D</code> - Display the dynamic symbols rather than the normal symbols.  This is only meaningful for dynamic objects, such as certain types of shared libraries.</p>
+<h1 id="nm的使用"><a href="#nm的使用" class="headerlink" title="nm的使用"></a>nm的使用</h1><h2 id="按地址升序打印并demangle"><a href="#按地址升序打印并demangle" class="headerlink" title="按地址升序打印并demangle"></a>按地址升序打印并demangle</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-C demangle symbols</span><br><span class="line">-n 按地址升序</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ nm -n -C demo</span><br><span class="line">                 U __cxa_atexit@@GLIBC_2.2.5</span><br><span class="line">                 w __gmon_start__</span><br><span class="line">                 U __libc_start_main@@GLIBC_2.2.5</span><br><span class="line">                 U std::ios_base::Init::Init()@@GLIBCXX_3.4</span><br><span class="line">0000000000400708 T _init</span><br><span class="line">00000000004007c0 T _start</span><br><span class="line">...</span><br><span class="line">0000000000601171 b std::__ioinit</span><br><span class="line">0000000000601178 B _end</span><br></pre></td></tr></table></figure>
 
@@ -297,21 +305,21 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/c/" rel="tag"># c++</a>
               <a href="/tags/linux/" rel="tag"># linux</a>
+              <a href="/tags/c/" rel="tag"># c++</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2024/02/19/note/linux/objdump/" rel="prev" title="Linux objdump">
-                  <i class="fa fa-angle-left"></i> Linux objdump
+                <a href="/2024/02/19/note/linux/sar/" rel="prev" title="Linux sar">
+                  <i class="fa fa-angle-left"></i> Linux sar
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2024/02/19/note/linux/linux%20tee%20cmd/" rel="next" title="Linux tee cmd">
-                  Linux tee cmd <i class="fa fa-angle-right"></i>
+                <a href="/2024/02/19/note/linux/objdump/" rel="next" title="Linux objdump">
+                  Linux objdump <i class="fa fa-angle-right"></i>
                 </a>
             </div>
           </div>
@@ -343,13 +351,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">197k</span>
+    <span title="站点总字数">211k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:29</span>
+    <span title="站点阅读时长">5:52</span>
   </span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
