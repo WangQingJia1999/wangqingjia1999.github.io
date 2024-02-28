@@ -79,6 +79,43 @@
       </tags>
   </entry>
   <entry>
+    <title>GDB指令备忘</title>
+    <url>/2024/02/26/note/cpp/GDB/</url>
+    <content><![CDATA[<p><a href="https://sourceware.org/gdb/current/onlinedocs/gdb.pdf">GDB使用手册</a></p>
+<h1 id="GDB配置"><a href="#GDB配置" class="headerlink" title="GDB配置"></a>GDB配置</h1><p>关闭输出过长提示</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">set pagination off</span><br></pre></td></tr></table></figure>
+
+<h2 id="watchpoint"><a href="#watchpoint" class="headerlink" title="watchpoint"></a>watchpoint</h2><p>watchpoint又叫数据断点（data breakpoint），用于监控内存的读写。</p>
+<h3 id="监控内存地址"><a href="#监控内存地址" class="headerlink" title="监控内存地址"></a>监控内存地址</h3><p>如果要监控 <code>0x402000</code> 上的读写。</p>
+<p>如下不行，因为 <code>0x402000</code> 被当作常量，永不变化</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) watch 0x402000</span><br><span class="line">Cannot watch constant value `0x402000&#x27;.</span><br></pre></td></tr></table></figure>
+
+<p>而要用</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) watch *0x402000</span><br><span class="line">Hardware watchpoint 5: *0x402000</span><br></pre></td></tr></table></figure>
+
+<p>如果要按hex打印变更前后数值，用如下</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">watch *(char**)0x402000</span><br><span class="line">watch *(void**)0x402000</span><br></pre></td></tr></table></figure>
+
+<h2 id="Demangle-symbol"><a href="#Demangle-symbol" class="headerlink" title="Demangle symbol"></a>Demangle symbol</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) dem _ZTV1C</span><br><span class="line">vtable for C</span><br></pre></td></tr></table></figure>
+
+<p>ref: <a href="https://sourceware.org/gdb/current/onlinedocs/gdb.html/Debugging-C-Plus-Plus.html">https://sourceware.org/gdb/current/onlinedocs/gdb.html/Debugging-C-Plus-Plus.html</a></p>
+<h2 id="打印对象的虚函数表"><a href="#打印对象的虚函数表" class="headerlink" title="打印对象的虚函数表"></a>打印对象的虚函数表</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) info vtbl c</span><br></pre></td></tr></table></figure>
+
+<h2 id="打印对象内部成员布局"><a href="#打印对象内部成员布局" class="headerlink" title="打印对象内部成员布局"></a>打印对象内部成员布局</h2><p>测试代码:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">Foo</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> a;</span><br><span class="line">    <span class="type">int</span> b;</span><br><span class="line">    <span class="type">double</span> c;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Foo foo;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>结构体成员内存布局如下：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">(gdb) pt /o foo</span><br><span class="line"><span class="comment">/* offset    |  size */</span>  type = <span class="keyword">struct</span> Foo &#123;</span><br><span class="line"><span class="comment">/*    0      |     1 */</span>    <span class="type">char</span> a;</span><br><span class="line"><span class="comment">/* XXX  3-byte hole */</span></span><br><span class="line"><span class="comment">/*    4      |     4 */</span>    <span class="type">int</span> b;</span><br><span class="line"><span class="comment">/*    8      |     8 */</span>    <span class="type">double</span> c;</span><br><span class="line"><span class="comment">/* total size (bytes):   16 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="找到类型定义的源文件位置"><a href="#找到类型定义的源文件位置" class="headerlink" title="找到类型定义的源文件位置"></a>找到类型定义的源文件位置</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">(gdb) info types _Atomic_word</span><br><span class="line">All types matching regular expression &quot;_Atomic_word&quot;:</span><br><span class="line"></span><br><span class="line">File /opt/rh/devtoolset-8/root/usr/include/c++/8/x86_64-redhat-linux/bits/atomic_word.h:</span><br><span class="line">32:     typedef int _Atomic_word;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>通过正则表达式搜索所有包含pattern的类型，比如会搜到模板参数实例化为pattern的类型，因此精确搜索要加上^和$，限制字符左右边界。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">(gdb) info types ^__gnu_cxx::_Lock_policy$</span><br><span class="line">All types matching regular expression &quot;^__gnu_cxx::_Lock_policy$&quot;:</span><br><span class="line"></span><br><span class="line">File /opt/rh/devtoolset-8/root/usr/include/c++/8/ext/concurrence.h:</span><br><span class="line">49:     __gnu_cxx::_Lock_policy;</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>c++</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C++ 模板类型推导</title>
     <url>/2024/02/19/note/cpp/Template%20Type%20Deduction%20/</url>
     <content><![CDATA[<h1 id="Template-Type-Deduction"><a href="#Template-Type-Deduction" class="headerlink" title="Template Type Deduction"></a>Template Type Deduction</h1><p>例子见：<a href="https://stackoverflow.com/a/47125430/11850070">https://stackoverflow.com/a/47125430/11850070</a></p>
@@ -118,43 +155,6 @@
 </ol>
 <p>总结就是忽略ref，const，volatile修饰。</p>
 ]]></content>
-      <tags>
-        <tag>c++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>GDB指令备忘</title>
-    <url>/2024/02/26/note/cpp/GDB/</url>
-    <content><![CDATA[<p><a href="https://sourceware.org/gdb/current/onlinedocs/gdb.pdf">GDB使用手册</a></p>
-<h1 id="GDB配置"><a href="#GDB配置" class="headerlink" title="GDB配置"></a>GDB配置</h1><p>关闭输出过长提示</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">set pagination off</span><br></pre></td></tr></table></figure>
-
-<h2 id="watchpoint"><a href="#watchpoint" class="headerlink" title="watchpoint"></a>watchpoint</h2><p>watchpoint又叫数据断点（data breakpoint），用于监控内存的读写。</p>
-<h3 id="监控内存地址"><a href="#监控内存地址" class="headerlink" title="监控内存地址"></a>监控内存地址</h3><p>如果要监控 <code>0x402000</code> 上的读写。</p>
-<p>如下不行，因为 <code>0x402000</code> 被当作常量，永不变化</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) watch 0x402000</span><br><span class="line">Cannot watch constant value `0x402000&#x27;.</span><br></pre></td></tr></table></figure>
-
-<p>而要用</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) watch *0x402000</span><br><span class="line">Hardware watchpoint 5: *0x402000</span><br></pre></td></tr></table></figure>
-
-<p>如果要按hex打印变更前后数值，用如下</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">watch *(char**)0x402000</span><br><span class="line">watch *(void**)0x402000</span><br></pre></td></tr></table></figure>
-
-<h2 id="Demangle-symbol"><a href="#Demangle-symbol" class="headerlink" title="Demangle symbol"></a>Demangle symbol</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) dem _ZTV1C</span><br><span class="line">vtable for C</span><br></pre></td></tr></table></figure>
-
-<p>ref: <a href="https://sourceware.org/gdb/current/onlinedocs/gdb.html/Debugging-C-Plus-Plus.html">https://sourceware.org/gdb/current/onlinedocs/gdb.html/Debugging-C-Plus-Plus.html</a></p>
-<h2 id="打印对象的虚函数表"><a href="#打印对象的虚函数表" class="headerlink" title="打印对象的虚函数表"></a>打印对象的虚函数表</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) info vtbl c</span><br></pre></td></tr></table></figure>
-
-<h2 id="打印对象内部成员布局"><a href="#打印对象内部成员布局" class="headerlink" title="打印对象内部成员布局"></a>打印对象内部成员布局</h2><p>测试代码:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">Foo</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> a;</span><br><span class="line">    <span class="type">int</span> b;</span><br><span class="line">    <span class="type">double</span> c;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Foo foo;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>结构体成员内存布局如下：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">(gdb) pt /o foo</span><br><span class="line"><span class="comment">/* offset    |  size */</span>  type = <span class="keyword">struct</span> Foo &#123;</span><br><span class="line"><span class="comment">/*    0      |     1 */</span>    <span class="type">char</span> a;</span><br><span class="line"><span class="comment">/* XXX  3-byte hole */</span></span><br><span class="line"><span class="comment">/*    4      |     4 */</span>    <span class="type">int</span> b;</span><br><span class="line"><span class="comment">/*    8      |     8 */</span>    <span class="type">double</span> c;</span><br><span class="line"><span class="comment">/* total size (bytes):   16 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="找到类型定义的源文件位置"><a href="#找到类型定义的源文件位置" class="headerlink" title="找到类型定义的源文件位置"></a>找到类型定义的源文件位置</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">(gdb) info types _Atomic_word</span><br><span class="line">All types matching regular expression &quot;_Atomic_word&quot;:</span><br><span class="line"></span><br><span class="line">File /opt/rh/devtoolset-8/root/usr/include/c++/8/x86_64-redhat-linux/bits/atomic_word.h:</span><br><span class="line">32:     typedef int _Atomic_word;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>通过正则表达式搜索所有包含pattern的类型，比如会搜到模板参数实例化为pattern的类型，因此精确搜索要加上^和$，限制字符左右边界。</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">(gdb) info types ^__gnu_cxx::_Lock_policy$</span><br><span class="line">All types matching regular expression &quot;^__gnu_cxx::_Lock_policy$&quot;:</span><br><span class="line"></span><br><span class="line">File /opt/rh/devtoolset-8/root/usr/include/c++/8/ext/concurrence.h:</span><br><span class="line">49:     __gnu_cxx::_Lock_policy;</span><br></pre></td></tr></table></figure>]]></content>
       <tags>
         <tag>c++</tag>
       </tags>
@@ -238,6 +238,19 @@
       </tags>
   </entry>
   <entry>
+    <title>Clang查看C++模板实例化后代码</title>
+    <url>/2024/02/19/note/cpp/clang/</url>
+    <content><![CDATA[<h1 id="Clang-AST"><a href="#Clang-AST" class="headerlink" title="Clang AST"></a>Clang AST</h1><p>see the compiler-instantiated code for a function template or a class template in C++?</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">clang++ -Xclang -ast-print -fsyntax-only vector.cpp &gt; vector_clang.cpp</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://stackoverflow.com/a/46573566/11850070">source</a></p>
+<p>What <code>-ast-print</code> produces is a textual representation of the AST.</p>
+]]></content>
+      <tags>
+        <tag>c++</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C++ 类型转换</title>
     <url>/2024/02/19/note/cpp/cast/</url>
     <content><![CDATA[<h1 id="static-cast"><a href="#static-cast" class="headerlink" title="static_cast"></a>static_cast</h1><ul>
@@ -268,29 +281,6 @@
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">movl    $<span class="number">0</span>, %ecx</span><br><span class="line">        movl    $typeinfo <span class="keyword">for</span> Derived, %edx</span><br><span class="line">        movl    $typeinfo <span class="keyword">for</span> Base, %esi</span><br><span class="line">        movq    %rax, %rdi</span><br><span class="line">        call    __dynamic_cast</span><br></pre></td></tr></table></figure>]]></content>
       <tags>
         <tag>c++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Clang查看C++模板实例化后代码</title>
-    <url>/2024/02/19/note/cpp/clang/</url>
-    <content><![CDATA[<h1 id="Clang-AST"><a href="#Clang-AST" class="headerlink" title="Clang AST"></a>Clang AST</h1><p>see the compiler-instantiated code for a function template or a class template in C++?</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">clang++ -Xclang -ast-print -fsyntax-only vector.cpp &gt; vector_clang.cpp</span><br></pre></td></tr></table></figure>
-
-<p><a href="https://stackoverflow.com/a/46573566/11850070">source</a></p>
-<p>What <code>-ast-print</code> produces is a textual representation of the AST.</p>
-]]></content>
-      <tags>
-        <tag>c++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>coredump备忘</title>
-    <url>/2024/02/19/note/cpp/coredump/</url>
-    <content><![CDATA[<p>The location of the core file depends on <code>/proc/sys/kernel/core_pattern</code></p>
-]]></content>
-      <tags>
-        <tag>c++</tag>
-        <tag>linux</tag>
       </tags>
   </entry>
   <entry>
@@ -343,6 +333,16 @@
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;mutex&gt;</span></span></span><br><span class="line"></span><br><span class="line">std::mutex mutex1;</span><br><span class="line">std::mutex mutex2;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">threadFunction1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::unique_lock&lt;std::mutex&gt; <span class="title">lock1</span><span class="params">(mutex1)</span></span>;</span><br><span class="line"></span><br><span class="line">    std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">milliseconds</span>(<span class="number">1000</span>)); <span class="comment">// Simulate some work</span></span><br><span class="line"></span><br><span class="line">    <span class="function">std::unique_lock&lt;std::mutex&gt; <span class="title">lock2</span><span class="params">(mutex2)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// T2和T1一样，先加L1再加L2</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">threadFunction2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::unique_lock&lt;std::mutex&gt; <span class="title">lock1</span><span class="params">(mutex1)</span></span>;</span><br><span class="line"></span><br><span class="line">    std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">milliseconds</span>(<span class="number">1000</span>)); <span class="comment">// Simulate some work</span></span><br><span class="line">    </span><br><span class="line">    <span class="function">std::unique_lock&lt;std::mutex&gt; <span class="title">lock2</span><span class="params">(mutex2)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::thread <span class="title">t1</span><span class="params">(threadFunction1)</span></span>;</span><br><span class="line">    <span class="function">std::thread <span class="title">t2</span><span class="params">(threadFunction2)</span></span>;</span><br><span class="line"></span><br><span class="line">    t1.<span class="built_in">join</span>();</span><br><span class="line">    t2.<span class="built_in">join</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
       <tags>
         <tag>c++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>coredump备忘</title>
+    <url>/2024/02/19/note/cpp/coredump/</url>
+    <content><![CDATA[<p>The location of the core file depends on <code>/proc/sys/kernel/core_pattern</code></p>
+]]></content>
+      <tags>
+        <tag>c++</tag>
+        <tag>linux</tag>
       </tags>
   </entry>
   <entry>
@@ -552,20 +552,6 @@
       </tags>
   </entry>
   <entry>
-    <title>C++静态变量</title>
-    <url>/2024/02/19/note/cpp/cpp%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F/</url>
-    <content><![CDATA[<h1 id="存哪里了？"><a href="#存哪里了？" class="headerlink" title="存哪里了？"></a>存哪里了？</h1><ul>
-<li>未初始化或初始化为0的存 <code>.bss</code></li>
-<li>初始化为非0的存 <code>.data</code></li>
-</ul>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> s_null;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> s_0 = <span class="number">0</span>;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> s_1 = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// objdump -C -t demo | grep s_</span></span><br><span class="line"></span><br><span class="line"><span class="number">0000000000601034</span> l     O .bss   <span class="number">0000000000000004</span>              s_null</span><br><span class="line"><span class="number">0000000000601038</span> l     O .bss   <span class="number">0000000000000004</span>              s_0</span><br><span class="line"><span class="number">000000000060102</span>c l     O .data  <span class="number">0000000000000004</span>              s_1</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>c++</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>C++ volatile 关键字</title>
     <url>/2024/02/19/note/cpp/cpp_volatile/</url>
     <content><![CDATA[<h1 id="c-Why-do-we-use-volatile-keyword-Stack-Overflow"><a href="#c-Why-do-we-use-volatile-keyword-Stack-Overflow" class="headerlink" title="c++ - Why do we use volatile keyword? - Stack Overflow"></a>c++ - Why do we use volatile keyword? - Stack Overflow</h1><p><a href="https://stackoverflow.com/questions/4437527/why-do-we-use-volatile-keyword/4437555#4437555">https://stackoverflow.com/questions/4437527/why-do-we-use-volatile-keyword/4437555#4437555</a></p>
@@ -598,6 +584,20 @@
 
 <p>这次乖乖取取内存中值，<code>some_int</code> 本身是存在栈内存中。</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">.LC0:</span><br><span class="line">        .string &quot;foo()\n&quot;</span><br><span class="line">foo():</span><br><span class="line">        subq    $8, %rsp</span><br><span class="line">        movl    $6, %edx</span><br><span class="line">        movl    $.LC0, %esi</span><br><span class="line">        movl    $_ZSt4cout, %edi</span><br><span class="line">        call    std::basic_ostream&lt;char, std::char_traits&lt;char&gt; &gt;&amp; std::__ostream_insert&lt;char, std::char_traits&lt;char&gt; &gt;(std::basic_ostream&lt;char, std::char_traits&lt;char&gt; &gt;&amp;, char const*, long)</span><br><span class="line">        addq    $8, %rsp</span><br><span class="line">        ret</span><br><span class="line">main:</span><br><span class="line">        subq    $24, %rsp</span><br><span class="line">        movl    $100, 12(%rsp)</span><br><span class="line">        movl    12(%rsp), %eax</span><br><span class="line">        cmpl    $100, %eax</span><br><span class="line">        je      .L6</span><br><span class="line">.L4:</span><br><span class="line">        movl    $0, %eax</span><br><span class="line">        addq    $24, %rsp</span><br><span class="line">        ret</span><br><span class="line">.L6:</span><br><span class="line">        call    foo()</span><br><span class="line">        jmp     .L4</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>c++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>C++静态变量</title>
+    <url>/2024/02/19/note/cpp/cpp%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F/</url>
+    <content><![CDATA[<h1 id="存哪里了？"><a href="#存哪里了？" class="headerlink" title="存哪里了？"></a>存哪里了？</h1><ul>
+<li>未初始化或初始化为0的存 <code>.bss</code></li>
+<li>初始化为非0的存 <code>.data</code></li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> s_null;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> s_0 = <span class="number">0</span>;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> s_1 = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// objdump -C -t demo | grep s_</span></span><br><span class="line"></span><br><span class="line"><span class="number">0000000000601034</span> l     O .bss   <span class="number">0000000000000004</span>              s_null</span><br><span class="line"><span class="number">0000000000601038</span> l     O .bss   <span class="number">0000000000000004</span>              s_0</span><br><span class="line"><span class="number">000000000060102</span>c l     O .data  <span class="number">0000000000000004</span>              s_1</span><br></pre></td></tr></table></figure>]]></content>
       <tags>
         <tag>c++</tag>
       </tags>
@@ -841,20 +841,6 @@
       </tags>
   </entry>
   <entry>
-    <title>C++ 运算符优先级</title>
-    <url>/2024/02/19/note/cpp/%E6%93%8D%E4%BD%9C%E7%AC%A6%E4%BC%98%E5%85%88%E7%BA%A7/</url>
-    <content><![CDATA[<p>注意 i– 与等号运算符共用时的优先级问题</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; nums&#123; <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span> &#125;;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">0</span>;</span><br><span class="line">    nums[j + <span class="number">1</span>] = nums[j--];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span>&amp; num : nums)</span><br><span class="line">        cout &lt;&lt; num &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>输出</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1 2 3 4 </span><br></pre></td></tr></table></figure>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">nums[j + <span class="number">1</span>] = nums[j--];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 1. 取 nums[j]，即 nums[0] = 1</span></span><br><span class="line"><span class="comment">// 2. j--，此时 j 为 -1</span></span><br><span class="line"><span class="comment">// 3. 将 1 赋值给 nums[j+1] = nums[-1+1] = nums[0]，所以是自己赋值给自己，数组没有任何变化</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <tags>
-        <tag>c++</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>C++内联汇编</title>
     <url>/2024/02/19/note/cpp/%E5%86%85%E8%81%94%E6%B1%87%E7%BC%96/</url>
     <content><![CDATA[<p><a href="https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html">Extended Asm (Using the GNU Compiler Collection (GCC))</a></p>
@@ -873,6 +859,20 @@
       <tags>
         <tag>c++</tag>
         <tag>asm</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>C++ 运算符优先级</title>
+    <url>/2024/02/19/note/cpp/%E6%93%8D%E4%BD%9C%E7%AC%A6%E4%BC%98%E5%85%88%E7%BA%A7/</url>
+    <content><![CDATA[<p>注意 i– 与等号运算符共用时的优先级问题</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; nums&#123; <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span> &#125;;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">0</span>;</span><br><span class="line">    nums[j + <span class="number">1</span>] = nums[j--];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span>&amp; num : nums)</span><br><span class="line">        cout &lt;&lt; num &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1 2 3 4 </span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">nums[j + <span class="number">1</span>] = nums[j--];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 1. 取 nums[j]，即 nums[0] = 1</span></span><br><span class="line"><span class="comment">// 2. j--，此时 j 为 -1</span></span><br><span class="line"><span class="comment">// 3. 将 1 赋值给 nums[j+1] = nums[-1+1] = nums[0]，所以是自己赋值给自己，数组没有任何变化</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <tags>
+        <tag>c++</tag>
       </tags>
   </entry>
   <entry>
@@ -902,38 +902,6 @@
 <h2 id="既继承又包含"><a href="#既继承又包含" class="headerlink" title="既继承又包含"></a>既继承又包含</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">A</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">A</span>() &#123; cout &lt;&lt; <span class="string">&quot;A() C-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">A</span>() &#123; cout &lt;&lt; <span class="string">&quot;~A() D-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">B</span> : <span class="keyword">public</span> A </span><br><span class="line">&#123;</span><br><span class="line">    A a;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">B</span>() &#123; cout &lt;&lt; <span class="string">&quot;B() C-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">B</span>() &#123; cout &lt;&lt; <span class="string">&quot;~B() D-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123; B b; &#125;</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">A</span>() C-<span class="function">tor</span></span><br><span class="line"><span class="function"><span class="title">A</span><span class="params">()</span> C-tor</span></span><br><span class="line"><span class="function"><span class="title">B</span><span class="params">()</span> C-tor</span></span><br><span class="line"><span class="function">~<span class="title">B</span><span class="params">()</span> D-tor</span></span><br><span class="line"><span class="function">~<span class="title">A</span><span class="params">()</span> D-tor</span></span><br><span class="line"><span class="function">~<span class="title">A</span><span class="params">()</span> D-tor</span></span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>c++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>C++ 编译器自动生成的构造，拷贝，移动函数</title>
-    <url>/2024/02/19/note/cpp/%E7%BC%96%E8%AF%91%E5%99%A8%E7%94%9F%E6%88%90%E7%9A%84%E6%9E%84%E9%80%A0%EF%BC%8C%E6%8B%B7%E8%B4%9D%EF%BC%8C%E7%A7%BB%E5%8A%A8%E5%87%BD%E6%95%B0%20/</url>
-    <content><![CDATA[<blockquote>
-<p>什么时候自动生成？</p>
-</blockquote>
-<ul>
-<li>没声明且用到了，则编译器自动生成一个默认的。</li>
-</ul>
-<blockquote>
-<p>怎么禁止编译器生成？</p>
-</blockquote>
-<ul>
-<li>≥ C++11 用delete</li>
-<li>只声明不实现，放在private中，如果调用了，报链接错误，undefined reference to xxx</li>
-</ul>
-<h2 id="空类，只用到默认构造"><a href="#空类，只用到默认构造" class="headerlink" title="空类，只用到默认构造"></a>空类，只用到默认构造</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>用 cppinsights 能看到：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="空类，用到构造、拷贝构造、拷贝赋值"><a href="#空类，用到构造、拷贝构造、拷贝赋值" class="headerlink" title="空类，用到构造、拷贝构造、拷贝赋值"></a>空类，用到构造、拷贝构造、拷贝赋值</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  <span class="function">Empty <span class="title">e2</span><span class="params">(e1)</span></span>;</span><br><span class="line">  e2 = e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty(const Empty &amp;) noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty &amp; operator=(const Empty &amp;) noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1 = <span class="built_in">Empty</span>();</span><br><span class="line">  Empty e2 = <span class="built_in">Empty</span>(e1);</span><br><span class="line">  e2.<span class="keyword">operator</span>=(e1);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="空类，只用到默认构造、拷贝赋值"><a href="#空类，只用到默认构造、拷贝赋值" class="headerlink" title="空类，只用到默认构造、拷贝赋值"></a>空类，只用到默认构造、拷贝赋值</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  Empty e2 = e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty(const Empty &amp;) noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  Empty e2 = <span class="built_in">Empty</span>(e1);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
       <tags>
         <tag>c++</tag>
       </tags>
@@ -1069,6 +1037,38 @@
       </tags>
   </entry>
   <entry>
+    <title>C++ 编译器自动生成的构造，拷贝，移动函数</title>
+    <url>/2024/02/19/note/cpp/%E7%BC%96%E8%AF%91%E5%99%A8%E7%94%9F%E6%88%90%E7%9A%84%E6%9E%84%E9%80%A0%EF%BC%8C%E6%8B%B7%E8%B4%9D%EF%BC%8C%E7%A7%BB%E5%8A%A8%E5%87%BD%E6%95%B0%20/</url>
+    <content><![CDATA[<blockquote>
+<p>什么时候自动生成？</p>
+</blockquote>
+<ul>
+<li>没声明且用到了，则编译器自动生成一个默认的。</li>
+</ul>
+<blockquote>
+<p>怎么禁止编译器生成？</p>
+</blockquote>
+<ul>
+<li>≥ C++11 用delete</li>
+<li>只声明不实现，放在private中，如果调用了，报链接错误，undefined reference to xxx</li>
+</ul>
+<h2 id="空类，只用到默认构造"><a href="#空类，只用到默认构造" class="headerlink" title="空类，只用到默认构造"></a>空类，只用到默认构造</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用 cppinsights 能看到：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="空类，用到构造、拷贝构造、拷贝赋值"><a href="#空类，用到构造、拷贝构造、拷贝赋值" class="headerlink" title="空类，用到构造、拷贝构造、拷贝赋值"></a>空类，用到构造、拷贝构造、拷贝赋值</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  <span class="function">Empty <span class="title">e2</span><span class="params">(e1)</span></span>;</span><br><span class="line">  e2 = e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty(const Empty &amp;) noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty &amp; operator=(const Empty &amp;) noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1 = <span class="built_in">Empty</span>();</span><br><span class="line">  Empty e2 = <span class="built_in">Empty</span>(e1);</span><br><span class="line">  e2.<span class="keyword">operator</span>=(e1);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="空类，只用到默认构造、拷贝赋值"><a href="#空类，只用到默认构造、拷贝赋值" class="headerlink" title="空类，只用到默认构造、拷贝赋值"></a>空类，只用到默认构造、拷贝赋值</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  Empty e2 = e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty(const Empty &amp;) noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  Empty e2 = <span class="built_in">Empty</span>(e1);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>c++</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Linux Kprobe</title>
     <url>/2024/02/23/note/linux/Kprobe/</url>
     <content><![CDATA[<p><a href="https://www.kernel.org/doc/Documentation/kprobes.txt">kprobe official doc</a></p>
@@ -1090,43 +1090,6 @@
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ dmesg</span><br><span class="line">...</span><br><span class="line">[ 5289.707424] Filename: /usr/bin/dmesg</span><br><span class="line">[ 5289.707426] Full path: /usr/bin/dmesg</span><br><span class="line">[ 5289.707427] Argument count: 1</span><br><span class="line">[ 5289.707428] Environment variable count: 36</span><br></pre></td></tr></table></figure>
 
 <h2 id="拦截中断处理函数"><a href="#拦截中断处理函数" class="headerlink" title="拦截中断处理函数"></a>拦截中断处理函数</h2>]]></content>
-      <tags>
-        <tag>linux</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Linux内核模块</title>
-    <url>/2024/02/26/note/linux/Linux%20Kernel%20Module/</url>
-    <content><![CDATA[<h1 id="脚本"><a href="#脚本" class="headerlink" title="脚本"></a>脚本</h1><p>Install Kernel Headers and Development Packages:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo yum install kernel-devel kernel-headers</span><br></pre></td></tr></table></figure>
-
-<p>demo.c</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 内核模块的代码</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/module.h&gt;</span>       <span class="comment">// Needed by all modules</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/kernel.h&gt;</span>       <span class="comment">// Needed for KERN_INFO</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">init_module</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    printk(KERN_INFO <span class="string">&quot;Minimal module loaded.\n&quot;</span>);</span><br><span class="line">    <span class="comment">// A non 0 return means init_module failed; module can&#x27;t be loaded.</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">cleanup_module</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    printk(KERN_INFO <span class="string">&quot;Minimal module unloaded.\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">MODULE_LICENSE(<span class="string">&quot;GPL&quot;</span>);</span><br><span class="line">MODULE_AUTHOR(<span class="string">&quot;Your Name&quot;</span>);</span><br><span class="line">MODULE_DESCRIPTION(<span class="string">&quot;A minimal Linux driver&quot;</span>);</span><br><span class="line">MODULE_VERSION(<span class="string">&quot;0.1&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>Makefile</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">obj-m += demo.o</span><br><span class="line"></span><br><span class="line">all:</span><br><span class="line">	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules</span><br><span class="line"></span><br><span class="line">clean:</span><br><span class="line">	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean</span><br></pre></td></tr></table></figure>
-
-<p>编译与挂载</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">cat</span> attach.sh</span><br><span class="line"><span class="comment">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">make</span><br><span class="line"></span><br><span class="line">insmod demo.ko</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;Module Status:&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>卸载</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">cat</span> detach.sh</span><br><span class="line"><span class="comment">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">rmmod demo</span><br><span class="line">dmesg | <span class="built_in">tail</span></span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>linux</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Linux bfd</title>
-    <url>/2024/02/20/note/linux/bfd/</url>
-    <content><![CDATA[<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><h2 id="arelent"><a href="#arelent" class="headerlink" title="arelent"></a>arelent</h2><blockquote>
-<p>BFD represents a relocation as a pointer to the ‘arelent’ type. A relocation describes an action which the linker must take to modify the section contents. Relocations have a symbol, an address, an addend, and a pointer to a howto structure which describes how to perform the relocation. </p>
-</blockquote>
-<blockquote>
-<p>In BFD, each section has an array of ‘arelent’ structures. Each structure has a pointer to a symbol, an address within the section, an addend, and a pointer to a ‘reloc_howto_struct’ structure. The howto structure has a bunch of fields describing the reloc, including a type field. The type field is specific to the object file format backend; none of the generic code in BFD examines it.</p>
-</blockquote>
-]]></content>
       <tags>
         <tag>linux</tag>
       </tags>
@@ -1168,6 +1131,43 @@
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 创建一个200MB的文件</span></span><br><span class="line">wqj@ubuntu-server:~/demo$ <span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=bigfile bs=1M count=200</span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ ll -h</span><br><span class="line">total 201M</span><br><span class="line">drwxrwxr-x  2 wqj wqj 4.0K Oct 16 09:51 ./</span><br><span class="line">drwxr-xr-x 12 wqj wqj 4.0K Oct 16 09:40 ../</span><br><span class="line">-rw-rw-r--  1 wqj wqj 200M Oct 16 09:43 bigfile      <span class="comment"># 有一个200M的文件</span></span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ fincore bigfile <span class="comment"># 没有生成pagecache</span></span><br><span class="line">RES PAGES  SIZE FILE</span><br><span class="line"> 0B     0  200M bigfile</span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ time <span class="built_in">cat</span> bigfile &gt; /dev/null <span class="comment"># 读这个文件（生成pagecache）</span></span><br><span class="line"></span><br><span class="line">real    0m0.242s</span><br><span class="line">user    0m0.011s</span><br><span class="line">sys     0m0.203s</span><br><span class="line">wqj@ubuntu-server:~/demo$ fincore bigfile <span class="comment"># 验证生成pagecache</span></span><br><span class="line">  RES PAGES  SIZE FILE</span><br><span class="line"> 200M 51200  200M bigfile</span><br><span class="line"></span><br><span class="line"><span class="comment"># 再次读这个文件，读的是pagecache，速度提升 0.242/0.032=7.56倍</span></span><br><span class="line">wqj@ubuntu-server:~/demo$ time <span class="built_in">cat</span> bigfile &gt; /dev/null </span><br><span class="line"></span><br><span class="line">real    0m0.032s</span><br><span class="line">user    0m0.000s</span><br><span class="line">sys     0m0.032s</span><br></pre></td></tr></table></figure>
 
 <h1 id="pcstat"><a href="#pcstat" class="headerlink" title="pcstat"></a>pcstat</h1><p><a href="https://github.com/tobert/pcstat">https://github.com/tobert/pcstat</a></p>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Linux内核模块</title>
+    <url>/2024/02/26/note/linux/Linux%20Kernel%20Module/</url>
+    <content><![CDATA[<h1 id="脚本"><a href="#脚本" class="headerlink" title="脚本"></a>脚本</h1><p>Install Kernel Headers and Development Packages:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo yum install kernel-devel kernel-headers</span><br></pre></td></tr></table></figure>
+
+<p>demo.c</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 内核模块的代码</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/module.h&gt;</span>       <span class="comment">// Needed by all modules</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/kernel.h&gt;</span>       <span class="comment">// Needed for KERN_INFO</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">init_module</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    printk(KERN_INFO <span class="string">&quot;Minimal module loaded.\n&quot;</span>);</span><br><span class="line">    <span class="comment">// A non 0 return means init_module failed; module can&#x27;t be loaded.</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">cleanup_module</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    printk(KERN_INFO <span class="string">&quot;Minimal module unloaded.\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">MODULE_LICENSE(<span class="string">&quot;GPL&quot;</span>);</span><br><span class="line">MODULE_AUTHOR(<span class="string">&quot;Your Name&quot;</span>);</span><br><span class="line">MODULE_DESCRIPTION(<span class="string">&quot;A minimal Linux driver&quot;</span>);</span><br><span class="line">MODULE_VERSION(<span class="string">&quot;0.1&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>Makefile</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">obj-m += demo.o</span><br><span class="line"></span><br><span class="line">all:</span><br><span class="line">	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules</span><br><span class="line"></span><br><span class="line">clean:</span><br><span class="line">	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean</span><br></pre></td></tr></table></figure>
+
+<p>编译与挂载</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">cat</span> attach.sh</span><br><span class="line"><span class="comment">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">make</span><br><span class="line"></span><br><span class="line">insmod demo.ko</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;Module Status:&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>卸载</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">cat</span> detach.sh</span><br><span class="line"><span class="comment">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">rmmod demo</span><br><span class="line">dmesg | <span class="built_in">tail</span></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Linux bfd</title>
+    <url>/2024/02/20/note/linux/bfd/</url>
+    <content><![CDATA[<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><h2 id="arelent"><a href="#arelent" class="headerlink" title="arelent"></a>arelent</h2><blockquote>
+<p>BFD represents a relocation as a pointer to the ‘arelent’ type. A relocation describes an action which the linker must take to modify the section contents. Relocations have a symbol, an address, an addend, and a pointer to a howto structure which describes how to perform the relocation. </p>
+</blockquote>
+<blockquote>
+<p>In BFD, each section has an array of ‘arelent’ structures. Each structure has a pointer to a symbol, an address within the section, an addend, and a pointer to a ‘reloc_howto_struct’ structure. The howto structure has a bunch of fields describing the reloc, including a type field. The type field is specific to the object file format backend; none of the generic code in BFD examines it.</p>
+</blockquote>
 ]]></content>
       <tags>
         <tag>linux</tag>
@@ -1346,7 +1346,7 @@
 <h3 id="hash"><a href="#hash" class="headerlink" title=".hash"></a>.hash</h3><p>给<code>ld.so</code> 查询动态符号用的哈希表</p>
 <p><a href="https://flapenguin.me/elf-dt-hash">https://flapenguin.me/elf-dt-hash</a></p>
 <h3 id="dynsym"><a href="#dynsym" class="headerlink" title=".dynsym"></a>.dynsym</h3><p>This section holds the dynamic linking symbol table</p>
-<p>The <code>.dynsym</code> section of an ELF file consists of fixed-length records, either of type <code>Elf32_Sym</code> or <code>Elf64_Sym</code>, depending on the architecture. These records are unable to directly contain the symbol names due to their variable length nature. Instead, they include an offset within the <code>.dynstr</code> section (in the <code>.st_name</code> field), where the actual symbol name is located. Therefore, it is incorrect to say that <code>.dynsym</code> directly contains symbol names like “<a href="mailto:&#115;&#101;&#x74;&#115;&#x6f;&#99;&#107;&#111;&#x70;&#116;&#x40;&#71;&#76;&#x49;&#x42;&#x43;&#x5f;&#50;&#46;&#x30;">&#115;&#101;&#x74;&#115;&#x6f;&#99;&#107;&#111;&#x70;&#116;&#x40;&#71;&#76;&#x49;&#x42;&#x43;&#x5f;&#50;&#46;&#x30;</a>.” It accurately contains an <code>Elf32_Sym</code> or <code>Elf64_Sym</code> entry for an imported symbol such as <code>setsockopt</code>, which refers to the symbol name’s offset in the <code>.dynstr</code> section.</p>
+<p>The <code>.dynsym</code> section of an ELF file consists of fixed-length records, either of type <code>Elf32_Sym</code> or <code>Elf64_Sym</code>, depending on the architecture. These records are unable to directly contain the symbol names due to their variable length nature. Instead, they include an offset within the <code>.dynstr</code> section (in the <code>.st_name</code> field), where the actual symbol name is located. Therefore, it is incorrect to say that <code>.dynsym</code> directly contains symbol names like “<a href="mailto:&#x73;&#x65;&#116;&#x73;&#111;&#x63;&#x6b;&#x6f;&#112;&#x74;&#x40;&#71;&#76;&#x49;&#x42;&#x43;&#x5f;&#x32;&#x2e;&#x30;">&#x73;&#x65;&#116;&#x73;&#111;&#x63;&#x6b;&#x6f;&#112;&#x74;&#x40;&#71;&#76;&#x49;&#x42;&#x43;&#x5f;&#x32;&#x2e;&#x30;</a>.” It accurately contains an <code>Elf32_Sym</code> or <code>Elf64_Sym</code> entry for an imported symbol such as <code>setsockopt</code>, which refers to the symbol name’s offset in the <code>.dynstr</code> section.</p>
 <h3 id="dynstr"><a href="#dynstr" class="headerlink" title=".dynstr"></a>.dynstr</h3><p>This section holds strings needed for dynamic linking</p>
 <h3 id="init"><a href="#init" class="headerlink" title=".init"></a>.init</h3><p>This section holds executable instructions that contribute to the process initialization code. When a program starts to run, the system executes the code in this section before calling the main program entry point (called main for C programs).</p>
 <h3 id="fini"><a href="#fini" class="headerlink" title=".fini"></a>.fini</h3><p>This section holds executable instructions that contribute to the process termination code. When a program exits normally, the system executes the code in this section.</p>
@@ -1851,6 +1851,33 @@
 ]]></content>
   </entry>
   <entry>
+    <title>Linux防火墙配置</title>
+    <url>/2024/02/19/note/linux/linux%20firewall/</url>
+    <content><![CDATA[<h1 id="linux-firewall"><a href="#linux-firewall" class="headerlink" title="linux firewall"></a>linux firewall</h1><p>To view open ports, use the following command.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --list-ports</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>We use the following to see services whose ports are open.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --list-services</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>We use the following to see services whose ports are open and see open ports</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --list-all</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>To add a service to the firewall, we use the following command, in which case the service will use any port to open in the firewall.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --add-services=ntp</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>For this service to be permanently open we use the following command.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd —add-service=ntp --permanent</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>To add a port, use the following command</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --add-port=132/tcp  --permanent</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>To run the firewall must be reloaded using the following command.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --reload</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Linux ld</title>
     <url>/2024/02/21/note/linux/ld/</url>
     <content><![CDATA[<p><a href="https://sourceware.org/binutils/docs/ld/index.html">LD用户手册</a></p>
@@ -1893,33 +1920,6 @@
       <tags>
         <tag>linux</tag>
         <tag>asm</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Linux防火墙配置</title>
-    <url>/2024/02/19/note/linux/linux%20firewall/</url>
-    <content><![CDATA[<h1 id="linux-firewall"><a href="#linux-firewall" class="headerlink" title="linux firewall"></a>linux firewall</h1><p>To view open ports, use the following command.</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --list-ports</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>We use the following to see services whose ports are open.</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --list-services</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>We use the following to see services whose ports are open and see open ports</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --list-all</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>To add a service to the firewall, we use the following command, in which case the service will use any port to open in the firewall.</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --add-services=ntp</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>For this service to be permanently open we use the following command.</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd —add-service=ntp --permanent</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>To add a port, use the following command</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --add-port=132/tcp  --permanent</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>To run the firewall must be reloaded using the following command.</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --reload</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>linux</tag>
       </tags>
   </entry>
   <entry>
@@ -2080,6 +2080,33 @@
       </tags>
   </entry>
   <entry>
+    <title>Linux软链接和硬链接用法及区别</title>
+    <url>/2024/02/19/note/linux/soft_link_and_hard_link/</url>
+    <content><![CDATA[<h1 id="Linux软链接和硬链接"><a href="#Linux软链接和硬链接" class="headerlink" title="Linux软链接和硬链接"></a>Linux软链接和硬链接</h1><h2 id="创建软硬链接"><a href="#创建软硬链接" class="headerlink" title="创建软硬链接"></a>创建软硬链接</h2><p>Creating a symlink</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">ln</span> -s myfile mylink</span><br></pre></td></tr></table></figure>
+
+<p>Creating a hardlink</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ ln somefile somelink</span><br></pre></td></tr></table></figure>
+
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><h3 id="硬链接"><a href="#硬链接" class="headerlink" title="硬链接"></a>硬链接</h3><p>硬链接与源文件共享inode（<code>ll -i</code> 第三列显示当前文件inode引用计数），删除源文件后（inode引用减一），硬链接还引用着，inode引用数为1，文件不删除。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># echo &quot;hh&quot; &gt; file</span></span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># ln file file_hard_link</span></span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># ll -i</span></span><br><span class="line">total 0</span><br><span class="line">115686215428339169 -rw-r--r-- 2 root root 3 Feb  6 16:45 file</span><br><span class="line">115686215428339169 -rw-r--r-- 2 root root 3 Feb  6 16:45 file_hard_link</span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># rm file</span></span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># ll -i</span></span><br><span class="line">total 0</span><br><span class="line">115686215428339169 -rw-r--r-- 1 root root 3 Feb  6 16:45 file_hard_link</span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># cat file_hard_link </span></span><br><span class="line">hh</span><br></pre></td></tr></table></figure>
+
+<h3 id="软链接"><a href="#软链接" class="headerlink" title="软链接"></a>软链接</h3><p>软链接指向源文件的路径，删除源文件后，软连接指向失效。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># ln -s file file_soft_link</span></span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># ll -i</span></span><br><span class="line">total 0</span><br><span class="line">115686215428339169 -rw-r--r-- 1 root root 3 Feb  6 16:45 file</span><br><span class="line">225179981368582177 lrwxrwxrwx 1 root root 4 Feb  6 16:48 file_soft_link -&gt; file</span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># rm -f file</span></span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># ll -i</span></span><br><span class="line">total 0</span><br><span class="line">225179981368582177 lrwxrwxrwx 1 root root 4 Feb  6 16:48 file_soft_link -&gt; file</span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># cat file_soft_link </span></span><br><span class="line"><span class="built_in">cat</span>: file_soft_link: No such file or directory</span><br></pre></td></tr></table></figure>
+
+<h2 id="二者区别"><a href="#二者区别" class="headerlink" title="二者区别"></a>二者区别</h2><p><img src="/../assets/image-66.png" alt="Alt text"></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">touch</span> file</span><br><span class="line">$ <span class="built_in">ln</span> -s file file_soft_link</span><br><span class="line">$ <span class="built_in">ln</span> file file_hard_link</span><br><span class="line">$ ll -i</span><br><span class="line">total 0</span><br><span class="line">21955048184376494 -rw-r--r-- 2 root root 0 Feb  6 16:30 file</span><br><span class="line">21955048184376494 -rw-r--r-- 2 root root 0 Feb  6 16:30 file_hard_link        </span><br><span class="line">11258999069499309 lrwxrwxrwx 1 root root 4 Feb  6 16:30 file_soft_link -&gt; file</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>软链接inode私有，硬链接inode共享；</li>
+<li>由于硬链接共享inode，而inode各个文件系统独立，因此硬链接不能跨文件系统；软链接支持跨文件系统，因为软连接指向的是文件的路径。</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Linux sar</title>
     <url>/2024/02/19/note/linux/sar/</url>
     <content><![CDATA[<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>sar &#x3D; <strong>s</strong>ystem <strong>a</strong>ctivity <strong>r</strong>eport</p>
@@ -2207,33 +2234,6 @@
 </li>
 <li><p><a href="https://www.thegeekstuff.com/2011/03/sar-examples/">10 Useful Sar (Sysstat) Examples for UNIX &#x2F; Linux Performance Monitoring</a></p>
 </li>
-</ul>
-]]></content>
-      <tags>
-        <tag>linux</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Linux软链接和硬链接用法及区别</title>
-    <url>/2024/02/19/note/linux/soft_link_and_hard_link/</url>
-    <content><![CDATA[<h1 id="Linux软链接和硬链接"><a href="#Linux软链接和硬链接" class="headerlink" title="Linux软链接和硬链接"></a>Linux软链接和硬链接</h1><h2 id="创建软硬链接"><a href="#创建软硬链接" class="headerlink" title="创建软硬链接"></a>创建软硬链接</h2><p>Creating a symlink</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">ln</span> -s myfile mylink</span><br></pre></td></tr></table></figure>
-
-<p>Creating a hardlink</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ ln somefile somelink</span><br></pre></td></tr></table></figure>
-
-<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><h3 id="硬链接"><a href="#硬链接" class="headerlink" title="硬链接"></a>硬链接</h3><p>硬链接与源文件共享inode（<code>ll -i</code> 第三列显示当前文件inode引用计数），删除源文件后（inode引用减一），硬链接还引用着，inode引用数为1，文件不删除。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># echo &quot;hh&quot; &gt; file</span></span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># ln file file_hard_link</span></span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># ll -i</span></span><br><span class="line">total 0</span><br><span class="line">115686215428339169 -rw-r--r-- 2 root root 3 Feb  6 16:45 file</span><br><span class="line">115686215428339169 -rw-r--r-- 2 root root 3 Feb  6 16:45 file_hard_link</span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># rm file</span></span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># ll -i</span></span><br><span class="line">total 0</span><br><span class="line">115686215428339169 -rw-r--r-- 1 root root 3 Feb  6 16:45 file_hard_link</span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># cat file_hard_link </span></span><br><span class="line">hh</span><br></pre></td></tr></table></figure>
-
-<h3 id="软链接"><a href="#软链接" class="headerlink" title="软链接"></a>软链接</h3><p>软链接指向源文件的路径，删除源文件后，软连接指向失效。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># ln -s file file_soft_link</span></span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># ll -i</span></span><br><span class="line">total 0</span><br><span class="line">115686215428339169 -rw-r--r-- 1 root root 3 Feb  6 16:45 file</span><br><span class="line">225179981368582177 lrwxrwxrwx 1 root root 4 Feb  6 16:48 file_soft_link -&gt; file</span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># rm -f file</span></span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># ll -i</span></span><br><span class="line">total 0</span><br><span class="line">225179981368582177 lrwxrwxrwx 1 root root 4 Feb  6 16:48 file_soft_link -&gt; file</span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># cat file_soft_link </span></span><br><span class="line"><span class="built_in">cat</span>: file_soft_link: No such file or directory</span><br></pre></td></tr></table></figure>
-
-<h2 id="二者区别"><a href="#二者区别" class="headerlink" title="二者区别"></a>二者区别</h2><p><img src="/../assets/image-66.png" alt="Alt text"></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">touch</span> file</span><br><span class="line">$ <span class="built_in">ln</span> -s file file_soft_link</span><br><span class="line">$ <span class="built_in">ln</span> file file_hard_link</span><br><span class="line">$ ll -i</span><br><span class="line">total 0</span><br><span class="line">21955048184376494 -rw-r--r-- 2 root root 0 Feb  6 16:30 file</span><br><span class="line">21955048184376494 -rw-r--r-- 2 root root 0 Feb  6 16:30 file_hard_link        </span><br><span class="line">11258999069499309 lrwxrwxrwx 1 root root 4 Feb  6 16:30 file_soft_link -&gt; file</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>软链接inode私有，硬链接inode共享；</li>
-<li>由于硬链接共享inode，而inode各个文件系统独立，因此硬链接不能跨文件系统；软链接支持跨文件系统，因为软连接指向的是文件的路径。</li>
 </ul>
 ]]></content>
       <tags>
@@ -2540,18 +2540,6 @@ Contents of section .data:
 ]]></content>
       <tags>
         <tag>redis</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>C++ std::vector::emplace_back</title>
-    <url>/2024/02/19/note/cpp/stl/emplace_back/</url>
-    <content><![CDATA[<p>emplace_back可传入对象的参数列表，在容器末尾的位置用 placement new 原地构造，连move都省去了。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">President</span></span><br><span class="line">&#123;</span><br><span class="line">    std::string name;</span><br><span class="line">    std::string country;</span><br><span class="line">    <span class="type">int</span> year;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(std::string p_name, std::string p_country, <span class="type">int</span> p_year)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(p_name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(p_country)), <span class="built_in">year</span>(p_year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; name &lt;&lt; <span class="string">&quot; being constructed.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(President&amp;&amp; other)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(other.name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(other.country)), <span class="built_in">year</span>(other.year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; name &lt;&lt; <span class="string">&quot; being moved.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    President&amp; <span class="keyword">operator</span>=(<span class="type">const</span> President&amp; other) = <span class="keyword">default</span>;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::vector&lt;President&gt; elections;</span><br><span class="line">    elections.<span class="built_in">reserve</span>(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;emplace_back obj&#x27;s args:\n&quot;</span>;</span><br><span class="line">    elections.<span class="built_in">emplace_back</span>(<span class="string">&quot;Nelson&quot;</span>, <span class="string">&quot;South Africa&quot;</span>, <span class="number">1994</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果emplace_back一个对象，则是先构造，后移动</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\nemplace_back an obj:\n&quot;</span>;</span><br><span class="line">    elections.<span class="built_in">emplace_back</span>(<span class="built_in">President</span>(<span class="string">&quot;aaa&quot;</span>, <span class="string">&quot;usa&quot;</span>, <span class="number">2000</span>));</span><br><span class="line">    </span><br><span class="line"> </span><br><span class="line">    std::vector&lt;President&gt; reElections;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\npush_back:\n&quot;</span>;</span><br><span class="line">    reElections.<span class="built_in">push_back</span>(<span class="built_in">President</span>(<span class="string">&quot;Franklin&quot;</span>, <span class="string">&quot;the USA&quot;</span>, <span class="number">1936</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>输出：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">emplace_back obj&#x27;s args:</span><br><span class="line">Nelson being constructed.</span><br><span class="line"></span><br><span class="line">emplace_back an obj:</span><br><span class="line">aaa being constructed.</span><br><span class="line">aaa being moved.</span><br><span class="line"></span><br><span class="line">push_back:</span><br><span class="line">Franklin being constructed.</span><br><span class="line">Franklin being moved.</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>cpp</tag>
       </tags>
   </entry>
   <entry>
@@ -3246,6 +3234,18 @@ Contents of section .data:
 ]]></content>
       <tags>
         <tag>redis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>C++ std::vector::emplace_back</title>
+    <url>/2024/02/19/note/cpp/stl/emplace_back/</url>
+    <content><![CDATA[<p>emplace_back可传入对象的参数列表，在容器末尾的位置用 placement new 原地构造，连move都省去了。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">President</span></span><br><span class="line">&#123;</span><br><span class="line">    std::string name;</span><br><span class="line">    std::string country;</span><br><span class="line">    <span class="type">int</span> year;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(std::string p_name, std::string p_country, <span class="type">int</span> p_year)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(p_name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(p_country)), <span class="built_in">year</span>(p_year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; name &lt;&lt; <span class="string">&quot; being constructed.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(President&amp;&amp; other)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(other.name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(other.country)), <span class="built_in">year</span>(other.year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; name &lt;&lt; <span class="string">&quot; being moved.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    President&amp; <span class="keyword">operator</span>=(<span class="type">const</span> President&amp; other) = <span class="keyword">default</span>;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::vector&lt;President&gt; elections;</span><br><span class="line">    elections.<span class="built_in">reserve</span>(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;emplace_back obj&#x27;s args:\n&quot;</span>;</span><br><span class="line">    elections.<span class="built_in">emplace_back</span>(<span class="string">&quot;Nelson&quot;</span>, <span class="string">&quot;South Africa&quot;</span>, <span class="number">1994</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果emplace_back一个对象，则是先构造，后移动</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\nemplace_back an obj:\n&quot;</span>;</span><br><span class="line">    elections.<span class="built_in">emplace_back</span>(<span class="built_in">President</span>(<span class="string">&quot;aaa&quot;</span>, <span class="string">&quot;usa&quot;</span>, <span class="number">2000</span>));</span><br><span class="line">    </span><br><span class="line"> </span><br><span class="line">    std::vector&lt;President&gt; reElections;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\npush_back:\n&quot;</span>;</span><br><span class="line">    reElections.<span class="built_in">push_back</span>(<span class="built_in">President</span>(<span class="string">&quot;Franklin&quot;</span>, <span class="string">&quot;the USA&quot;</span>, <span class="number">1936</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">emplace_back obj&#x27;s args:</span><br><span class="line">Nelson being constructed.</span><br><span class="line"></span><br><span class="line">emplace_back an obj:</span><br><span class="line">aaa being constructed.</span><br><span class="line">aaa being moved.</span><br><span class="line"></span><br><span class="line">push_back:</span><br><span class="line">Franklin being constructed.</span><br><span class="line">Franklin being moved.</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>cpp</tag>
       </tags>
   </entry>
   <entry>
