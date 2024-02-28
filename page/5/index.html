@@ -147,7 +147,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">62</span>
+          <span class="site-state-item-count">61</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -170,116 +170,6 @@
     </div>
 
     <div class="main-inner index posts-expand">
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/make/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/make/" class="post-title-link" itemprop="url">未命名</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>2.2k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>4 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>The <code>make</code> command in Linux is a utility used to automate the compilation and building process of projects. It reads a file named <code>Makefile</code> that contains a set of directives about how to compile and link a program. Here’s a brief overview of the syntax and key concepts of a <code>Makefile</code>:</p>
-<h3 id="Basic-Structure"><a href="#Basic-Structure" class="headerlink" title="Basic Structure"></a>Basic Structure</h3><p>A <code>Makefile</code> typically consists of a set of rules. A rule is made up of three parts:</p>
-<ol>
-<li><strong>Target</strong>: The name of the file that the rule produces.</li>
-<li><strong>Prerequisites</strong>: The files that are used as input to create the target.</li>
-<li><strong>Recipe</strong>: The commands that will be executed to create the target from the prerequisites.</li>
-</ol>
-<p>The basic syntax of a rule is:</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">target: prerequisites</span></span><br><span class="line">    recipe</span><br></pre></td></tr></table></figure>
-
-<h3 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h3><p>Here’s a simple example of a <code>Makefile</code> that compiles a C program:</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Define the compiler</span></span><br><span class="line">CC=gcc</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the compiler flags</span></span><br><span class="line">CFLAGS=-Wall</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the target executable</span></span><br><span class="line">TARGET=myprogram</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the rule for the target</span></span><br><span class="line"><span class="variable">$(TARGET)</span>: <span class="variable">$(TARGET)</span>.c</span><br><span class="line">    <span class="variable">$(CC)</span> <span class="variable">$(CFLAGS)</span> -o <span class="variable">$(TARGET)</span> <span class="variable">$(TARGET)</span>.c</span><br></pre></td></tr></table></figure>
-
-<h3 id="Variables"><a href="#Variables" class="headerlink" title="Variables"></a>Variables</h3><p>You can define variables in a <code>Makefile</code> to make it more readable and maintainable. In the example above, <code>CC</code>, <code>CFLAGS</code>, and <code>TARGET</code> are variables.</p>
-<h3 id="Comments"><a href="#Comments" class="headerlink" title="Comments"></a>Comments</h3><p>Comments in a <code>Makefile</code> start with the <code>#</code> symbol. Anything following this symbol on a line is considered a comment.</p>
-<h3 id="Phony-Targets"><a href="#Phony-Targets" class="headerlink" title="Phony Targets"></a>Phony Targets</h3><p>By default, Makefile targets are “file targets” - they are used to build files from other files. Make assumes its target is a file, and this makes writing Makefiles relatively easy:</p>
-<p>In terms of Make, a phony target is simply a target that is always out-of-date, so whenever you ask make <phony_target>, it will run, independent from the state of the file system. Some common make targets that are often phony are: all, install, clean, distclean, TAGS, info, check.</p>
-<p>A phony target is one that does not represent a file. It’s used to avoid conflicts with files of the same name and to improve performance. You can declare phony targets using the <code>.PHONY</code> directive.</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"><span class="keyword">.PHONY</span>: clean</span></span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">    rm -f <span class="variable">$(TARGET)</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="Advanced-Features"><a href="#Advanced-Features" class="headerlink" title="Advanced Features"></a>Advanced Features</h3><ul>
-<li><strong>Pattern Rules</strong>: Allow you to define generic rules using <code>%</code> as a pattern matcher.</li>
-<li><strong>Automatic Variables</strong>: Variables like <code>$@</code> (the name of the target), <code>$&lt;</code> (the name of the first prerequisite), and <code>$^</code> (the names of all the prerequisites) are set automatically and can be used in recipes.</li>
-<li><strong>Conditional Execution</strong>: You can include conditionals in a <code>Makefile</code> to control the flow based on certain conditions.</li>
-</ul>
-<h3 id="Running-Make"><a href="#Running-Make" class="headerlink" title="Running Make"></a>Running Make</h3><p>To run <code>make</code>, simply type <code>make</code> in the terminal in the directory containing the <code>Makefile</code>. If you want to run a specific target, type <code>make &lt;target_name&gt;</code>.</p>
-<p>This overview covers the basics of <code>make</code> syntax. <code>make</code> is a powerful tool with many more features and capabilities to explore.</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
 
     
 
@@ -1384,6 +1274,125 @@
 </ul>
 <h1 id="Red-Black-Tree"><a href="#Red-Black-Tree" class="headerlink" title="Red-Black Tree"></a>Red-Black Tree</h1><p>std::map &#x2F; std::set 底层实现都是红黑树。</p>
 
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/cpp_volatile/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/cpp_volatile/" class="post-title-link" itemprop="url">C++ volatile 关键字</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>5 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="c-Why-do-we-use-volatile-keyword-Stack-Overflow"><a href="#c-Why-do-we-use-volatile-keyword-Stack-Overflow" class="headerlink" title="c++ - Why do we use volatile keyword? - Stack Overflow"></a>c++ - Why do we use volatile keyword? - Stack Overflow</h1><p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/4437527/why-do-we-use-volatile-keyword/4437555#4437555">https://stackoverflow.com/questions/4437527/why-do-we-use-volatile-keyword/4437555#4437555</a></p>
+<p>Consider this code,</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> some_int = <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(some_int == <span class="number">100</span>)</span><br><span class="line">&#123;</span><br><span class="line">   <span class="comment">//your code</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>When this program gets compiled, the compiler may optimize this code, if it finds that the program <strong>never</strong> ever makes any attempt to change the value of <code>some_int</code>, so it may be tempted to optimize the <code>while</code> loop by changing it from <code>while(some_int == 100)</code> to <em>something</em> which is equivalent to <code>while(true)</code> so that the execution could be fast (since the condition in <code>while</code> loop appears to be <code>true</code> always). <em>(if the compiler doesn’t optimize it, then it has to fetch the value of <code>some_int</code> and compare it with 100, in each iteration which obviously is a little bit slow.)</em></p>
+<p>However, sometimes, optimization (of some parts of your program) may be <strong>undesirable</strong>, because it may be that someone else is changing the value of <code>some_int</code> from <strong>outside the program which compiler is not aware of</strong>, since it can’t see it; but it’s how you’ve designed it. In that case, compiler’s optimization would <strong>not</strong> produce the desired result!</p>
+<p>So, to ensure the desired result, you need to somehow stop the compiler from optimizing the <code>while</code> loop. That is where the <code>volatile</code> keyword plays its role. All you need to do is this,</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatile int some_int = 100; //note the &#x27;volatile&#x27; qualifier now!</span><br></pre></td></tr></table></figure>
+
+<p>In other words, I would explain this as follows:</p>
+<p><code>volatile</code> tells the compiler that,</p>
+<blockquote>
+<p>“Hey compiler, I’m volatile and, you know, I can be changed by some XYZ that you’re not even aware of. That XYZ could be anything. Maybe some alien outside this planet called program. Maybe some lightning, some form of interrupt, volcanoes, etc can mutate me. Maybe. You never know who is going to change me! So O you ignorant, stop playing an all-knowing god, and don’t dare touch the code where I’m present. Okay?”</p>
+</blockquote>
+<p>Well, that is how <code>volatile</code> prevents the compiler from optimizing code. Now search the web to see some sample examples.</p>
+<p>Quoting from the C++ Standard ($7.1.5.1&#x2F;8)</p>
+<blockquote>
+<p>[..] volatile is a hint to the implementation to <strong>avoid aggressive optimization involving the object</strong> because the value of the object might be changed by means undetectable by an implementation.[…]</p>
+</blockquote>
+<p>例子：在编译器看来恒为true的条件，如果编译开启了优化，则会跳过判断。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;foo()\n&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> some_int = <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(some_int == <span class="number">100</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">foo</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>加 <code>-O1</code> 优化，直接调 <code>foo()</code> ，跳过了检查</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">.LC0:</span><br><span class="line">        .string &quot;foo()\n&quot;</span><br><span class="line">foo():</span><br><span class="line">        subq    $8, %rsp</span><br><span class="line">        movl    $6, %edx</span><br><span class="line">        movl    $.LC0, %esi</span><br><span class="line">        movl    $_ZSt4cout, %edi</span><br><span class="line">        call    std::basic_ostream&lt;char, std::char_traits&lt;char&gt; &gt;&amp; std::__ostream_insert&lt;char, std::char_traits&lt;char&gt; &gt;(std::basic_ostream&lt;char, std::char_traits&lt;char&gt; &gt;&amp;, char const*, long)</span><br><span class="line">        addq    $8, %rsp</span><br><span class="line">        ret</span><br><span class="line">main:</span><br><span class="line">        subq    $8, %rsp</span><br><span class="line">        call    foo()</span><br><span class="line">        movl    $0, %eax</span><br><span class="line">        addq    $8, %rsp</span><br><span class="line">        ret</span><br></pre></td></tr></table></figure>
+
+<p>加上 <code>volatile</code> ，禁止编译器优化 <code>some_int</code> 变量。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;foo()\n&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="type">int</span> some_int = <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(some_int == <span class="number">100</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">foo</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这次乖乖取取内存中值，<code>some_int</code> 本身是存在栈内存中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">.LC0:</span><br><span class="line">        .string &quot;foo()\n&quot;</span><br><span class="line">foo():</span><br><span class="line">        subq    $8, %rsp</span><br><span class="line">        movl    $6, %edx</span><br><span class="line">        movl    $.LC0, %esi</span><br><span class="line">        movl    $_ZSt4cout, %edi</span><br><span class="line">        call    std::basic_ostream&lt;char, std::char_traits&lt;char&gt; &gt;&amp; std::__ostream_insert&lt;char, std::char_traits&lt;char&gt; &gt;(std::basic_ostream&lt;char, std::char_traits&lt;char&gt; &gt;&amp;, char const*, long)</span><br><span class="line">        addq    $8, %rsp</span><br><span class="line">        ret</span><br><span class="line">main:</span><br><span class="line">        subq    $24, %rsp</span><br><span class="line">        movl    $100, 12(%rsp)</span><br><span class="line">        movl    12(%rsp), %eax</span><br><span class="line">        cmpl    $100, %eax</span><br><span class="line">        je      .L6</span><br><span class="line">.L4:</span><br><span class="line">        movl    $0, %eax</span><br><span class="line">        addq    $24, %rsp</span><br><span class="line">        ret</span><br><span class="line">.L6:</span><br><span class="line">        call    foo()</span><br><span class="line">        jmp     .L4</span><br></pre></td></tr></table></figure>
       
     </div>
 

@@ -147,7 +147,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">62</span>
+          <span class="site-state-item-count">61</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -351,94 +351,6 @@
           <p>每个中断都通过一个唯一的<code>数字标志</code>区分，称为<code>中断请求(IRQ)线</code>(IRQ line，或叫中断号)</p>
 <p>在响应一个特定中断的时候，内核会执行一个函数，称为<code>中断处理程序</code>(interrupt handler)或<code>中断服务例程</code>(interrupt service routine，ISR)。</p>
 <p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240223180221.png" alt="image.png"></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/26/note/linux/kernel_compile/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/26/note/linux/kernel_compile/" class="post-title-link" itemprop="url">未命名</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-26 10:36:17" itemprop="dateCreated datePublished" datetime="2024-02-26T10:36:17+08:00">2024-02-26</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>78</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>1 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>Linux kernel compiling</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/cirosantilli/linux-kernel-module-cheat</span><br></pre></td></tr></table></figure>
-
-
-
 
       
     </div>
@@ -1419,7 +1331,7 @@
 <h3 id="hash"><a href="#hash" class="headerlink" title=".hash"></a>.hash</h3><p>给<code>ld.so</code> 查询动态符号用的哈希表</p>
 <p><a target="_blank" rel="noopener" href="https://flapenguin.me/elf-dt-hash">https://flapenguin.me/elf-dt-hash</a></p>
 <h3 id="dynsym"><a href="#dynsym" class="headerlink" title=".dynsym"></a>.dynsym</h3><p>This section holds the dynamic linking symbol table</p>
-<p>The <code>.dynsym</code> section of an ELF file consists of fixed-length records, either of type <code>Elf32_Sym</code> or <code>Elf64_Sym</code>, depending on the architecture. These records are unable to directly contain the symbol names due to their variable length nature. Instead, they include an offset within the <code>.dynstr</code> section (in the <code>.st_name</code> field), where the actual symbol name is located. Therefore, it is incorrect to say that <code>.dynsym</code> directly contains symbol names like “<a href="mailto:&#x73;&#x65;&#x74;&#115;&#x6f;&#99;&#107;&#x6f;&#112;&#116;&#64;&#71;&#x4c;&#x49;&#x42;&#x43;&#x5f;&#x32;&#x2e;&#x30;">&#x73;&#x65;&#x74;&#115;&#x6f;&#99;&#107;&#x6f;&#112;&#116;&#64;&#71;&#x4c;&#x49;&#x42;&#x43;&#x5f;&#x32;&#x2e;&#x30;</a>.” It accurately contains an <code>Elf32_Sym</code> or <code>Elf64_Sym</code> entry for an imported symbol such as <code>setsockopt</code>, which refers to the symbol name’s offset in the <code>.dynstr</code> section.</p>
+<p>The <code>.dynsym</code> section of an ELF file consists of fixed-length records, either of type <code>Elf32_Sym</code> or <code>Elf64_Sym</code>, depending on the architecture. These records are unable to directly contain the symbol names due to their variable length nature. Instead, they include an offset within the <code>.dynstr</code> section (in the <code>.st_name</code> field), where the actual symbol name is located. Therefore, it is incorrect to say that <code>.dynsym</code> directly contains symbol names like “<a href="mailto:&#x73;&#101;&#116;&#115;&#x6f;&#99;&#x6b;&#111;&#112;&#116;&#x40;&#71;&#76;&#73;&#x42;&#x43;&#95;&#x32;&#x2e;&#x30;">&#x73;&#101;&#116;&#115;&#x6f;&#99;&#x6b;&#111;&#112;&#116;&#x40;&#71;&#76;&#73;&#x42;&#x43;&#95;&#x32;&#x2e;&#x30;</a>.” It accurately contains an <code>Elf32_Sym</code> or <code>Elf64_Sym</code> entry for an imported symbol such as <code>setsockopt</code>, which refers to the symbol name’s offset in the <code>.dynstr</code> section.</p>
 <h3 id="dynstr"><a href="#dynstr" class="headerlink" title=".dynstr"></a>.dynstr</h3><p>This section holds strings needed for dynamic linking</p>
 <h3 id="init"><a href="#init" class="headerlink" title=".init"></a>.init</h3><p>This section holds executable instructions that contribute to the process initialization code. When a program starts to run, the system executes the code in this section before calling the main program entry point (called main for C programs).</p>
 <h3 id="fini"><a href="#fini" class="headerlink" title=".fini"></a>.fini</h3><p>This section holds executable instructions that contribute to the process termination code. When a program exits normally, the system executes the code in this section.</p>
@@ -1656,6 +1568,95 @@
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
 <li><a target="_blank" rel="noopener" href="http://chuquan.me/2018/06/03/linking-static-linking-dynamic-linking/#%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5">http://chuquan.me/2018/06/03/linking-static-linking-dynamic-linking/#%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5</a></li>
 </ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/21/note/linux/readelf/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/21/note/linux/readelf/" class="post-title-link" itemprop="url">Linux readelf</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-21 10:14:08" itemprop="dateCreated datePublished" datetime="2024-02-21T10:14:08+08:00">2024-02-21</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.7k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Options"><a href="#Options" class="headerlink" title="Options"></a>Options</h1><p><code>-h</code> 打印 elf header<br><code>-l</code> 打印 program headers<br><code>-S</code> 打印 section headers<br><code>-x section_name</code> Hexdump the contents of section<br><code>-W --wide</code> 输出宽度超过80个字符也不换行</p>
+<h1 id="Usage"><a href="#Usage" class="headerlink" title="Usage"></a>Usage</h1><h2 id="Dump-section-header-table"><a href="#Dump-section-header-table" class="headerlink" title="Dump section header table"></a>Dump section header table</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">readelf -S -W a.o</span></span><br><span class="line">There are 13 section headers, starting at offset 0x298:</span><br><span class="line"></span><br><span class="line">Section Headers:</span><br><span class="line">  [Nr] Name              Type            Address          Off    Size   ES Flg Lk Inf Al</span><br><span class="line">  [ 0]                   NULL            0000000000000000 000000 000000 00      0   0  0</span><br><span class="line">  [ 1] .text             PROGBITS        0000000000000000 000040 000010 00  AX  0   0  1</span><br><span class="line">  [ 2] .rela.text        RELA            0000000000000000 0001f8 000018 18   I 10   1  8</span><br><span class="line">  [ 3] .data             PROGBITS        0000000000000000 000050 000000 00  WA  0   0  1</span><br><span class="line">  [ 4] .bss              NOBITS          0000000000000000 000050 000000 00  WA  0   0  1</span><br><span class="line">  [ 5] .comment          PROGBITS        0000000000000000 000050 00002c 01  MS  0   0  1</span><br><span class="line">  [ 6] .note.GNU-stack   PROGBITS        0000000000000000 00007c 000000 00      0   0  1</span><br><span class="line">  [ 7] .note.gnu.property NOTE            0000000000000000 000080 000020 00   A  0   0  8</span><br><span class="line">  [ 8] .eh_frame         PROGBITS        0000000000000000 0000a0 000038 00   A  0   0  8</span><br><span class="line">  [ 9] .rela.eh_frame    RELA            0000000000000000 000210 000018 18   I 10   8  8</span><br><span class="line">  [10] .symtab           SYMTAB          0000000000000000 0000d8 000108 18     11   9  8</span><br><span class="line">  [11] .strtab           STRTAB          0000000000000000 0001e0 000012 00      0   0  1</span><br><span class="line">  [12] .shstrtab         STRTAB          0000000000000000 000228 00006c 00      0   0  1</span><br><span class="line">Key to Flags:</span><br><span class="line">  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),</span><br><span class="line">  L (link order), O (extra OS processing required), G (group), T (TLS),</span><br><span class="line">  C (compressed), x (unknown), o (OS specific), E (exclude),</span><br><span class="line">  l (large), p (processor specific)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Dump-content-of-a-section"><a href="#Dump-content-of-a-section" class="headerlink" title="Dump content of a section"></a>Dump content of a section</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">readelf -x .rela.text a.o</span></span><br><span class="line"></span><br><span class="line">Hex dump of section &#x27;.rela.text&#x27;:</span><br><span class="line">  0x00000000 0a000000 00000000 02000000 0a000000 ................</span><br><span class="line">  0x00000010 fcffffff ffffffff                   ........</span><br></pre></td></tr></table></figure>
+
+<h2 id="Dump-relocation-entries"><a href="#Dump-relocation-entries" class="headerlink" title="Dump relocation entries"></a>Dump relocation entries</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">readelf -r a.o</span></span><br><span class="line"></span><br><span class="line">Relocation section &#x27;.rela.text&#x27; at offset 0x1f8 contains 1 entry:</span><br><span class="line">  Offset          Info           Type           Sym. Value    Sym. Name + Addend</span><br><span class="line">00000000000a  000a00000002 R_X86_64_PC32     0000000000000000 foo - 4</span><br><span class="line"></span><br><span class="line">Relocation section &#x27;.rela.eh_frame&#x27; at offset 0x210 contains 1 entry:</span><br><span class="line">  Offset          Info           Type           Sym. Value    Sym. Name + Addend</span><br><span class="line">000000000020  000200000002 R_X86_64_PC32     0000000000000000 .text + 0</span><br></pre></td></tr></table></figure>
 
       
     </div>
