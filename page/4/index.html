@@ -144,13 +144,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-count">63</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -167,6 +167,574 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%20/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%20/" class="post-title-link" itemprop="url">C++ 虚析构函数</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>5 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="虚析构函数"><a href="#虚析构函数" class="headerlink" title="虚析构函数"></a>虚析构函数</h1><blockquote>
+<p>何时声明类的析构函数为virtual？</p>
+</blockquote>
+<ul>
+<li>当要通过基类指针删除子类对象时，如果基类的析构函数没用virtual，则是未定义行为，大多数实现是把基类的析构函数当作普通非虚函数，因此只析构基类，导致子类资源泄露。</li>
+<li>因此Effective C++讲：只要基类有一个虚函数，就该考虑将其析构函数声明为virtual。从而确保从子类→基类的析构函数依次调用（构造顺序是先基类后子类，析构顺序正好相反，先子类后父类），否则只有基类析构，子类没析构，子类发生资源泄漏。</li>
+<li>也可以声明基类析构函数为protected，从而编译器禁止通过基类指针删除子类对象。</li>
+</ul>
+<blockquote>
+<p>那是否每个基类的析构函数都声明为virtual？</p>
+</blockquote>
+<ul>
+<li>不用，只要最上边的基类是virtual即可，其余子类的析构函数均继承了virtual修饰。</li>
+</ul>
+<h2 id="多态基类析构函数没加virtual"><a href="#多态基类析构函数没加virtual" class="headerlink" title="多态基类析构函数没加virtual"></a>多态基类析构函数没加virtual</h2><p>这种情况是未定义的，大多数实现是只析构基类了</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">// 这里去掉了virtual</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line"><span class="built_in">MyCircle</span>()</span><br><span class="line"></span><br><span class="line">~<span class="built_in">Shape</span>() <span class="comment">// 要删除子类，结果只调了基类的析构函数</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="多态基类析构函数加上virtual后"><a href="#多态基类析构函数加上virtual后" class="headerlink" title="多态基类析构函数加上virtual后"></a>多态基类析构函数加上virtual后</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">// 这里加上virtual</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line"><span class="built_in">MyCircle</span>()</span><br><span class="line"></span><br><span class="line">~<span class="built_in">MyCircle</span>() <span class="comment">// 从子类到父类依次析构</span></span><br><span class="line">~<span class="built_in">Circle</span>()</span><br><span class="line">~<span class="built_in">Shape</span>()</span><br></pre></td></tr></table></figure>
+
+<h2 id="多态基类析构函数声明为protected"><a href="#多态基类析构函数声明为protected" class="headerlink" title="多态基类析构函数声明为protected"></a>多态基类析构函数声明为protected</h2><p>禁止从基类指针删除子类对象</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;source&gt;: In function <span class="string">&#x27;int main()&#x27;</span>:</span><br><span class="line">&lt;source&gt;:<span class="number">32</span>:<span class="number">12</span>: error: <span class="string">&#x27;Shape::~Shape()&#x27;</span> is <span class="keyword">protected</span> within <span class="keyword">this</span> context</span><br><span class="line">   <span class="number">32</span> |     <span class="keyword">delete</span> shape;</span><br><span class="line">      |            ^~~~~</span><br><span class="line">&lt;source&gt;:<span class="number">10</span>:<span class="number">5</span>: note: declared <span class="keyword">protected</span> here</span><br><span class="line">   <span class="number">10</span> |     ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">      |     ^</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E7%BB%9D%E4%B8%8D%E8%83%BD%E5%9C%A8%E6%9E%84%E9%80%A0%E5%92%8C%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%AD%E8%B0%83%E8%99%9A%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/%E7%BB%9D%E4%B8%8D%E8%83%BD%E5%9C%A8%E6%9E%84%E9%80%A0%E5%92%8C%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%AD%E8%B0%83%E8%99%9A%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">C++ 绝不能在构造和析构函数中调虚函数</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>775</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>1 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>绝不在构造和析构过程中调用 virtual 函数，因为这类调用只会调用当前类的虚函数版本，从不下降至更下级子类（derived class）</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() </span><br><span class="line">    &#123; </span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="built_in">foo</span>(); <span class="comment">// 在构造函数中调虚函数，只会调该类的，不会向下走</span></span><br><span class="line">    &#125;</span><br><span class="line">    ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;Shape::foo()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;Circle::foo()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Circle c;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line">Shape::<span class="built_in">foo</span>() <span class="comment">// 构造是Circle，但调的是基类的虚函数</span></span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line">~<span class="built_in">Circle</span>()</span><br><span class="line">~<span class="built_in">Shape</span>()</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E7%BB%A7%E6%89%BF%E7%B1%BB%E6%9E%84%E9%80%A0%E4%B8%8E%E6%9E%90%E6%9E%84%E9%A1%BA%E5%BA%8F%20/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/%E7%BB%A7%E6%89%BF%E7%B1%BB%E6%9E%84%E9%80%A0%E4%B8%8E%E6%9E%90%E6%9E%84%E9%A1%BA%E5%BA%8F%20/" class="post-title-link" itemprop="url">C++ 继承类构造与析构顺序</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <ul>
+<li>先base类构造函数，如果继承多个，则从左到右依次构造base，如果其中有virtual继承，则高优先级；</li>
+<li>接着是成员变量，按声明的顺序依次构建</li>
+<li>最后是这个类当前构造函数花括号内的逻辑</li>
+<li>析构与构造顺序完全相反</li>
+</ul>
+<h2 id="连续继承"><a href="#连续继承" class="headerlink" title="连续继承"></a>连续继承</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line"><span class="built_in">MyCircle</span>()</span><br><span class="line"></span><br><span class="line">~<span class="built_in">MyCircle</span>()</span><br><span class="line">~<span class="built_in">Circle</span>()</span><br><span class="line">~<span class="built_in">Shape</span>()</span><br></pre></td></tr></table></figure>
+
+<h2 id="既继承又包含"><a href="#既继承又包含" class="headerlink" title="既继承又包含"></a>既继承又包含</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">A</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">A</span>() &#123; cout &lt;&lt; <span class="string">&quot;A() C-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">A</span>() &#123; cout &lt;&lt; <span class="string">&quot;~A() D-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">B</span> : <span class="keyword">public</span> A </span><br><span class="line">&#123;</span><br><span class="line">    A a;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">B</span>() &#123; cout &lt;&lt; <span class="string">&quot;B() C-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">B</span>() &#123; cout &lt;&lt; <span class="string">&quot;~B() D-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123; B b; &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">A</span>() C-<span class="function">tor</span></span><br><span class="line"><span class="function"><span class="title">A</span><span class="params">()</span> C-tor</span></span><br><span class="line"><span class="function"><span class="title">B</span><span class="params">()</span> C-tor</span></span><br><span class="line"><span class="function">~<span class="title">B</span><span class="params">()</span> D-tor</span></span><br><span class="line"><span class="function">~<span class="title">A</span><span class="params">()</span> D-tor</span></span><br><span class="line"><span class="function">~<span class="title">A</span><span class="params">()</span> D-tor</span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E7%BC%96%E8%AF%91%E5%99%A8%E7%94%9F%E6%88%90%E7%9A%84%E6%9E%84%E9%80%A0%EF%BC%8C%E6%8B%B7%E8%B4%9D%EF%BC%8C%E7%A7%BB%E5%8A%A8%E5%87%BD%E6%95%B0%20/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/%E7%BC%96%E8%AF%91%E5%99%A8%E7%94%9F%E6%88%90%E7%9A%84%E6%9E%84%E9%80%A0%EF%BC%8C%E6%8B%B7%E8%B4%9D%EF%BC%8C%E7%A7%BB%E5%8A%A8%E5%87%BD%E6%95%B0%20/" class="post-title-link" itemprop="url">C++ 编译器自动生成的构造，拷贝，移动函数</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>989</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>什么时候自动生成？</p>
+</blockquote>
+<ul>
+<li>没声明且用到了，则编译器自动生成一个默认的。</li>
+</ul>
+<blockquote>
+<p>怎么禁止编译器生成？</p>
+</blockquote>
+<ul>
+<li>≥ C++11 用delete</li>
+<li>只声明不实现，放在private中，如果调用了，报链接错误，undefined reference to xxx</li>
+</ul>
+<h2 id="空类，只用到默认构造"><a href="#空类，只用到默认构造" class="headerlink" title="空类，只用到默认构造"></a>空类，只用到默认构造</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用 cppinsights 能看到：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="空类，用到构造、拷贝构造、拷贝赋值"><a href="#空类，用到构造、拷贝构造、拷贝赋值" class="headerlink" title="空类，用到构造、拷贝构造、拷贝赋值"></a>空类，用到构造、拷贝构造、拷贝赋值</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  <span class="function">Empty <span class="title">e2</span><span class="params">(e1)</span></span>;</span><br><span class="line">  e2 = e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty(const Empty &amp;) noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty &amp; operator=(const Empty &amp;) noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1 = <span class="built_in">Empty</span>();</span><br><span class="line">  Empty e2 = <span class="built_in">Empty</span>(e1);</span><br><span class="line">  e2.<span class="keyword">operator</span>=(e1);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="空类，只用到默认构造、拷贝赋值"><a href="#空类，只用到默认构造、拷贝赋值" class="headerlink" title="空类，只用到默认构造、拷贝赋值"></a>空类，只用到默认构造、拷贝赋值</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  Empty e2 = e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty(const Empty &amp;) noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  Empty e2 = <span class="built_in">Empty</span>(e1);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E8%99%9A%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/%E8%99%9A%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" class="post-title-link" itemprop="url">C++ 虚函数实现原理</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>8.1k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>13 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>关于这块，检索到的资料大都模棱两可，可信度很存疑，对这块的理解停留在道听途说的层面，不够深刻。</p>
+<p>想了想，可以从汇编角度，看看编译器究竟为实现虚函数在背后默默做了什么。</p>
+<p>本文分析 <code>gcc version 9.4.0</code> 的虚函数的实现方式。</p>
+<p>基本原理：一个类只要声明了一个虚函数，则编译器为该类生成一个虚函数表（vtable），虚函数表中主要是该类的虚函数的定义地址，由该类所有的对象共享。每个对象内部存一个虚函数表指针（vptr）指向该vtable。</p>
+<p>因此需要明确：虚函数表是属于类的，虚函数指针是属于单个对象。</p>
+<p>注意：c++标准没有规定必须用虚函数表这种形式实现，只是大多数编译器采用这种实现方式。</p>
+<h1 id="虚函数表内容"><a href="#虚函数表内容" class="headerlink" title="虚函数表内容"></a>虚函数表内容</h1><p>首先，看下虚函数表中究竟有什么。</p>
+<h2 id="查看编译器生成汇编代码"><a href="#查看编译器生成汇编代码" class="headerlink" title="查看编译器生成汇编代码"></a>查看编译器生成汇编代码</h2><p>测试代码:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// demo.cpp</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span> : <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Base* p = <span class="keyword">new</span> <span class="built_in">Derived</span>();</span><br><span class="line">    p-&gt;<span class="built_in">foo</span>();</span><br><span class="line">    p-&gt;<span class="built_in">bar</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用 -S 指示g++编译成功后立刻打住，保留汇编代码，不进行下一步汇编代码转二进制机器码的步骤。</p>
+<p>注意：g++ -S 输出的汇编代码中所有符号均已 name-mangled，因此需要用 c++filt 还原符号。</p>
+<p>将可读的汇编代码存到 demo.s 中</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">g++ -S -g demo.cpp -o demo.mangled.s</span><br><span class="line"><span class="built_in">cat</span> demo.mangled.s | c++filt &gt; demo.s</span><br></pre></td></tr></table></figure>
+
+<p>从汇编代码中摘出Base和Derived类的虚函数表。</p>
+<ul>
+<li><code>.quad expr</code> 告知汇编器开辟8字节内存空间，填充 expr</li>
+<li><code>.section</code> 指明该符号放在哪个section</li>
+</ul>
+<p>Derived的虚表大小共4*8 &#x3D; 32字节，后两个8字节是 <code>Derived::foo()</code> 与 <code>Base::bar()</code> 这两个符号的地址。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">vtable <span class="keyword">for</span> Derived:</span><br><span class="line">	.quad	<span class="number">0</span></span><br><span class="line">	.quad	typeinfo <span class="keyword">for</span> Derived</span><br><span class="line">	.<span class="function">quad	<span class="title">Derived::foo</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	.quad	<span class="title">Base::bar</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	.weak	vtable <span class="keyword">for</span> Base</span></span><br><span class="line"><span class="function">	.section	.data.rel.ro.local._ZTV4Base,&quot;awG&quot;,@progbits,vtable <span class="keyword">for</span> Base,comdat</span></span><br><span class="line"><span class="function">	.align 8</span></span><br><span class="line"><span class="function">	.type	vtable <span class="keyword">for</span> Base, @object</span></span><br><span class="line"><span class="function">	.size	vtable <span class="keyword">for</span> Base, 32</span></span><br><span class="line"><span class="function">vtable <span class="keyword">for</span> Base:</span></span><br><span class="line"><span class="function">	.quad	<span class="number">0</span></span></span><br><span class="line"><span class="function">	.quad	typeinfo for Base</span></span><br><span class="line"><span class="function">	.quad	Base::foo()</span></span><br><span class="line"><span class="function">	.quad	Base::bar()</span></span><br><span class="line"><span class="function">	.weak	typeinfo for Derived</span></span><br><span class="line"><span class="function">	.section	.data.rel.ro._ZTI7Derived,<span class="string">&quot;awG&quot;</span>,@progbits,typeinfo for Derived,comdat</span></span><br><span class="line"><span class="function">	.align <span class="number">8</span></span></span><br><span class="line"><span class="function">	.type	typeinfo for Derived, @object</span></span><br><span class="line"><span class="function">	.size	typeinfo for Derived, <span class="number">24</span></span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="运行期"><a href="#运行期" class="headerlink" title="运行期"></a>运行期</h2><h3 id="GDB打印对象的vtable"><a href="#GDB打印对象的vtable" class="headerlink" title="GDB打印对象的vtable"></a>GDB打印对象的vtable</h3><p>最简单直观的一种方式，在GDB中，可直接打印运行时，对象的虚函数表</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span> : <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Base* p = <span class="keyword">new</span> <span class="built_in">Derived</span>();</span><br><span class="line">    p-&gt;<span class="built_in">foo</span>();</span><br><span class="line">    p-&gt;<span class="built_in">bar</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info vtbl p</span><br><span class="line">vtable <span class="keyword">for</span> <span class="string">&#x27;Base&#x27;</span> @ <span class="number">0x555555556d18</span> (subobject @ <span class="number">0x555555569eb0</span>):</span><br><span class="line">[<span class="number">0</span>]: <span class="number">0x555555554a72</span> &lt;Derived::<span class="built_in">foo</span>()&gt;</span><br><span class="line">[<span class="number">1</span>]: <span class="number">0x555555554a62</span> &lt;Base::<span class="built_in">bar</span>()&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>直接看下最终生成的可执行文件，正好对应于gcc -S给出的vtable中前四个.quad汇编指示，所以直接看gcc -S生成的vtable更直观</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">objdump -C -j .rodata -z -S demo</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]# objdump -C -j .rodata -z -S demo</span><br><span class="line"></span><br><span class="line">demo:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line">Disassembly of section .rodata:</span><br><span class="line"></span><br><span class="line">0000000000400b50 &lt;vtable for C&gt;:</span><br><span class="line">  400b50:       00 00 00 00 00 00 00 00 b0 0b 40 00 00 00 00 00     ..........@.....</span><br><span class="line">  400b60:       02 0a 40 00 00 00 00 00 aa 09 40 00 00 00 00 00     ..@.......@.....</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]# objdump -C -t demo | grep 400bb0</span><br><span class="line">0000000000400bb0  w    O .rodata        0000000000000018              typeinfo for C</span><br><span class="line">[root@ZLPC-wangqingjia demo]# objdump -C -t demo | grep 400a02</span><br><span class="line">0000000000400a02  w    F .text  000000000000002b              C::foo()</span><br><span class="line">[root@ZLPC-wangqingjia demo]# objdump -C -t demo | grep 4009aa</span><br><span class="line">00000000004009aa  w    F .text  000000000000002b              A::bar()</span><br></pre></td></tr></table></figure>
+
+<h1 id="gcc导出类的虚表构成"><a href="#gcc导出类的虚表构成" class="headerlink" title="gcc导出类的虚表构成"></a>gcc导出类的虚表构成</h1><p>For GCC compiler in Linux run:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -fdump-lang-<span class="keyword">class</span> <span class="title class_">demo</span>.cpp</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>NOTE: Before GCC 8, the option is -fdump-class-hierarchy instead of -fdump-lang-class.</p>
+</blockquote>
+<p>输出与gcc反汇编一致</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Vtable for C</span><br><span class="line">C::vtable for C: 4 entries</span><br><span class="line">0     (int (*)(...))0</span><br><span class="line">8     (int (*)(...))(&amp; typeinfo for C)</span><br><span class="line">16    (int (*)(...))C::foo</span><br><span class="line">24    (int (*)(...))A::bar</span><br></pre></td></tr></table></figure>
+
+<h1 id="虚函数表在哪？"><a href="#虚函数表在哪？" class="headerlink" title="虚函数表在哪？"></a>虚函数表在哪？</h1><p>在 .rodata</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -t 打印该section内symbol table</span></span><br><span class="line">[root@ZLPC-WangQingJia demo]<span class="comment"># objdump -C -t a.out | grep vtable</span></span><br><span class="line">0000000000400bb0  w    O .rodata        0000000000000020              vtable <span class="keyword">for</span> A</span><br><span class="line">0000000000601d40  w    O .data.rel.ro   0000000000000058              vtable <span class="keyword">for</span> __cxxabiv1::__class_type_info@@CXXABI_1.3</span><br><span class="line">0000000000400b70  w    O .rodata        0000000000000020              vtable <span class="keyword">for</span> C</span><br><span class="line">0000000000601da0  w    O .data.rel.ro   0000000000000058              vtable <span class="keyword">for</span> __cxxabiv1::__si_class_type_info@@CXXABI_1.3</span><br><span class="line">0000000000400b90  w    O .rodata        0000000000000020              vtable <span class="keyword">for</span> B</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="虚函数表指针在哪"><a href="#虚函数表指针在哪" class="headerlink" title="虚函数表指针在哪?"></a>虚函数表指针在哪?</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> </span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;A::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;A::bar&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span> : <span class="keyword">public</span> A</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;B::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span> : <span class="keyword">public</span> B</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;C::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    B* b = <span class="keyword">new</span> C;</span><br><span class="line">    b-&gt;<span class="built_in">foo</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一个指向多态对象的指针，指向成员变量连续内存的起始地址，但由于vptr在成员变量列表最开始位置，因此实际是指向vptr。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">(gdb) p/x $rbp</span><br><span class="line">$24 = 0x7ffffffed780</span><br><span class="line"></span><br><span class="line">(gdb) p b</span><br><span class="line">$22 = (B *) 0x603030</span><br><span class="line">(gdb) p &amp;b</span><br><span class="line">$23 = (B **) 0x7ffffffed760  # 说明基类指针b本身存在栈中</span><br><span class="line">(gdb) x/xg 0x603030</span><br><span class="line">0x603030:       0x0000000000400b90  # 0x603030 应是虚函数表指针的地址，即 p 指向虚函数指针</span><br><span class="line">(gdb) x/xg 0x0000000000400b90</span><br><span class="line">0x400b90 &lt;_ZTV1C+16&gt;:   0x0000000000400a2e # 0x400b90 是虚表函数指针数组首个元素地址</span><br><span class="line">(gdb) dem _ZTV1C</span><br><span class="line">vtable for C</span><br><span class="line">(gdb) x/xg 0x0000000000400a2e</span><br><span class="line">0x400a2e &lt;C::foo()&gt;:    0x10ec8348e5894855 # 注意： 0x10ec8348e5894855 其实是一串汇编指令</span><br></pre></td></tr></table></figure>
+
+
+
+
+<p><img src="/../assets/image-12.png" alt="Alt text"></p>
+<h1 id="虚函数指针究竟在对象中哪里存的"><a href="#虚函数指针究竟在对象中哪里存的" class="headerlink" title="虚函数指针究竟在对象中哪里存的?"></a>虚函数指针究竟在对象中哪里存的?</h1><p>反汇编指令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">g++ -g -O0 demo.cpp -o demo</span><br><span class="line"></span><br><span class="line">g++ -S -g -O0 demo.cpp -o demo.s.tmp</span><br><span class="line"><span class="built_in">cat</span> demo.s.tmp | c++filt &gt; demo.gcc.s</span><br><span class="line"><span class="built_in">rm</span> demo.s.tmp</span><br><span class="line"></span><br><span class="line">objdump -C -d -S demo &gt; demo.s</span><br><span class="line">objdump -C -t demo &gt; demo.sym</span><br><span class="line">objdump -C -j .rodata -z -S demo &gt; demo.rodata.s</span><br><span class="line"></span><br><span class="line">g++ -fdump-lang-class demo.cpp</span><br><span class="line"><span class="built_in">cat</span> demo.cpp.001l.class | c++filt &gt; demo.class</span><br><span class="line"><span class="built_in">rm</span> demo.cpp.001l.class</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> </span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;A::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;A::bar&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span> : <span class="keyword">public</span> A</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;B::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span> : <span class="keyword">public</span> B</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">10</span>;</span><br><span class="line">    <span class="type">int</span> b = <span class="number">10</span>;</span><br><span class="line">    <span class="type">short</span> c = <span class="number">20</span>;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;C::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    A* a = <span class="keyword">new</span> <span class="built_in">C</span>();</span><br><span class="line">    a-&gt;<span class="built_in">foo</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在堆上构造含虚函数的对象</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">A* a = new C();</span><br><span class="line">     bc6:    bf 18 00 00 00           mov    $0x18,%edi       // 类大小为0x18=24字节</span><br><span class="line">     bcb:    e8 b0 fe ff ff           callq  a80 &lt;_init+0xa0&gt; // new 出内存</span><br><span class="line">     bd0:    48 89 c3                 mov    %rax,%rbx        // 申请的地址在 %rax 中</span><br><span class="line">     bd3:    48 c7 03 00 00 00 00     movq   $0x0,(%rbx)      // 类C虚函数表vptr</span><br><span class="line">     bda:    c7 43 08 00 00 00 00     movl   $0x0,0x8(%rbx)   // int a</span><br><span class="line">     be1:    c7 43 0c 00 00 00 00     movl   $0x0,0xc(%rbx)   // int b</span><br><span class="line">     be8:    66 c7 43 10 00 00        movw   $0x0,0x10(%rbx)  // short c </span><br><span class="line">     bee:    48 89 df                 mov    %rbx,%rdi        // 将对象的起始地址(在%rbx中暂存)传入C::C()构造函数</span><br><span class="line">     bf1:    e8 c6 01 00 00           callq  dbc &lt;C::C()&gt;</span><br></pre></td></tr></table></figure>
+
+<p>new出内存之后，调用 C::C() 构造对象之前：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(gdb) x/24xb $rbx</span><br><span class="line">0x555555569eb0: 0x00    0x00    0x00    0x00    0x00    0x00    0x00    0x00</span><br><span class="line">0x555555569eb8: 0x00    0x00    0x00    0x00    0x00    0x00    0x00    0x00</span><br><span class="line">0x555555569ec0: 0x00    0x00    0x00    0x00    0x00    0x00    0x00    0x00</span><br></pre></td></tr></table></figure>
+
+<p>调用 C::C() 之后</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">(gdb) x/24xb $rbx</span><br><span class="line">0x555555569eb0: 0xc8    0x6c    0x55    0x55    0x55    0x55    0x00    0x00</span><br><span class="line">0x555555569eb8: 0x0a    0x00    0x00    0x00    0x0a    0x00    0x00    0x00</span><br><span class="line">0x555555569ec0: 0x14    0x00    0x00    0x00    0x00    0x00    0x00    0x00</span><br><span class="line"></span><br><span class="line">// 最开头的8字节是vptr for C</span><br><span class="line">(gdb) x/gx 0x555555556cc8</span><br><span class="line">0x555555556cc8 &lt;_ZTV1C+16&gt;:     0x0000555555554d34</span><br><span class="line">(gdb) dem _ZTV1C</span><br><span class="line">vtable for C</span><br><span class="line">(gdb) x/gx 0x0000555555554d34</span><br><span class="line">0x555555554d34 &lt;C::foo()&gt;:      0xe5894855fa1e0ff3</span><br><span class="line"></span><br><span class="line">// 接下来8字节分别是 int a = 10 = 0x0a 和 int b = 10 = 0x0a</span><br><span class="line"></span><br><span class="line">// 最后8字节的低2字节: 0x14 = 20 即 int c = 20;</span><br></pre></td></tr></table></figure>
+
+<h1 id="多继承虚函数指针怎么分布？"><a href="#多继承虚函数指针怎么分布？" class="headerlink" title="多继承虚函数指针怎么分布？"></a>多继承虚函数指针怎么分布？</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> </span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">aFunc1</span><span class="params">()</span> </span>&#123; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">aFunc2</span><span class="params">()</span> </span>&#123; &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">aFunc3</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bFunc1</span><span class="params">()</span> </span>&#123; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bFunc2</span><span class="params">()</span> </span>&#123; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">D</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">dFunc1</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">dFunc2</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">E</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">eFunc1</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">eFunc2</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span> : <span class="keyword">public</span> A, <span class="keyword">public</span> B, <span class="keyword">public</span> D, <span class="keyword">public</span> E</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">aFunc2</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">cFunc1</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">dFunc1</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>gcc导出vtable</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">g++ -fdump-lang-<span class="keyword">class</span> <span class="title class_">demo</span>.cpp</span><br><span class="line">cat demo.cpp<span class="number">.001l</span>.<span class="keyword">class</span> | c++filt &gt; demo.<span class="keyword">class</span>  # 导出为demo.<span class="keyword">class</span></span><br><span class="line"><span class="title class_">rm</span> demo.cpp<span class="number">.001l</span>.<span class="keyword">class</span></span><br></pre></td></tr></table></figure>
+
+<p>C类继承4个父类，类C本身的虚函数跟在第一个父类指针数组后面，其余父类的虚函数依次排列，每个C类的对象含4个vptr，分别指向C类虚函表数组的四个地址。注意是全指向C类的虚表数组，数组中存的是虚函数地址，不涉及父类虚表。编译期就确定了某个类的虚表分布与构成。</p>
+<ol>
+<li>vtable+16</li>
+<li>vtable+64</li>
+<li>vtable+96</li>
+<li>vtable+128</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">Vtable <span class="keyword">for</span> C</span><br><span class="line">C::vtable <span class="keyword">for</span> C: <span class="number">18</span> entries</span><br><span class="line"><span class="number">0</span>     (<span class="built_in">int</span> (*)(...))<span class="number">0</span></span><br><span class="line"><span class="number">8</span>     (<span class="built_in">int</span> (*)(...))(&amp; typeinfo <span class="keyword">for</span> C)</span><br><span class="line"><span class="number">16</span>    (<span class="built_in">int</span> (*)(...))A::aFunc1</span><br><span class="line"><span class="number">24</span>    (<span class="built_in">int</span> (*)(...))C::aFunc2</span><br><span class="line"><span class="number">32</span>    (<span class="built_in">int</span> (*)(...))C::cFunc1</span><br><span class="line"><span class="number">40</span>    (<span class="built_in">int</span> (*)(...))C::dFunc1</span><br><span class="line"><span class="number">48</span>    (<span class="built_in">int</span> (*)(...))<span class="number">-8</span></span><br><span class="line"><span class="number">56</span>    (<span class="built_in">int</span> (*)(...))(&amp; typeinfo <span class="keyword">for</span> C)</span><br><span class="line"><span class="number">64</span>    (<span class="built_in">int</span> (*)(...))B::bFunc1</span><br><span class="line"><span class="number">72</span>    (<span class="built_in">int</span> (*)(...))B::bFunc2</span><br><span class="line"><span class="number">80</span>    (<span class="built_in">int</span> (*)(...))<span class="number">-16</span></span><br><span class="line"><span class="number">88</span>    (<span class="built_in">int</span> (*)(...))(&amp; typeinfo <span class="keyword">for</span> C)</span><br><span class="line"><span class="number">96</span>    (<span class="built_in">int</span> (*)(...))C::non-<span class="function"><span class="keyword">virtual</span> thunk to <span class="title">C::dFunc1</span><span class="params">()</span></span></span><br><span class="line"><span class="function">104   <span class="params">(<span class="type">int</span> (*)(...))</span>D::dFunc2</span></span><br><span class="line"><span class="function">112   <span class="params">(<span class="type">int</span> (*)(...))</span>-24</span></span><br><span class="line"><span class="function">120   <span class="params">(<span class="type">int</span> (*)(...))</span><span class="params">(&amp; typeinfo <span class="keyword">for</span> C)</span></span></span><br><span class="line"><span class="function">128   <span class="params">(<span class="type">int</span> (*)(...))</span>E::eFunc1</span></span><br><span class="line"><span class="function">136   <span class="params">(<span class="type">int</span> (*)(...))</span>E::eFunc2</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">Class C</span></span><br><span class="line"><span class="function">   size</span>=<span class="number">32</span> align=<span class="number">8</span></span><br><span class="line">   base size=<span class="number">32</span> base align=<span class="number">8</span></span><br><span class="line"><span class="built_in">C</span> (<span class="number">0x0</span>x7fa0d22ea900) <span class="number">0</span></span><br><span class="line">    vptr=((&amp; C::vtable <span class="keyword">for</span> C) + <span class="number">16</span>)</span><br><span class="line">  <span class="built_in">A</span> (<span class="number">0x0</span>x7fa0d2424e40) <span class="number">0</span> nearly-empty</span><br><span class="line">      primary-<span class="keyword">for</span> <span class="built_in">C</span> (<span class="number">0x0</span>x7fa0d22ea900)</span><br><span class="line">  <span class="built_in">B</span> (<span class="number">0x0</span>x7fa0d2424ea0) <span class="number">8</span> nearly-empty</span><br><span class="line">      vptr=((&amp; C::vtable <span class="keyword">for</span> C) + <span class="number">64</span>)</span><br><span class="line">  <span class="built_in">D</span> (<span class="number">0x0</span>x7fa0d2424f00) <span class="number">16</span> nearly-empty</span><br><span class="line">      vptr=((&amp; C::vtable <span class="keyword">for</span> C) + <span class="number">96</span>)</span><br><span class="line">  <span class="built_in">E</span> (<span class="number">0x0</span>x7fa0d2424f60) <span class="number">24</span> nearly-empty</span><br><span class="line">      vptr=((&amp; C::vtable <span class="keyword">for</span> C) + <span class="number">128</span>)</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -670,557 +1238,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/internal%20linkage%20external%20linkage/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/internal%20linkage%20external%20linkage/" class="post-title-link" itemprop="url">C++ 内部链接与外部链接</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>2.3k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>4 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="内部链接与外部链接"><a href="#内部链接与外部链接" class="headerlink" title="内部链接与外部链接"></a>内部链接与外部链接</h1><h2 id="内部链接（Internal-Linkage）"><a href="#内部链接（Internal-Linkage）" class="headerlink" title="内部链接（Internal Linkage）:"></a><strong>内部链接（Internal Linkage）:</strong></h2><ol>
-<li><strong>作用域</strong>：内部链接标识的符号仅在所定义的翻译单元可访问，其他翻译单元不可访问。</li>
-<li><strong>声明</strong>：<ol>
-<li>使用 <strong><code>static</code></strong> 关键字</li>
-<li>非 <code>extern</code> 的 <code>const</code>   </li>
-<li>匿名命名空间内部所定义的符号为内部链接。</li>
-</ol>
-</li>
-<li><strong>用途</strong>：<ul>
-<li>限制作用域，避免命名冲突</li>
-<li>封装实现细节</li>
-</ul>
-</li>
-</ol>
-<h2 id="外部链接（External-Linkage）"><a href="#外部链接（External-Linkage）" class="headerlink" title="外部链接（External Linkage）:"></a><strong>外部链接（External Linkage）:</strong></h2><ol>
-<li><strong>作用域</strong>：外部链接符号在整个程序的所有翻译单元内均可访问。</li>
-<li><strong>声明</strong>：<ol>
-<li>全局符号默认为外部链接链接。</li>
-<li>使用 <strong><code>extern</code></strong> 关键字显式指定。符号定义到当前编译单元或其他链接的编译单元均可。</li>
-</ol>
-</li>
-<li><strong>用途</strong>：<ul>
-<li>多个翻译单元共享符号。</li>
-</ul>
-</li>
-</ol>
-<h1 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// internal linkage</span></span><br><span class="line"><span class="type">int</span> v_gloabl;</span><br><span class="line"><span class="keyword">namespace</span>&#123;</span><br><span class="line">	<span class="type">int</span> v_anonymous_namespace;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> v_const = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// global linkage</span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">int</span> v_extern;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> v_static;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;&#125;<span class="number">3</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 第二列 l 代表 local，g 代表 global</span></span><br><span class="line">$ objdump -C -t a.out | grep v_</span><br><span class="line"><span class="number">0000000000002018</span> l     O .bss   <span class="number">0000000000000004</span>              v_static</span><br><span class="line"><span class="number">000000000000201</span>c l     O .bss   <span class="number">0000000000000004</span>              (anonymous <span class="keyword">namespace</span>)::v_anonymous_namespace</span><br><span class="line"><span class="number">00000000000006</span>cc l     O .rodata        <span class="number">0000000000000004</span>              v_const</span><br><span class="line"><span class="number">0000000000002014</span> g     O .bss   <span class="number">0000000000000004</span>              v_gloabl</span><br><span class="line"><span class="number">0000000000002020</span> g     O .bss   <span class="number">0000000000000004</span>              v_extern</span><br></pre></td></tr></table></figure>
-
-
-<h2 id="extern-关键字"><a href="#extern-关键字" class="headerlink" title="extern 关键字"></a>extern 关键字</h2><p>声明一个符号为外部链接，即全局链接，告知编译器这个符号可能定义在任意一个编译单元，由链接器负责最终找这个定义。</p>
-<p>main.cpp</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">extern</span> <span class="type">int</span> <span class="title">foo</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">extern</span> <span class="type">int</span> <span class="title">bar</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 直接在当前编译单元定义也行</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">bar</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">foo</span>();</span><br><span class="line">    <span class="built_in">bar</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>lib.cpp</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">foo</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">10</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>自动脚本：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 先分别编译成 .o 文件</span></span><br><span class="line">g++ -g -c main.cpp -o main.o</span><br><span class="line">g++ -g -c lib.cpp -o lib.o</span><br><span class="line"></span><br><span class="line"><span class="comment"># 再链接成可执行文件</span></span><br><span class="line">g++ lib.o main.o -o main.exe</span><br><span class="line"></span><br><span class="line"><span class="comment"># 反汇编目标文件和可执行文件</span></span><br><span class="line">objdump -C -D main.o &gt; main.o.s</span><br><span class="line">objdump -C -D lib.o &gt; lib.o.s</span><br><span class="line">objdump -C -D main.exe &gt; main.exe.s</span><br></pre></td></tr></table></figure>
-
-<p>main.o </p>
-<ul>
-<li>注意其中 callq 的地址是相对地址<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">0000000000000000 &lt;bar()&gt;:</span><br><span class="line">   0:	55                   	push   %rbp</span><br><span class="line">   1:	48 89 e5             	mov    %rsp,%rbp</span><br><span class="line">   4:	b8 02 00 00 00       	mov    $0x2,%eax</span><br><span class="line">   9:	5d                   	pop    %rbp</span><br><span class="line">   a:	c3                   	retq   </span><br><span class="line"></span><br><span class="line">000000000000000b &lt;main&gt;:</span><br><span class="line">   b:	55                   	push   %rbp</span><br><span class="line">   c:	48 89 e5             	mov    %rsp,%rbp</span><br><span class="line">   f:	e8 00 00 00 00       	callq  14 &lt;main+0x9&gt;</span><br><span class="line">  14:	e8 00 00 00 00       	callq  19 &lt;main+0xe&gt;</span><br><span class="line">  19:	b8 00 00 00 00       	mov    $0x0,%eax</span><br><span class="line">  1e:	5d                   	pop    %rbp</span><br><span class="line">  1f:	c3                   	retq   </span><br></pre></td></tr></table></figure></li>
-</ul>
-<p>lib.o.s</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">0000000000000000 &lt;foo()&gt;:</span><br><span class="line">   0:	55                   	push   %rbp</span><br><span class="line">   1:	48 89 e5             	mov    %rsp,%rbp</span><br><span class="line">   4:	b8 01 00 00 00       	mov    $0x1,%eax</span><br><span class="line">   9:	5d                   	pop    %rbp</span><br><span class="line">   a:	c3                   	retq   </span><br></pre></td></tr></table></figure>
-
-<p>main.exe.s  </p>
-<ul>
-<li>链接器搜索所有目标文件中搜索foo()和bar()，汇总到可执行文件。</li>
-<li>callq的地址变成绝对地址，链接器进行了静态地址重定向。</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">0000000000400632 &lt;foo()&gt;:</span><br><span class="line">  400632:	55                   	push   %rbp</span><br><span class="line">  400633:	48 89 e5             	mov    %rsp,%rbp</span><br><span class="line">  400636:	b8 01 00 00 00       	mov    $0x1,%eax</span><br><span class="line">  40063b:	5d                   	pop    %rbp</span><br><span class="line">  40063c:	c3                   	retq   </span><br><span class="line"></span><br><span class="line">000000000040063d &lt;bar()&gt;:</span><br><span class="line">  40063d:	55                   	push   %rbp</span><br><span class="line">  40063e:	48 89 e5             	mov    %rsp,%rbp</span><br><span class="line">  400641:	b8 02 00 00 00       	mov    $0x2,%eax</span><br><span class="line">  400646:	5d                   	pop    %rbp</span><br><span class="line">  400647:	c3                   	retq   </span><br><span class="line"></span><br><span class="line">0000000000400648 &lt;main&gt;:</span><br><span class="line">  400648:	55                   	push   %rbp</span><br><span class="line">  400649:	48 89 e5             	mov    %rsp,%rbp</span><br><span class="line">  40064c:	e8 e1 ff ff ff       	callq  400632 &lt;foo()&gt;</span><br><span class="line">  400651:	e8 e7 ff ff ff       	callq  40063d &lt;bar()&gt;</span><br><span class="line">  400656:	b8 00 00 00 00       	mov    $0x0,%eax</span><br><span class="line">  40065b:	5d                   	pop    %rbp</span><br><span class="line">  40065c:	c3                   	retq   </span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/std%20move%20std%20forward%20/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/std%20move%20std%20forward%20/" class="post-title-link" itemprop="url">C++ std::move vs std::forward</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>4.8k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>8 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="std-move-std-forward"><a href="#std-move-std-forward" class="headerlink" title="std::move std::forward"></a>std::move std::forward</h1><p>二者唯一区别: std::move无条件将入参转换为右值，std::forward特定条件才转换为右值</p>
-<p>std::move适用于将对象无条件转换为右值，从而为移动服务；</p>
-<p>std::forward适用于保留对象的左值&#x2F;右值这一特性，从而原封不动的转发，保留原汁原味；</p>
-<p>二者均是编译期生效，运行期什么都不做。</p>
-<p><a target="_blank" rel="noopener" href="https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2951.html">https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2951.html</a> 标准实现讨论</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *  @brief  Convert a value to an rvalue.</span></span><br><span class="line"><span class="comment"> *  @param  __t  A thing of arbitrary type.</span></span><br><span class="line"><span class="comment"> *  @return The parameter cast to an rvalue-reference to allow moving it.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> _Tp&gt;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">typename</span> std::remove_reference&lt;_Tp&gt;::<span class="function">type &amp;&amp;</span></span><br><span class="line"><span class="function"><span class="title">move</span><span class="params">(_Tp &amp;&amp;<span class="type">__t</span>)</span> <span class="keyword">noexcept</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">static_cast</span>&lt;<span class="keyword">typename</span> std::remove_reference&lt;_Tp&gt;::type &amp;&amp;&gt;(<span class="type">__t</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>std::move(var) 无条件将var类型转换为右值，std::move一定返回右值，但不保证可以被移动，比如, </p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> std::string s;</span><br></pre></td></tr></table></figure>
-
-<p>std::move后保留const，因此，待移动的变量不能是const，否则就不能匹配上<strong>移动</strong>构造&#x2F;赋值函数，而退化为<strong>拷贝</strong>构造&#x2F;赋值函数。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Str</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Str</span>() &#123; cout &lt;&lt; <span class="string">&quot;Str default constructor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="built_in">Str</span>(<span class="type">const</span> Str&amp;) &#123; cout &lt;&lt; <span class="string">&quot;Str copy construtor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="built_in">Str</span>(Str&amp;&amp;) &#123; cout &lt;&lt; <span class="string">&quot;Str move constructor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span></span><br><span class="line">&#123;</span><br><span class="line">    Str s;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">C</span>(Str str) : <span class="built_in">s</span>(str) &#123;&#125; <span class="comment">// 效率最低的一种</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Str s;</span><br><span class="line">    <span class="function">C <span class="title">c</span><span class="params">(s)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Str <span class="keyword">default</span> constructor</span><br><span class="line">Str copy construtor <span class="comment">// 参数拷贝传递触发</span></span><br><span class="line">Str copy construtor <span class="comment">// C的初始化列表触发, 这里可以用std::move优化</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Str</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Str</span>() &#123; cout &lt;&lt; <span class="string">&quot;Str default constructor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="built_in">Str</span>(<span class="type">const</span> Str&amp;) &#123; cout &lt;&lt; <span class="string">&quot;Str copy construtor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="built_in">Str</span>(Str&amp;&amp;) &#123; cout &lt;&lt; <span class="string">&quot;Str move constructor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span></span><br><span class="line">&#123;</span><br><span class="line">    Str s;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">C</span>(Str str) : <span class="built_in">s</span>(std::<span class="built_in">move</span>(str)) &#123;&#125; <span class="comment">// 优化一次copy为move</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Str s;</span><br><span class="line">    <span class="function">C <span class="title">c</span><span class="params">(s)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Str <span class="keyword">default</span> constructor</span><br><span class="line">Str copy construtor</span><br><span class="line">Str move constructor</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Str</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Str</span>() &#123; cout &lt;&lt; <span class="string">&quot;Str default constructor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="built_in">Str</span>(<span class="type">const</span> Str&amp;) &#123; cout &lt;&lt; <span class="string">&quot;Str copy construtor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="built_in">Str</span>(Str&amp;&amp;) &#123; cout &lt;&lt; <span class="string">&quot;Str move constructor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span></span><br><span class="line">&#123;</span><br><span class="line">    Str s;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">        <span class="comment">// 效率最低的一种，因为const的存在，转换为右值不能移动，退化为拷贝</span></span><br><span class="line">    <span class="built_in">C</span>(<span class="type">const</span> Str str) : <span class="built_in">s</span>(std::<span class="built_in">move</span>(str)) &#123;&#125; </span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Str s;</span><br><span class="line">    <span class="function">C <span class="title">c</span><span class="params">(s)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Str <span class="keyword">default</span> constructor</span><br><span class="line">Str copy construtor</span><br><span class="line">Str copy construtor</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Str</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Str</span>() &#123; cout &lt;&lt; <span class="string">&quot;Str default constructor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="built_in">Str</span>(<span class="type">const</span> Str&amp;) &#123; cout &lt;&lt; <span class="string">&quot;Str copy construtor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="built_in">Str</span>(Str&amp;&amp;) &#123; cout &lt;&lt; <span class="string">&quot;Str move constructor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span></span><br><span class="line">&#123;</span><br><span class="line">    Str s;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">C</span>(<span class="type">const</span> Str&amp; str) : <span class="built_in">s</span>(std::<span class="built_in">move</span>(str)) &#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Str s;</span><br><span class="line">    <span class="function">C <span class="title">c</span><span class="params">(s)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Str <span class="keyword">default</span> constructor</span><br><span class="line"><span class="comment">// 参数以const&amp;传递，省去一次拷贝构造</span></span><br><span class="line">Str copy construtor <span class="comment">// C的构造函数入参str加了const，std::move不去掉const，所以不能移动，只能拷贝</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Str</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Str</span>() &#123; cout &lt;&lt; <span class="string">&quot;Str default constructor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="built_in">Str</span>(<span class="type">const</span> Str&amp;) &#123; cout &lt;&lt; <span class="string">&quot;Str copy construtor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="built_in">Str</span>(Str&amp;&amp;) &#123; cout &lt;&lt; <span class="string">&quot;Str move constructor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span></span><br><span class="line">&#123;</span><br><span class="line">    Str s;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">C</span>(Str&amp; str) : <span class="built_in">s</span>(std::<span class="built_in">move</span>(str)) &#123;&#125; <span class="comment">// 最高效的一种</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Str s;</span><br><span class="line">    <span class="function">C <span class="title">c</span><span class="params">(s)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Str <span class="keyword">default</span> constructor</span><br><span class="line">Str move constructor <span class="comment">// 这里才是一次真正的move</span></span><br></pre></td></tr></table></figure>
-
-<h1 id="std-forward"><a href="#std-forward" class="headerlink" title="std::forward"></a>std::forward</h1><p>std::forward is a conditional cast: it casts to an rvalue only if its argument was initialized with an<br>rvalue.</p>
-<h2 id="用法举例"><a href="#用法举例" class="headerlink" title="用法举例"></a>用法举例</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;utility&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">overloaded_function</span><span class="params">(std::string&amp; param)</span> </span>&#123;</span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;std::string&amp; version&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">overloaded_function</span><span class="params">(std::string&amp;&amp; param)</span> </span>&#123;</span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;std::string&amp;&amp; version&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">pass_through</span><span class="params">(T&amp;&amp; param)</span> </span>&#123;</span><br><span class="line">  <span class="built_in">overloaded_function</span>(std::forward&lt;T&gt;(param));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  std::string pes;</span><br><span class="line">  <span class="built_in">pass_through</span>(pes);</span><br><span class="line">  <span class="built_in">pass_through</span>(std::<span class="built_in">move</span>(pes));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="为什么用std-forward"><a href="#为什么用std-forward" class="headerlink" title="为什么用std::forward?"></a>为什么用std::forward?</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;utility&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">foo</span><span class="params">(T&amp;&amp; t)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">foo</span>(t);</span><br><span class="line">    <span class="built_in">foo</span>(forward&lt;T&gt;(t));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">foo</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">void foo&lt;int&gt;(int&amp;&amp;):</span><br><span class="line">        push    rbp</span><br><span class="line">        mov     rbp, rsp</span><br><span class="line">        sub     rsp, 16</span><br><span class="line">        mov     QWORD PTR [rbp-8], rdi</span><br><span class="line">        mov     rax, QWORD PTR [rbp-8]</span><br><span class="line">        mov     rdi, rax</span><br><span class="line">        call    void foo&lt;int&amp;&gt;(int&amp;) // 这里以左值传递给下一层，错了</span><br><span class="line">        mov     rax, QWORD PTR [rbp-8]</span><br><span class="line">        mov     rdi, rax</span><br><span class="line">        call    int&amp;&amp; std::forward&lt;int&gt;(std::remove_reference&lt;int&gt;::type&amp;)</span><br><span class="line">        mov     rdi, rax</span><br><span class="line">        call    void foo&lt;int&gt;(int&amp;&amp;) // 这里以右值继续传递，正确</span><br><span class="line">        nop</span><br><span class="line">        leave</span><br><span class="line">        ret</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/make/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/make/" class="post-title-link" itemprop="url">未命名</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>2.2k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>4 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>The <code>make</code> command in Linux is a utility used to automate the compilation and building process of projects. It reads a file named <code>Makefile</code> that contains a set of directives about how to compile and link a program. Here’s a brief overview of the syntax and key concepts of a <code>Makefile</code>:</p>
-<h3 id="Basic-Structure"><a href="#Basic-Structure" class="headerlink" title="Basic Structure"></a>Basic Structure</h3><p>A <code>Makefile</code> typically consists of a set of rules. A rule is made up of three parts:</p>
-<ol>
-<li><strong>Target</strong>: The name of the file that the rule produces.</li>
-<li><strong>Prerequisites</strong>: The files that are used as input to create the target.</li>
-<li><strong>Recipe</strong>: The commands that will be executed to create the target from the prerequisites.</li>
-</ol>
-<p>The basic syntax of a rule is:</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">target: prerequisites</span></span><br><span class="line">    recipe</span><br></pre></td></tr></table></figure>
-
-<h3 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h3><p>Here’s a simple example of a <code>Makefile</code> that compiles a C program:</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Define the compiler</span></span><br><span class="line">CC=gcc</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the compiler flags</span></span><br><span class="line">CFLAGS=-Wall</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the target executable</span></span><br><span class="line">TARGET=myprogram</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the rule for the target</span></span><br><span class="line"><span class="variable">$(TARGET)</span>: <span class="variable">$(TARGET)</span>.c</span><br><span class="line">    <span class="variable">$(CC)</span> <span class="variable">$(CFLAGS)</span> -o <span class="variable">$(TARGET)</span> <span class="variable">$(TARGET)</span>.c</span><br></pre></td></tr></table></figure>
-
-<h3 id="Variables"><a href="#Variables" class="headerlink" title="Variables"></a>Variables</h3><p>You can define variables in a <code>Makefile</code> to make it more readable and maintainable. In the example above, <code>CC</code>, <code>CFLAGS</code>, and <code>TARGET</code> are variables.</p>
-<h3 id="Comments"><a href="#Comments" class="headerlink" title="Comments"></a>Comments</h3><p>Comments in a <code>Makefile</code> start with the <code>#</code> symbol. Anything following this symbol on a line is considered a comment.</p>
-<h3 id="Phony-Targets"><a href="#Phony-Targets" class="headerlink" title="Phony Targets"></a>Phony Targets</h3><p>By default, Makefile targets are “file targets” - they are used to build files from other files. Make assumes its target is a file, and this makes writing Makefiles relatively easy:</p>
-<p>In terms of Make, a phony target is simply a target that is always out-of-date, so whenever you ask make <phony_target>, it will run, independent from the state of the file system. Some common make targets that are often phony are: all, install, clean, distclean, TAGS, info, check.</p>
-<p>A phony target is one that does not represent a file. It’s used to avoid conflicts with files of the same name and to improve performance. You can declare phony targets using the <code>.PHONY</code> directive.</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"><span class="keyword">.PHONY</span>: clean</span></span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">    rm -f <span class="variable">$(TARGET)</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="Advanced-Features"><a href="#Advanced-Features" class="headerlink" title="Advanced Features"></a>Advanced Features</h3><ul>
-<li><strong>Pattern Rules</strong>: Allow you to define generic rules using <code>%</code> as a pattern matcher.</li>
-<li><strong>Automatic Variables</strong>: Variables like <code>$@</code> (the name of the target), <code>$&lt;</code> (the name of the first prerequisite), and <code>$^</code> (the names of all the prerequisites) are set automatically and can be used in recipes.</li>
-<li><strong>Conditional Execution</strong>: You can include conditionals in a <code>Makefile</code> to control the flow based on certain conditions.</li>
-</ul>
-<h3 id="Running-Make"><a href="#Running-Make" class="headerlink" title="Running Make"></a>Running Make</h3><p>To run <code>make</code>, simply type <code>make</code> in the terminal in the directory containing the <code>Makefile</code>. If you want to run a specific target, type <code>make &lt;target_name&gt;</code>.</p>
-<p>This overview covers the basics of <code>make</code> syntax. <code>make</code> is a powerful tool with many more features and capabilities to explore.</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/pahole/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/pahole/" class="post-title-link" itemprop="url">C++ pahole 查看对象成员内存布局</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>1.6k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>3 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>pahole: Poke-a-Hole</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get -y install dwarves</span><br></pre></td></tr></table></figure>
-
-<p>–show_private_classes 显示所有在namespace内部的类</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">wqj@WQJ:~/demo$ pahole ./a.out --show_private_classes | grep shared_ptr</span><br><span class="line">die__process_class: tag not supported 0x2f (template_type_parameter)!</span><br><span class="line">die__process_class: tag not supported 0x30 (template_value_parameter)!</span><br><span class="line">die__process_function: tag not supported 0x4107 (GNU_template_parameter_pack)!</span><br><span class="line">die__process_function: tag not supported 0x4108 (GNU_formal_parameter_pack)!</span><br><span class="line">class __shared_ptr_access&lt;int, (__gnu_cxx::_Lock_policy)2, false, false&gt; &#123;</span><br><span class="line">class __shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; : public __shared_ptr_access&lt;int, (__gnu_cxx::_Lock_policy)2, false, false&gt; &#123;</span><br><span class="line">        /* class __shared_ptr_access&lt;int, (__gnu_cxx::_Lock_policy)2, false, false&gt; &lt;ancestor&gt;; */ /*     0     0 */</span><br><span class="line">class shared_ptr&lt;int&gt; : public __shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; &#123;</span><br><span class="line">        /* class __shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; &lt;ancestor&gt;; */ /*     0    16 */</span><br></pre></td></tr></table></figure>
-
-<p>It doesn’t uses any source code files, just the DWARF2<br>information in ELF sections, inserted by ‘gcc -g’, to print out the<br>above information:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[acme@newtoy net-2.6]$ pahole kernel/sched.o task_struct</span><br><span class="line">/* include2/asm/system.h:11 */</span><br><span class="line">struct task_struct &#123;</span><br><span class="line">        volatile long int       state;          /*     0     4 */</span><br><span class="line">        struct thread_info *    thread_info;    /*     4     4 */</span><br><span class="line">        atomic_t                usage;          /*     8     4 */</span><br><span class="line">        long unsigned int       flags;          /*    12     4 */</span><br><span class="line"></span><br><span class="line">	&lt;SNIP&gt;</span><br><span class="line"></span><br><span class="line">        short unsigned int         ioprio;      /*    52     2 */</span><br><span class="line"></span><br><span class="line">        /* XXX 2 bytes hole, try to pack */</span><br><span class="line"></span><br><span class="line">        long unsigned int          sleep_avg;   /*    56     4 */ */</span><br><span class="line">        unsigned char              fpu_counter; /*   388     1 */</span><br><span class="line"></span><br><span class="line">        /* XXX 3 bytes hole, try to pack */</span><br><span class="line"></span><br><span class="line">        int                        oomkilladj;  /*   392     4 */</span><br><span class="line"></span><br><span class="line">	&lt;SNIP&gt;</span><br><span class="line"></span><br><span class="line">&#125;; /* size: 1312, sum members: 1287, holes: 3, sum holes: 13, padding: 12 */</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/new-operator/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/new-operator/" class="post-title-link" itemprop="url">C++ placement new</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>2.3k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>4 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="placement-new"><a href="#placement-new" class="headerlink" title="placement new"></a>placement new</h1><p>在预先申请好的一片内存上构造对象。</p>
-<p>比如 vector 的 reserve()，先预先申请足够的内存，后续用 placement new按需构造对象。</p>
-<p>在内存池和垃圾回收器中经常用到。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> *buf  = <span class="keyword">new</span> <span class="type">char</span>[<span class="built_in">sizeof</span>(string)]; <span class="comment">// pre-allocated buffer</span></span><br><span class="line">string *p = <span class="built_in">new</span> (buf) <span class="built_in">string</span>(<span class="string">&quot;hi&quot;</span>);    <span class="comment">// placement new</span></span><br><span class="line">string *q = <span class="keyword">new</span> <span class="built_in">string</span>(<span class="string">&quot;hi&quot;</span>);          <span class="comment">// ordinary heap allocation</span></span><br></pre></td></tr></table></figure>
-
-<h1 id="那有-placement-delete-吗？"><a href="#那有-placement-delete-吗？" class="headerlink" title="那有 placement delete 吗？"></a>那有 placement delete 吗？</h1><p>没有</p>
-<h1 id="vector的placement-new"><a href="#vector的placement-new" class="headerlink" title="vector的placement new"></a>vector的placement new</h1><h2 id="allocate"><a href="#allocate" class="headerlink" title="allocate"></a>allocate</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">(gdb) bt</span><br><span class="line">#<span class="number">0</span>  __gnu_cxx::new_allocator&lt;S&gt;::<span class="built_in">allocate</span> (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __n=<span class="number">1</span>) at /usr/include/c++/<span class="number">9</span>/ext/new_allocator.h:<span class="number">114</span></span><br><span class="line">#<span class="number">1</span>  <span class="number">0x000055555555583a</span> in std::allocator_traits&lt;std::allocator&lt;S&gt; &gt;::<span class="built_in">allocate</span> (__a=..., __n=<span class="number">1</span>) at /usr/include/c++/<span class="number">9</span>/bits/alloc_traits.h:<span class="number">443</span></span><br><span class="line">#<span class="number">2</span>  <span class="number">0x000055555555569c</span> in std::_Vector_base&lt;S, std::allocator&lt;S&gt; &gt;::_M_allocate (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __n=<span class="number">1</span>) at /usr/include/c++/<span class="number">9</span>/bits/stl_vector.h:<span class="number">343</span></span><br><span class="line">#<span class="number">3</span>  <span class="number">0x00005555555551e7</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::_M_realloc_insert&lt;S&gt; (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __position=non-dereferenceable iterator <span class="keyword">for</span> std::vector) at /usr/include/c++/<span class="number">9</span>/bits/vector.tcc:<span class="number">440</span></span><br><span class="line">#<span class="number">4</span>  <span class="number">0x0000555555554ffa</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::<span class="built_in">emplace_back</span>&lt;S&gt; (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>) at /usr/include/c++/<span class="number">9</span>/bits/vector.tcc:<span class="number">121</span></span><br><span class="line">#<span class="number">5</span>  <span class="number">0x0000555555554e72</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::<span class="built_in">push_back</span> (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __x=...) at /usr/include/c++/<span class="number">9</span>/bits/stl_vector.h:<span class="number">1201</span></span><br><span class="line">#<span class="number">6</span>  <span class="number">0x0000555555554c0a</span> <span class="function">in <span class="title">main</span> <span class="params">()</span> at demo.cpp:<span class="number">29</span></span></span><br></pre></td></tr></table></figure>
-
-<h2 id="construct"><a href="#construct" class="headerlink" title="construct"></a>construct</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(gdb) bt</span><br><span class="line">#<span class="number">0</span>  __gnu_cxx::new_allocator&lt;S&gt;::<span class="built_in">construct</span>&lt;S, S&gt; (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __p=<span class="number">0x55555556aeb0</span>) at /usr/include/c++/<span class="number">9</span>/ext/new_allocator.h:<span class="number">146</span></span><br><span class="line">#<span class="number">1</span>  <span class="number">0x00005555555550b9</span> in std::allocator_traits&lt;std::allocator&lt;S&gt; &gt;::<span class="built_in">construct</span>&lt;S, S&gt; (__a=..., __p=<span class="number">0x55555556aeb0</span>) at /usr/include/c++/<span class="number">9</span>/bits/alloc_traits.h:<span class="number">483</span></span><br><span class="line">#<span class="number">2</span>  <span class="number">0x0000555555555224</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::_M_realloc_insert&lt;S&gt; (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __position=non-dereferenceable iterator <span class="keyword">for</span> std::vector) at /usr/include/c++/<span class="number">9</span>/bits/vector.tcc:<span class="number">449</span></span><br><span class="line">#<span class="number">3</span>  <span class="number">0x0000555555554ffa</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::<span class="built_in">emplace_back</span>&lt;S&gt; (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>) at /usr/include/c++/<span class="number">9</span>/bits/vector.tcc:<span class="number">121</span></span><br><span class="line">#<span class="number">4</span>  <span class="number">0x0000555555554e72</span> in std::vector&lt;S, std::allocator&lt;S&gt; &gt;::<span class="built_in">push_back</span> (<span class="keyword">this</span>=<span class="number">0x7fffffffe2b0</span>, __x=...) at /usr/include/c++/<span class="number">9</span>/bits/stl_vector.h:<span class="number">1201</span></span><br><span class="line">#<span class="number">5</span>  <span class="number">0x0000555555554c0a</span> <span class="function">in <span class="title">main</span> <span class="params">()</span> at demo.cpp:<span class="number">29</span></span></span><br></pre></td></tr></table></figure>
-
-<h1 id="stl为什么用allocator而不是直接new？"><a href="#stl为什么用allocator而不是直接new？" class="headerlink" title="stl为什么用allocator而不是直接new？"></a>stl为什么用allocator而不是直接new？</h1><p>因为stl需要将对象构造拆分为两步，1. 申请内存; 2. 构造对象。同样析构也拆分为，1. 析构对象; 2. 释放内存；如果没有这个拆分的需求，new足矣。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/5/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/5/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 </div>
@@ -1242,13 +1261,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">211k</span>
+    <span title="站点总字数">206k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:52</span>
+    <span title="站点阅读时长">5:44</span>
   </span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
