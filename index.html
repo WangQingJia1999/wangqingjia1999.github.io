@@ -571,6 +571,13 @@
 
       <time title="创建时间：2024-02-26 10:36:17" itemprop="dateCreated datePublished" datetime="2024-02-26T10:36:17+08:00">2024-02-26</time>
     </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-28 11:53:44" itemprop="dateModified" datetime="2024-02-28T11:53:44+08:00">2024-02-28</time>
+    </span>
 
   
     <span class="post-meta-break"></span>
@@ -623,9 +630,12 @@
 <p>结构体成员内存布局如下：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">(gdb) pt /o foo</span><br><span class="line"><span class="comment">/* offset    |  size */</span>  type = <span class="keyword">struct</span> Foo &#123;</span><br><span class="line"><span class="comment">/*    0      |     1 */</span>    <span class="type">char</span> a;</span><br><span class="line"><span class="comment">/* XXX  3-byte hole */</span></span><br><span class="line"><span class="comment">/*    4      |     4 */</span>    <span class="type">int</span> b;</span><br><span class="line"><span class="comment">/*    8      |     8 */</span>    <span class="type">double</span> c;</span><br><span class="line"><span class="comment">/* total size (bytes):   16 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h2 id="找到类型定义的源文件位置"><a href="#找到类型定义的源文件位置" class="headerlink" title="找到类型定义的源文件位置"></a>找到类型定义的源文件位置</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info types _Atomic_word</span><br><span class="line">All types matching regular expression &quot;_Atomic_word&quot;:</span><br><span class="line"></span><br><span class="line">File /opt/rh/devtoolset-8/root/usr/include/c++/8/x86_64-redhat-linux/bits/atomic_word.h:</span><br><span class="line">32:     typedef int _Atomic_word;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="搜索符号定义的位置"><a href="#搜索符号定义的位置" class="headerlink" title="搜索符号定义的位置"></a>搜索符号定义的位置</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info types regex</span><br></pre></td></tr></table></figure>
 
-<p>通过正则表达式搜索所有包含pattern的类型，比如会搜到模板参数实例化为pattern的类型，因此精确搜索要加上^和$，限制字符左右边界。</p>
+<p>例子：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info types _Atomic_word</span><br><span class="line">All types matching regular expression &quot;_Atomic_word&quot;:</span><br><span class="line"></span><br><span class="line">File /opt/rh/devtoolset-8/root/usr/include/c++/8/x86_64-redhat-linux/bits/atomic_word.h:</span><br><span class="line">32:     typedef int _Atomic_word;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>^匹配符号开始，$匹配符号结束</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info types ^__gnu_cxx::_Lock_policy$</span><br><span class="line">All types matching regular expression &quot;^__gnu_cxx::_Lock_policy$&quot;:</span><br><span class="line"></span><br><span class="line">File /opt/rh/devtoolset-8/root/usr/include/c++/8/ext/concurrence.h:</span><br><span class="line">49:     __gnu_cxx::_Lock_policy;</span><br></pre></td></tr></table></figure>
       
     </div>
@@ -1455,7 +1465,7 @@
 <h3 id="hash"><a href="#hash" class="headerlink" title=".hash"></a>.hash</h3><p>给<code>ld.so</code> 查询动态符号用的哈希表</p>
 <p><a target="_blank" rel="noopener" href="https://flapenguin.me/elf-dt-hash">https://flapenguin.me/elf-dt-hash</a></p>
 <h3 id="dynsym"><a href="#dynsym" class="headerlink" title=".dynsym"></a>.dynsym</h3><p>This section holds the dynamic linking symbol table</p>
-<p>The <code>.dynsym</code> section of an ELF file consists of fixed-length records, either of type <code>Elf32_Sym</code> or <code>Elf64_Sym</code>, depending on the architecture. These records are unable to directly contain the symbol names due to their variable length nature. Instead, they include an offset within the <code>.dynstr</code> section (in the <code>.st_name</code> field), where the actual symbol name is located. Therefore, it is incorrect to say that <code>.dynsym</code> directly contains symbol names like “<a href="mailto:&#x73;&#x65;&#116;&#x73;&#111;&#x63;&#x6b;&#x6f;&#112;&#x74;&#x40;&#71;&#76;&#x49;&#x42;&#x43;&#x5f;&#x32;&#x2e;&#x30;">&#x73;&#x65;&#116;&#x73;&#111;&#x63;&#x6b;&#x6f;&#112;&#x74;&#x40;&#71;&#76;&#x49;&#x42;&#x43;&#x5f;&#x32;&#x2e;&#x30;</a>.” It accurately contains an <code>Elf32_Sym</code> or <code>Elf64_Sym</code> entry for an imported symbol such as <code>setsockopt</code>, which refers to the symbol name’s offset in the <code>.dynstr</code> section.</p>
+<p>The <code>.dynsym</code> section of an ELF file consists of fixed-length records, either of type <code>Elf32_Sym</code> or <code>Elf64_Sym</code>, depending on the architecture. These records are unable to directly contain the symbol names due to their variable length nature. Instead, they include an offset within the <code>.dynstr</code> section (in the <code>.st_name</code> field), where the actual symbol name is located. Therefore, it is incorrect to say that <code>.dynsym</code> directly contains symbol names like “<a href="mailto:&#x73;&#x65;&#x74;&#x73;&#x6f;&#99;&#x6b;&#x6f;&#112;&#116;&#x40;&#71;&#76;&#73;&#x42;&#x43;&#95;&#x32;&#46;&#48;">&#x73;&#x65;&#x74;&#x73;&#x6f;&#99;&#x6b;&#x6f;&#112;&#116;&#x40;&#71;&#76;&#73;&#x42;&#x43;&#95;&#x32;&#46;&#48;</a>.” It accurately contains an <code>Elf32_Sym</code> or <code>Elf64_Sym</code> entry for an imported symbol such as <code>setsockopt</code>, which refers to the symbol name’s offset in the <code>.dynstr</code> section.</p>
 <h3 id="dynstr"><a href="#dynstr" class="headerlink" title=".dynstr"></a>.dynstr</h3><p>This section holds strings needed for dynamic linking</p>
 <h3 id="init"><a href="#init" class="headerlink" title=".init"></a>.init</h3><p>This section holds executable instructions that contribute to the process initialization code. When a program starts to run, the system executes the code in this section before calling the main program entry point (called main for C programs).</p>
 <h3 id="fini"><a href="#fini" class="headerlink" title=".fini"></a>.fini</h3><p>This section holds executable instructions that contribute to the process termination code. When a program exits normally, the system executes the code in this section.</p>
