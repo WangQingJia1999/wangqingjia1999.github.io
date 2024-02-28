@@ -59,6 +59,9 @@
       <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
   <div class="site-nav-toggle">
     <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
     </div>
   </div>
 
@@ -81,7 +84,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -150,7 +153,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -389,9 +392,15 @@ Contents of section .data:
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2024-02-20 10:20:04 / 修改时间：11:44:19" itemprop="dateCreated datePublished" datetime="2024-02-20T10:20:04+08:00">2024-02-20</time>
+      <time title="创建时间：2024-02-20 10:20:04" itemprop="dateCreated datePublished" datetime="2024-02-20T10:20:04+08:00">2024-02-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-28 20:36:00" itemprop="dateModified" datetime="2024-02-28T20:36:00+08:00">2024-02-28</time>
     </span>
 
   
@@ -1730,6 +1739,93 @@ Contents of section .data:
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/wsl_proxy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/linux/wsl_proxy/" class="post-title-link" itemprop="url">wsl代理配置</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="wsl1-proxy"><a href="#wsl1-proxy" class="headerlink" title="wsl1 proxy"></a>wsl1 proxy</h1><p>勾选 “Allow LAN” 后，设置如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export ALL_PROXY=&quot;http://127.0.0.1:7890&quot;</span><br></pre></td></tr></table></figure>
+
+<h1 id="wsl2-proxy"><a href="#wsl2-proxy" class="headerlink" title="wsl2 proxy"></a>wsl2 proxy</h1><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/592620059">https://zhuanlan.zhihu.com/p/592620059</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line">hostip=$(cat /etc/resolv.conf | grep nameserver | awk &#x27;&#123; print $2 &#125;&#x27;)</span><br><span class="line">wslip=$(hostname -I | awk &#x27;&#123;print $1&#125;&#x27;)</span><br><span class="line"># 这里填写主机代理的端口</span><br><span class="line">port=7890</span><br><span class="line"></span><br><span class="line">PROXY_HTTP=&quot;http://$&#123;hostip&#125;:$&#123;port&#125;&quot;</span><br><span class="line"></span><br><span class="line">set_proxy()&#123;</span><br><span class="line">    export http_proxy=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">    export HTTP_PROXY=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line"></span><br><span class="line">    export https_proxy=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">    export HTTPS_proxy=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line"></span><br><span class="line">    git config --global http.proxy &quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">    git config --global https.proxy &quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">unset_proxy()&#123;</span><br><span class="line">    unset http_proxy</span><br><span class="line">    unset HTTP_PROXY</span><br><span class="line">    unset https_proxy</span><br><span class="line">    unset HTTPS_PROXY</span><br><span class="line">    git config --global --unset http.proxy</span><br><span class="line">    git config --global --unset https.proxy</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test_setting()&#123;</span><br><span class="line">    echo &quot;Host ip:&quot; $&#123;hostip&#125;</span><br><span class="line">    echo &quot;WSL ip:&quot; $&#123;wslip&#125;</span><br><span class="line">    echo &quot;Current proxy:&quot; $https_proxy</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if [ &quot;$1&quot; = &quot;set&quot; ]</span><br><span class="line">then</span><br><span class="line">    set_proxy</span><br><span class="line"></span><br><span class="line">elif [ &quot;$1&quot; = &quot;unset&quot; ]</span><br><span class="line">then</span><br><span class="line">    unset_proxy</span><br><span class="line"></span><br><span class="line">elif [ &quot;$1&quot; = &quot;test&quot; ]</span><br><span class="line">then</span><br><span class="line">    test_setting</span><br><span class="line">else</span><br><span class="line">    echo &quot;Unsupported arguments.&quot;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/strace/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1796,93 +1892,6 @@ Contents of section .data:
 <li><code>-e trace=/exec</code> - filter system calls so only ones starting with exec are shown</li>
 </ul>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -o forked.log -s 1024 -f -e trace=/exec gcc hello.c.s -o hello_gcc</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/wsl_proxy/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/linux/wsl_proxy/" class="post-title-link" itemprop="url">wsl代理配置</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>1.3k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>2 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="wsl1-proxy"><a href="#wsl1-proxy" class="headerlink" title="wsl1 proxy"></a>wsl1 proxy</h1><p>勾选 “Allow LAN” 后，设置如下:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export ALL_PROXY=&quot;http://127.0.0.1:7890&quot;</span><br></pre></td></tr></table></figure>
-
-<h1 id="wsl2-proxy"><a href="#wsl2-proxy" class="headerlink" title="wsl2 proxy"></a>wsl2 proxy</h1><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/592620059">https://zhuanlan.zhihu.com/p/592620059</a></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line">hostip=$(cat /etc/resolv.conf | grep nameserver | awk &#x27;&#123; print $2 &#125;&#x27;)</span><br><span class="line">wslip=$(hostname -I | awk &#x27;&#123;print $1&#125;&#x27;)</span><br><span class="line"># 这里填写主机代理的端口</span><br><span class="line">port=7890</span><br><span class="line"></span><br><span class="line">PROXY_HTTP=&quot;http://$&#123;hostip&#125;:$&#123;port&#125;&quot;</span><br><span class="line"></span><br><span class="line">set_proxy()&#123;</span><br><span class="line">    export http_proxy=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">    export HTTP_PROXY=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line"></span><br><span class="line">    export https_proxy=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">    export HTTPS_proxy=&quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line"></span><br><span class="line">    git config --global http.proxy &quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">    git config --global https.proxy &quot;$&#123;PROXY_HTTP&#125;&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">unset_proxy()&#123;</span><br><span class="line">    unset http_proxy</span><br><span class="line">    unset HTTP_PROXY</span><br><span class="line">    unset https_proxy</span><br><span class="line">    unset HTTPS_PROXY</span><br><span class="line">    git config --global --unset http.proxy</span><br><span class="line">    git config --global --unset https.proxy</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test_setting()&#123;</span><br><span class="line">    echo &quot;Host ip:&quot; $&#123;hostip&#125;</span><br><span class="line">    echo &quot;WSL ip:&quot; $&#123;wslip&#125;</span><br><span class="line">    echo &quot;Current proxy:&quot; $https_proxy</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if [ &quot;$1&quot; = &quot;set&quot; ]</span><br><span class="line">then</span><br><span class="line">    set_proxy</span><br><span class="line"></span><br><span class="line">elif [ &quot;$1&quot; = &quot;unset&quot; ]</span><br><span class="line">then</span><br><span class="line">    unset_proxy</span><br><span class="line"></span><br><span class="line">elif [ &quot;$1&quot; = &quot;test&quot; ]</span><br><span class="line">then</span><br><span class="line">    test_setting</span><br><span class="line">else</span><br><span class="line">    echo &quot;Unsupported arguments.&quot;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
       
     </div>
 

@@ -59,6 +59,9 @@
       <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
   <div class="site-nav-toggle">
     <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
     </div>
   </div>
 
@@ -81,7 +84,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -150,7 +153,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -498,7 +501,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-02-28 11:53:44" itemprop="dateModified" datetime="2024-02-28T11:53:44+08:00">2024-02-28</time>
+      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
     </span>
 
   
@@ -620,7 +623,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-02-28 20:28:23" itemprop="dateModified" datetime="2024-02-28T20:28:23+08:00">2024-02-28</time>
+      <time title="修改时间：2024-02-28 20:30:27" itemprop="dateModified" datetime="2024-02-28T20:30:27+08:00">2024-02-28</time>
     </span>
 
   
@@ -664,7 +667,7 @@
 <p>或者</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">journalctl -k -f</span><br></pre></td></tr></table></figure>
 
-<h2 id="打印-load-elf-binary-的入参"><a href="#打印-load-elf-binary-的入参" class="headerlink" title="打印 load_elf_binary 的入参"></a>打印 load_elf_binary 的入参</h2><p>内核函数声明为，只有一个入参 <code>bprm</code>，根据 Linux x86-64 ABI，第一个入参经由 <code>%rdx</code> 寄存器传入</p>
+<h2 id="打印-load-elf-binary-的入参"><a href="#打印-load-elf-binary-的入参" class="headerlink" title="打印 load_elf_binary 的入参"></a>打印 load_elf_binary 的入参</h2><p>该内核函数的接口为，根据 Linux x86-64 ABI，入参 <code>bprm</code> 由 <code>%rdx</code> 寄存器传入</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">load_elf_binary</span><span class="params">(<span class="keyword">struct</span> linux_binprm *bprm)</span></span><br></pre></td></tr></table></figure>
 
 
@@ -936,6 +939,13 @@
 
       <time title="创建时间：2024-02-23 11:26:49" itemprop="dateCreated datePublished" datetime="2024-02-23T11:26:49+08:00">2024-02-23</time>
     </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-28 20:46:00" itemprop="dateModified" datetime="2024-02-28T20:46:00+08:00">2024-02-28</time>
+    </span>
 
   
     <span class="post-meta-break"></span>
@@ -1020,6 +1030,13 @@
       <span class="post-meta-item-text">发表于</span>
 
       <time title="创建时间：2024-02-23 11:26:49" itemprop="dateCreated datePublished" datetime="2024-02-23T11:26:49+08:00">2024-02-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-28 20:38:02" itemprop="dateModified" datetime="2024-02-28T20:38:02+08:00">2024-02-28</time>
     </span>
 
   
@@ -1204,7 +1221,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-02-22 20:05:50" itemprop="dateModified" datetime="2024-02-22T20:05:50+08:00">2024-02-22</time>
+      <time title="修改时间：2024-02-28 20:36:06" itemprop="dateModified" datetime="2024-02-28T20:36:06+08:00">2024-02-28</time>
     </span>
 
   
@@ -1402,7 +1419,7 @@
 <h3 id="hash"><a href="#hash" class="headerlink" title=".hash"></a>.hash</h3><p>给<code>ld.so</code> 查询动态符号用的哈希表</p>
 <p><a target="_blank" rel="noopener" href="https://flapenguin.me/elf-dt-hash">https://flapenguin.me/elf-dt-hash</a></p>
 <h3 id="dynsym"><a href="#dynsym" class="headerlink" title=".dynsym"></a>.dynsym</h3><p>This section holds the dynamic linking symbol table</p>
-<p>The <code>.dynsym</code> section of an ELF file consists of fixed-length records, either of type <code>Elf32_Sym</code> or <code>Elf64_Sym</code>, depending on the architecture. These records are unable to directly contain the symbol names due to their variable length nature. Instead, they include an offset within the <code>.dynstr</code> section (in the <code>.st_name</code> field), where the actual symbol name is located. Therefore, it is incorrect to say that <code>.dynsym</code> directly contains symbol names like “<a href="mailto:&#115;&#x65;&#116;&#115;&#x6f;&#x63;&#x6b;&#x6f;&#112;&#x74;&#64;&#71;&#x4c;&#x49;&#x42;&#x43;&#95;&#50;&#46;&#x30;">&#115;&#x65;&#116;&#115;&#x6f;&#x63;&#x6b;&#x6f;&#112;&#x74;&#64;&#71;&#x4c;&#x49;&#x42;&#x43;&#95;&#50;&#46;&#x30;</a>.” It accurately contains an <code>Elf32_Sym</code> or <code>Elf64_Sym</code> entry for an imported symbol such as <code>setsockopt</code>, which refers to the symbol name’s offset in the <code>.dynstr</code> section.</p>
+<p>The <code>.dynsym</code> section of an ELF file consists of fixed-length records, either of type <code>Elf32_Sym</code> or <code>Elf64_Sym</code>, depending on the architecture. These records are unable to directly contain the symbol names due to their variable length nature. Instead, they include an offset within the <code>.dynstr</code> section (in the <code>.st_name</code> field), where the actual symbol name is located. Therefore, it is incorrect to say that <code>.dynsym</code> directly contains symbol names like “<a href="mailto:&#x73;&#x65;&#x74;&#115;&#x6f;&#99;&#107;&#x6f;&#112;&#116;&#64;&#71;&#x4c;&#x49;&#x42;&#x43;&#x5f;&#x32;&#x2e;&#x30;">&#x73;&#x65;&#x74;&#115;&#x6f;&#99;&#107;&#x6f;&#112;&#116;&#64;&#71;&#x4c;&#x49;&#x42;&#x43;&#x5f;&#x32;&#x2e;&#x30;</a>.” It accurately contains an <code>Elf32_Sym</code> or <code>Elf64_Sym</code> entry for an imported symbol such as <code>setsockopt</code>, which refers to the symbol name’s offset in the <code>.dynstr</code> section.</p>
 <h3 id="dynstr"><a href="#dynstr" class="headerlink" title=".dynstr"></a>.dynstr</h3><p>This section holds strings needed for dynamic linking</p>
 <h3 id="init"><a href="#init" class="headerlink" title=".init"></a>.init</h3><p>This section holds executable instructions that contribute to the process initialization code. When a program starts to run, the system executes the code in this section before calling the main program entry point (called main for C programs).</p>
 <h3 id="fini"><a href="#fini" class="headerlink" title=".fini"></a>.fini</h3><p>This section holds executable instructions that contribute to the process termination code. When a program exits normally, the system executes the code in this section.</p>
