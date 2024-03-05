@@ -78,46 +78,6 @@
       </tags>
   </entry>
   <entry>
-    <title>GDB指令备忘</title>
-    <url>/2024/02/26/note/cpp/GDB/</url>
-    <content><![CDATA[<p><a href="https://sourceware.org/gdb/current/onlinedocs/gdb.pdf">GDB使用手册</a></p>
-<h1 id="GDB配置"><a href="#GDB配置" class="headerlink" title="GDB配置"></a>GDB配置</h1><p>关闭输出过长提示</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">set pagination off</span><br></pre></td></tr></table></figure>
-
-<h2 id="watchpoint"><a href="#watchpoint" class="headerlink" title="watchpoint"></a>watchpoint</h2><p>watchpoint又叫数据断点（data breakpoint），用于监控内存的读写。</p>
-<h3 id="监控内存地址"><a href="#监控内存地址" class="headerlink" title="监控内存地址"></a>监控内存地址</h3><p>如果要监控 <code>0x402000</code> 上的读写。</p>
-<p>如下不行，因为 <code>0x402000</code> 被当作常量，永不变化</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) watch 0x402000</span><br><span class="line">Cannot watch constant value `0x402000&#x27;.</span><br></pre></td></tr></table></figure>
-
-<p>而要用</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) watch *0x402000</span><br><span class="line">Hardware watchpoint 5: *0x402000</span><br></pre></td></tr></table></figure>
-
-<p>如果要按hex打印变更前后数值，用如下</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">watch *(char**)0x402000</span><br><span class="line">watch *(void**)0x402000</span><br></pre></td></tr></table></figure>
-
-<h2 id="Demangle-symbol"><a href="#Demangle-symbol" class="headerlink" title="Demangle symbol"></a>Demangle symbol</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) dem _ZTV1C</span><br><span class="line">vtable for C</span><br></pre></td></tr></table></figure>
-
-<p>ref: <a href="https://sourceware.org/gdb/current/onlinedocs/gdb.html/Debugging-C-Plus-Plus.html">https://sourceware.org/gdb/current/onlinedocs/gdb.html/Debugging-C-Plus-Plus.html</a></p>
-<h2 id="打印对象的虚函数表"><a href="#打印对象的虚函数表" class="headerlink" title="打印对象的虚函数表"></a>打印对象的虚函数表</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) info vtbl c</span><br></pre></td></tr></table></figure>
-
-<h2 id="打印对象内部成员布局"><a href="#打印对象内部成员布局" class="headerlink" title="打印对象内部成员布局"></a>打印对象内部成员布局</h2><p>测试代码:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">Foo</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> a;</span><br><span class="line">    <span class="type">int</span> b;</span><br><span class="line">    <span class="type">double</span> c;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Foo foo;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>结构体成员内存布局如下：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">(gdb) pt /o foo</span><br><span class="line"><span class="comment">/* offset    |  size */</span>  type = <span class="keyword">struct</span> Foo &#123;</span><br><span class="line"><span class="comment">/*    0      |     1 */</span>    <span class="type">char</span> a;</span><br><span class="line"><span class="comment">/* XXX  3-byte hole */</span></span><br><span class="line"><span class="comment">/*    4      |     4 */</span>    <span class="type">int</span> b;</span><br><span class="line"><span class="comment">/*    8      |     8 */</span>    <span class="type">double</span> c;</span><br><span class="line"><span class="comment">/* total size (bytes):   16 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="搜索符号定义的位置"><a href="#搜索符号定义的位置" class="headerlink" title="搜索符号定义的位置"></a>搜索符号定义的位置</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">(gdb) info types regex</span><br></pre></td></tr></table></figure>
-
-<p>例子：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">(gdb) info types _Atomic_word</span><br><span class="line">All types matching regular expression &quot;_Atomic_word&quot;:</span><br><span class="line"></span><br><span class="line">File /opt/rh/devtoolset-8/root/usr/include/c++/8/x86_64-redhat-linux/bits/atomic_word.h:</span><br><span class="line">32:     typedef int _Atomic_word;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>^匹配符号开始，$匹配符号结束</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">(gdb) info types ^__gnu_cxx::_Lock_policy$</span><br><span class="line">All types matching regular expression &quot;^__gnu_cxx::_Lock_policy$&quot;:</span><br><span class="line"></span><br><span class="line">File /opt/rh/devtoolset-8/root/usr/include/c++/8/ext/concurrence.h:</span><br><span class="line">49:     __gnu_cxx::_Lock_policy;</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>cpp</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>C++ 模板类型推导</title>
     <url>/2024/02/19/note/cpp/Template%20Type%20Deduction%20/</url>
     <content><![CDATA[<h1 id="Template-Type-Deduction"><a href="#Template-Type-Deduction" class="headerlink" title="Template Type Deduction"></a>Template Type Deduction</h1><p>例子见：<a href="https://stackoverflow.com/a/47125430/11850070">https://stackoverflow.com/a/47125430/11850070</a></p>
@@ -157,6 +117,46 @@
 </ol>
 <p>总结就是忽略ref，const，volatile修饰。</p>
 ]]></content>
+      <tags>
+        <tag>cpp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>GDB指令备忘</title>
+    <url>/2024/02/26/note/cpp/GDB/</url>
+    <content><![CDATA[<p><a href="https://sourceware.org/gdb/current/onlinedocs/gdb.pdf">GDB使用手册</a></p>
+<h1 id="GDB配置"><a href="#GDB配置" class="headerlink" title="GDB配置"></a>GDB配置</h1><p>关闭输出过长提示</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">set pagination off</span><br></pre></td></tr></table></figure>
+
+<h2 id="watchpoint"><a href="#watchpoint" class="headerlink" title="watchpoint"></a>watchpoint</h2><p>watchpoint又叫数据断点（data breakpoint），用于监控内存的读写。</p>
+<h3 id="监控内存地址"><a href="#监控内存地址" class="headerlink" title="监控内存地址"></a>监控内存地址</h3><p>如果要监控 <code>0x402000</code> 上的读写。</p>
+<p>如下不行，因为 <code>0x402000</code> 被当作常量，永不变化</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) watch 0x402000</span><br><span class="line">Cannot watch constant value `0x402000&#x27;.</span><br></pre></td></tr></table></figure>
+
+<p>而要用</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) watch *0x402000</span><br><span class="line">Hardware watchpoint 5: *0x402000</span><br></pre></td></tr></table></figure>
+
+<p>如果要按hex打印变更前后数值，用如下</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">watch *(char**)0x402000</span><br><span class="line">watch *(void**)0x402000</span><br></pre></td></tr></table></figure>
+
+<h2 id="Demangle-symbol"><a href="#Demangle-symbol" class="headerlink" title="Demangle symbol"></a>Demangle symbol</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) dem _ZTV1C</span><br><span class="line">vtable for C</span><br></pre></td></tr></table></figure>
+
+<p>ref: <a href="https://sourceware.org/gdb/current/onlinedocs/gdb.html/Debugging-C-Plus-Plus.html">https://sourceware.org/gdb/current/onlinedocs/gdb.html/Debugging-C-Plus-Plus.html</a></p>
+<h2 id="打印对象的虚函数表"><a href="#打印对象的虚函数表" class="headerlink" title="打印对象的虚函数表"></a>打印对象的虚函数表</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(gdb) info vtbl c</span><br></pre></td></tr></table></figure>
+
+<h2 id="打印对象内部成员布局"><a href="#打印对象内部成员布局" class="headerlink" title="打印对象内部成员布局"></a>打印对象内部成员布局</h2><p>测试代码:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">Foo</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> a;</span><br><span class="line">    <span class="type">int</span> b;</span><br><span class="line">    <span class="type">double</span> c;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Foo foo;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>结构体成员内存布局如下：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">(gdb) pt /o foo</span><br><span class="line"><span class="comment">/* offset    |  size */</span>  type = <span class="keyword">struct</span> Foo &#123;</span><br><span class="line"><span class="comment">/*    0      |     1 */</span>    <span class="type">char</span> a;</span><br><span class="line"><span class="comment">/* XXX  3-byte hole */</span></span><br><span class="line"><span class="comment">/*    4      |     4 */</span>    <span class="type">int</span> b;</span><br><span class="line"><span class="comment">/*    8      |     8 */</span>    <span class="type">double</span> c;</span><br><span class="line"><span class="comment">/* total size (bytes):   16 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="搜索符号定义的位置"><a href="#搜索符号定义的位置" class="headerlink" title="搜索符号定义的位置"></a>搜索符号定义的位置</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">(gdb) info types regex</span><br></pre></td></tr></table></figure>
+
+<p>例子：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">(gdb) info types _Atomic_word</span><br><span class="line">All types matching regular expression &quot;_Atomic_word&quot;:</span><br><span class="line"></span><br><span class="line">File /opt/rh/devtoolset-8/root/usr/include/c++/8/x86_64-redhat-linux/bits/atomic_word.h:</span><br><span class="line">32:     typedef int _Atomic_word;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>^匹配符号开始，$匹配符号结束</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">(gdb) info types ^__gnu_cxx::_Lock_policy$</span><br><span class="line">All types matching regular expression &quot;^__gnu_cxx::_Lock_policy$&quot;:</span><br><span class="line"></span><br><span class="line">File /opt/rh/devtoolset-8/root/usr/include/c++/8/ext/concurrence.h:</span><br><span class="line">49:     __gnu_cxx::_Lock_policy;</span><br></pre></td></tr></table></figure>]]></content>
       <tags>
         <tag>cpp</tag>
       </tags>
@@ -1171,105 +1171,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Linux bfd</title>
-    <url>/2024/02/20/note/linux/bfd/</url>
-    <content><![CDATA[<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><h2 id="arelent"><a href="#arelent" class="headerlink" title="arelent"></a>arelent</h2><blockquote>
-<p>BFD represents a relocation as a pointer to the ‘arelent’ type. A relocation describes an action which the linker must take to modify the section contents. Relocations have a symbol, an address, an addend, and a pointer to a howto structure which describes how to perform the relocation. </p>
-</blockquote>
-<blockquote>
-<p>In BFD, each section has an array of ‘arelent’ structures. Each structure has a pointer to a symbol, an address within the section, an addend, and a pointer to a ‘reloc_howto_struct’ structure. The howto structure has a bunch of fields describing the reloc, including a type field. The type field is specific to the object file format backend; none of the generic code in BFD examines it.</p>
-</blockquote>
-]]></content>
-      <tags>
-        <tag>linux</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Linux Ftrace</title>
-    <url>/2024/02/29/note/linux/ftrace/</url>
-    <content><![CDATA[<h1 id="ftrace"><a href="#ftrace" class="headerlink" title="ftrace"></a>ftrace</h1><p><a href="https://www.youtube.com/watch?v=68osT1soAPM">https://www.youtube.com/watch?v=68osT1soAPM</a></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo mount -t debugfs none /sys/kernel/debug/</span><br></pre></td></tr></table></figure>
-
-<h3 id="跟踪open"><a href="#跟踪open" class="headerlink" title="跟踪open()"></a>跟踪open()</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span>    <span class="comment">// For O_RDONLY</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span>   <span class="comment">// For open, getpid</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cerrno&gt;</span>     <span class="comment">// For errno</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstring&gt;</span>    <span class="comment">// For strerror</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>   <span class="comment">// For std::cerr</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> fd = <span class="built_in">open</span>(<span class="string">&quot;example.txt&quot;</span>, O_RDONLY);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (fd == <span class="number">-1</span>) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Error opening file (PID: &quot;</span> &lt;&lt; <span class="built_in">getpid</span>() &lt;&lt; <span class="string">&quot;): &quot;</span> &lt;&lt; <span class="built_in">strerror</span>(errno) &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>利用ftrace+kprobe获取调用栈及入参和返回值</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">CUR_DIR=$(<span class="built_in">pwd</span>)</span><br><span class="line"></span><br><span class="line">TRACING_DIR=/sys/kernel/debug/tracing</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启用debugfs</span></span><br><span class="line"><span class="keyword">if</span> [ ! -d <span class="variable">$TRACING_DIR</span> ]; <span class="keyword">then</span></span><br><span class="line">    mount -t debugfs none /sys/kernel/debug/</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> <span class="variable">$TRACING_DIR</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置tracer参数</span></span><br><span class="line"><span class="built_in">echo</span> function_graph &gt; current_tracer <span class="comment"># 抓取函数调用栈</span></span><br><span class="line"><span class="built_in">echo</span> do_sys_open &gt; set_graph_function <span class="comment"># 只抓取这个函数及其内部</span></span><br><span class="line"><span class="built_in">echo</span> funcgraph-proc &gt; trace_options <span class="comment"># 显示进程名列</span></span><br><span class="line"><span class="built_in">echo</span> funcgraph-tail &gt; trace_options <span class="comment"># 函数结束大括号处注释函数名</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 关闭所有event</span></span><br><span class="line"><span class="built_in">echo</span> 0 &gt; <span class="variable">$TRACING_DIR</span>/events/enable</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;p:pre_do_sys_open do_sys_open dfd=%di filename=+0(%si):string flags=%dx mode=%cx&#x27;</span> &gt; kprobe_events</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;r:post_do_sys_open do_sys_open fd=$retval&#x27;</span> &gt;&gt; kprobe_events</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;filename ~ &quot;example.txt&quot;&#x27;</span> &gt; events/kprobes/pre_do_sys_open/filter</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;p:pre_link_path_walk link_path_walk name=+0(%di):string name_hex=%di:x64&#x27;</span> &gt;&gt; kprobe_events</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;r:post_link_path_walk link_path_walk ret=$retval:x64&#x27;</span> &gt;&gt; kprobe_events</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;r:post_step_into step_into ret=+0($retval):string ret_hex=$retval:x64&#x27;</span> &gt;&gt; kprobe_events</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> 1 &gt; events/kprobes/pre_do_sys_open/enable</span><br><span class="line"><span class="built_in">echo</span> 1 &gt; events/kprobes/post_do_sys_open/enable</span><br><span class="line"><span class="built_in">echo</span> 1 &gt; events/kprobes/pre_link_path_walk/enable</span><br><span class="line"><span class="built_in">echo</span> 1 &gt; events/kprobes/post_link_path_walk/enable</span><br><span class="line"><span class="built_in">echo</span> 1 &gt; events/kprobes/post_step_into/enable</span><br><span class="line"></span><br><span class="line"><span class="comment"># 开启所有event</span></span><br><span class="line"><span class="comment"># echo 1 &gt; $TRACING_DIR/events/enable</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 清空trace历史记录</span></span><br><span class="line"><span class="built_in">echo</span> &gt; trace</span><br><span class="line"></span><br><span class="line"><span class="comment"># 开始trace</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;start tracer&quot;</span></span><br><span class="line"><span class="built_in">echo</span> 1 &gt; <span class="variable">$TRACING_DIR</span>/tracing_on</span><br><span class="line"></span><br><span class="line"><span class="comment"># 执行程序</span></span><br><span class="line"><span class="built_in">cd</span> <span class="variable">$CUR_DIR</span></span><br><span class="line">./a.out</span><br><span class="line"></span><br><span class="line"><span class="comment"># 停止trace</span></span><br><span class="line"><span class="built_in">echo</span> 0 &gt; <span class="variable">$TRACING_DIR</span>/tracing_on</span><br><span class="line"></span><br><span class="line"><span class="built_in">cat</span> <span class="variable">$TRACING_DIR</span>/trace &gt; trace.out</span><br><span class="line">gawk -F<span class="string">&#x27;|&#x27;</span> <span class="string">&#x27;&#123;print $3&#125;&#x27;</span> trace.out &gt; trace.func</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;stop tracer&quot;</span></span><br></pre></td></tr></table></figure>
-
-<h1 id="Tracing-Events"><a href="#Tracing-Events" class="headerlink" title="Tracing Events"></a>Tracing Events</h1><p>official doc: <a href="https://www.kernel.org/doc/html/v4.19/trace/events.html#event-tracing">https://www.kernel.org/doc/html/v4.19/trace/events.html#event-tracing</a></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wqj@WQJ:/sys/kernel$ sudo <span class="built_in">ls</span> /sys/kernel/debug/tracing/events</span><br><span class="line">9p            btrfs       dev           exceptions  fs_dax        hyperv       iommu        kvm        msr      netvsc  page_isolation  ras           <span class="built_in">sched</span>   sock      thermal   workqueue</span><br><span class="line">alarmtimer    cgroup      dma_fence     ext4        fscache       i2c          irq          kvmmmu     napi     nfs     pagemap         raw_syscalls  scsi    sunrpc    timer     writeback</span><br><span class="line">block         cifs        drm           fib         ftrace        initcall     irq_matrix   migrate    neigh    nfs4    percpu          rcu           sctp    swiotlb   tlb       x86_fpu</span><br><span class="line">bpf_test_run  clk         <span class="built_in">enable</span>        fib6        header_event  intel_iommu  irq_vectors  mmap       net      nfsd    power           rpcgss        signal  syscalls  udp       xdp</span><br><span class="line">bpf_trace     compaction  erofs         filelock    header_page   io_uring     jbd2         mmap_lock  netfs    nmi     printk          rseq          skb     task      vmscan    xfs</span><br><span class="line">bridge        cpuhp       error_report  filemap     huge_memory   iomap        kmem         module     netlink  oom     qdisc           rtc           smbus   tcp       vsyscall  xfs_scrub</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wqj@WQJ:/sys/kernel$ sudo <span class="built_in">ls</span> /sys/kernel/debug/tracing/events/irq</span><br><span class="line"><span class="built_in">enable</span>  filter  irq_handler_entry  irq_handler_exit  softirq_entry  softirq_exit  softirq_raise</span><br></pre></td></tr></table></figure>
-
-<h1 id="trace-cmd"><a href="#trace-cmd" class="headerlink" title="trace-cmd"></a>trace-cmd</h1><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install trace-cmd</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">-p tracer</span><br><span class="line">           Specify a tracer. Tracers usually <span class="keyword">do</span> more than just trace an</span><br><span class="line">           event. Common tracers are: <span class="keyword">function</span>, function_graph,</span><br><span class="line">           preemptirqsoff, irqsoff, preemptoff and wakeup. A tracer must</span><br><span class="line">           be supported by the running kernel. To see a list of</span><br><span class="line">           available tracers, see trace-cmd-list(1).</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">trace-cmd record -p function_graph -n do_sys_open ./a.out</span><br></pre></td></tr></table></figure>
-
-<h1 id="Kprobe"><a href="#Kprobe" class="headerlink" title="Kprobe"></a>Kprobe</h1><p>ftrace能打印出内核函数调用栈，但是入参和返回值获取不到，这时候用kprobe。</p>
-<p>ref: <a href="https://docs.kernel.org/trace/kprobetrace.html">Kprobe-based Event Tracing &#8212; The Linux Kernel documentation</a></p>
-<p>add probe points</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&quot;&quot;</span> &gt;&gt; /sys/kernel/debug/tracing/kprobe_events</span><br></pre></td></tr></table></figure>
-
-<p>enable probe points</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> 1 &gt; /sys/kernel/debug/tracing/events/kprobes/&lt;EVENT&gt;/enabled.</span><br></pre></td></tr></table></figure>
-
-<p>To add a probe as a new event, write a new definition to kprobe_events as below.</p>
-<blockquote>
-<p>Note:</p>
-<p>The register&#x2F;stack entry assigned to each function argument depends on arch-specific ABI.</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;p:myprobe do_sys_open dfd=%ax filename=%dx flags=%cx mode=+4($stack)&#x27;</span> &gt; /sys/kernel/debug/tracing/kprobe_events</span><br><span class="line"></span><br><span class="line"><span class="comment"># 确认是否加上</span></span><br><span class="line">$ <span class="built_in">ls</span> /sys/kernel/debug/tracing/events/kprobes/myprobe/</span><br><span class="line"><span class="built_in">enable</span>  filter  format  <span class="built_in">id</span>  trigger</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;r:myretprobe do_sys_open $retval&#x27;</span> &gt;&gt; /sys/kernel/debug/tracing/kprobe_events</span><br></pre></td></tr></table></figure>
-
-<p>Right after definition, each event is disabled by default. For tracing these events, you need to enable it.</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> 1 &gt; /sys/kernel/debug/tracing/events/kprobes/myprobe/enable</span><br><span class="line"><span class="built_in">echo</span> 1 &gt; /sys/kernel/debug/tracing/events/kprobes/myretprobe/enable</span><br></pre></td></tr></table></figure>
-
-<h2 id="开关event"><a href="#开关event" class="headerlink" title="开关event"></a>开关event</h2><p><a href="https://www.chiark.greenend.org.uk/doc/linux-doc-5.10/html/trace/events.html#via-the-enable-toggle">Event Tracing &mdash; The Linux Kernel documentation</a></p>
-<p>To enable event ‘sched_wakeup’:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> 1 &gt; /sys/kernel/debug/tracing/events/sched/sched_wakeup/enable</span><br></pre></td></tr></table></figure>
-
-<p>To disable it:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> 0 &gt; /sys/kernel/debug/tracing/events/sched/sched_wakeup/enable</span><br></pre></td></tr></table></figure>
-
-<p>To enable all events in sched subsystem:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> 1 &gt; /sys/kernel/debug/tracing/events/sched/enable</span><br></pre></td></tr></table></figure>
-
-<p>To enable all events:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> 1 &gt; /sys/kernel/debug/tracing/events/enable</span><br></pre></td></tr></table></figure>
-
-<p>When reading one of these enable files, there are four results:</p>
-<blockquote>
-<ul>
-<li><p>0 - all events this file affects are disabled</p>
-</li>
-<li><p>1 - all events this file affects are enabled</p>
-</li>
-<li><p>X - there is a mixture of events enabled and disabled</p>
-</li>
-<li><p>? - this file does not affect any event</p>
-</li>
-</ul>
-</blockquote>
-<h2 id="寄存器位长格式"><a href="#寄存器位长格式" class="headerlink" title="寄存器位长格式"></a>寄存器位长格式</h2><p>x86_64 寄存器如 rdx, rdi 带有 ‘r’ 前缀，但是加kprobe时，不识别’r’前缀，原因为kprobe自动识别位长，不用加前缀。</p>
-<p>转而可用类型转换指明想要的长度。</p>
-<blockquote>
-<p>After discussing with <code>kprobe</code> maintainer, I get the answer:</p>
-<p><code>ftrace-kprobe</code> interface does not accept bitwidth prefix like ‘<code>rax</code>‘ instead it accepts ‘<code>ax</code>‘. </p>
-<p>The bitwidth is automatically chosen by architecture. So please remove ‘<code>r</code>‘ from all arguments. </p>
-<p>If you’d like to access <code>eax</code> or <code>ax</code>, you can use typecast, like as <code>%ax:u32</code>.</p>
-<p><a href="https://stackoverflow.com/questions/33096225/how-to-use-registers-in-kprobe">linux - How to use registers in kprobe? - Stack Overflow</a></p>
-</blockquote>
-<h2 id="入参为结构体指针"><a href="#入参为结构体指针" class="headerlink" title="入参为结构体指针"></a>入参为结构体指针</h2><p>怎么知道内存布局从而取特定字段？用C版本kprobe应该行。</p>
-<h2 id="参数过滤"><a href="#参数过滤" class="headerlink" title="参数过滤"></a>参数过滤</h2><p><a href="https://www.chiark.greenend.org.uk/doc/linux-doc-5.10/html/trace/events.html#event-filtering">Event Tracing &mdash; The Linux Kernel documentation</a></p>
-<h2 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h2><h3 id="在内核函数内任意位置绑定回调"><a href="#在内核函数内任意位置绑定回调" class="headerlink" title="在内核函数内任意位置绑定回调"></a>在内核函数内任意位置绑定回调</h3><p><a href="https://medium.com/@hu3vjeen/modifying-kernel-behavior-using-kprobe-based-modules-2795b0716964">https://medium.com/@hu3vjeen/modifying-kernel-behavior-using-kprobe-based-modules-2795b0716964</a></p>
-]]></content>
-      <tags>
-        <tag>linux</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Linux ELF文件分析</title>
     <url>/2024/02/21/note/linux/elf/</url>
     <content><![CDATA[<blockquote>
@@ -1442,7 +1343,7 @@
 <h3 id="hash"><a href="#hash" class="headerlink" title=".hash"></a>.hash</h3><p>给<code>ld.so</code> 查询动态符号用的哈希表</p>
 <p><a href="https://flapenguin.me/elf-dt-hash">https://flapenguin.me/elf-dt-hash</a></p>
 <h3 id="dynsym"><a href="#dynsym" class="headerlink" title=".dynsym"></a>.dynsym</h3><p>This section holds the dynamic linking symbol table</p>
-<p>The <code>.dynsym</code> section of an ELF file consists of fixed-length records, either of type <code>Elf32_Sym</code> or <code>Elf64_Sym</code>, depending on the architecture. These records are unable to directly contain the symbol names due to their variable length nature. Instead, they include an offset within the <code>.dynstr</code> section (in the <code>.st_name</code> field), where the actual symbol name is located. Therefore, it is incorrect to say that <code>.dynsym</code> directly contains symbol names like “<a href="mailto:&#x73;&#101;&#116;&#x73;&#111;&#x63;&#x6b;&#x6f;&#x70;&#x74;&#x40;&#71;&#x4c;&#73;&#66;&#67;&#x5f;&#x32;&#x2e;&#48;">&#x73;&#101;&#116;&#x73;&#111;&#x63;&#x6b;&#x6f;&#x70;&#x74;&#x40;&#71;&#x4c;&#73;&#66;&#67;&#x5f;&#x32;&#x2e;&#48;</a>.” It accurately contains an <code>Elf32_Sym</code> or <code>Elf64_Sym</code> entry for an imported symbol such as <code>setsockopt</code>, which refers to the symbol name’s offset in the <code>.dynstr</code> section.</p>
+<p>The <code>.dynsym</code> section of an ELF file consists of fixed-length records, either of type <code>Elf32_Sym</code> or <code>Elf64_Sym</code>, depending on the architecture. These records are unable to directly contain the symbol names due to their variable length nature. Instead, they include an offset within the <code>.dynstr</code> section (in the <code>.st_name</code> field), where the actual symbol name is located. Therefore, it is incorrect to say that <code>.dynsym</code> directly contains symbol names like “<a href="mailto:&#115;&#x65;&#x74;&#x73;&#x6f;&#99;&#x6b;&#x6f;&#x70;&#116;&#x40;&#71;&#76;&#x49;&#66;&#x43;&#x5f;&#x32;&#46;&#x30;">&#115;&#x65;&#x74;&#x73;&#x6f;&#99;&#x6b;&#x6f;&#x70;&#116;&#x40;&#71;&#76;&#x49;&#66;&#x43;&#x5f;&#x32;&#46;&#x30;</a>.” It accurately contains an <code>Elf32_Sym</code> or <code>Elf64_Sym</code> entry for an imported symbol such as <code>setsockopt</code>, which refers to the symbol name’s offset in the <code>.dynstr</code> section.</p>
 <h3 id="dynstr"><a href="#dynstr" class="headerlink" title=".dynstr"></a>.dynstr</h3><p>This section holds strings needed for dynamic linking</p>
 <h3 id="init"><a href="#init" class="headerlink" title=".init"></a>.init</h3><p>This section holds executable instructions that contribute to the process initialization code. When a program starts to run, the system executes the code in this section before calling the main program entry point (called main for C programs).</p>
 <h3 id="fini"><a href="#fini" class="headerlink" title=".fini"></a>.fini</h3><p>This section holds executable instructions that contribute to the process termination code. When a program exits normally, the system executes the code in this section.</p>
@@ -1566,6 +1467,20 @@
       </tags>
   </entry>
   <entry>
+    <title>Linux bfd</title>
+    <url>/2024/02/20/note/linux/bfd/</url>
+    <content><![CDATA[<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><h2 id="arelent"><a href="#arelent" class="headerlink" title="arelent"></a>arelent</h2><blockquote>
+<p>BFD represents a relocation as a pointer to the ‘arelent’ type. A relocation describes an action which the linker must take to modify the section contents. Relocations have a symbol, an address, an addend, and a pointer to a howto structure which describes how to perform the relocation. </p>
+</blockquote>
+<blockquote>
+<p>In BFD, each section has an array of ‘arelent’ structures. Each structure has a pointer to a symbol, an address within the section, an addend, and a pointer to a ‘reloc_howto_struct’ structure. The howto structure has a bunch of fields describing the reloc, including a type field. The type field is specific to the object file format backend; none of the generic code in BFD examines it.</p>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Linux epoll 学习</title>
     <url>/2024/02/19/note/linux/epoll/</url>
     <content><![CDATA[<h1 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a>epoll</h1><h1 id="边沿触发和水平触发"><a href="#边沿触发和水平触发" class="headerlink" title="边沿触发和水平触发"></a>边沿触发和水平触发</h1><p>只有epoll有这两种模式，select和poll均只有水平触发。</p>
@@ -1595,6 +1510,91 @@
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">[<span class="number">1</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">1</span>]Child found readable fd</span><br><span class="line">[<span class="number">2</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">2</span>]Child found readable fd</span><br><span class="line">[<span class="number">3</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">3</span>]Child found readable fd</span><br><span class="line">[<span class="number">4</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">4</span>]Child found readable fd</span><br><span class="line">[<span class="number">5</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">5</span>]Child found readable fd</span><br><span class="line">[<span class="number">6</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">6</span>]Child found readable fd</span><br><span class="line">[<span class="number">7</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">7</span>]Child found readable fd</span><br><span class="line">[<span class="number">8</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">8</span>]Child found readable fd</span><br><span class="line">[<span class="number">9</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">9</span>]Child found readable fd</span><br><span class="line">[<span class="number">10</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">10</span>]Child found readable fd</span><br></pre></td></tr></table></figure>
 
 <h1 id="为什么边沿触发效率更高"><a href="#为什么边沿触发效率更高" class="headerlink" title="为什么边沿触发效率更高"></a>为什么边沿触发效率更高</h1>]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Linux Ftrace</title>
+    <url>/2024/02/29/note/linux/ftrace/</url>
+    <content><![CDATA[<h1 id="ftrace"><a href="#ftrace" class="headerlink" title="ftrace"></a>ftrace</h1><p><a href="https://www.youtube.com/watch?v=68osT1soAPM">https://www.youtube.com/watch?v=68osT1soAPM</a></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo mount -t debugfs none /sys/kernel/debug/</span><br></pre></td></tr></table></figure>
+
+<h3 id="跟踪open"><a href="#跟踪open" class="headerlink" title="跟踪open()"></a>跟踪open()</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span>    <span class="comment">// For O_RDONLY</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span>   <span class="comment">// For open, getpid</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cerrno&gt;</span>     <span class="comment">// For errno</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstring&gt;</span>    <span class="comment">// For strerror</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>   <span class="comment">// For std::cerr</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> fd = <span class="built_in">open</span>(<span class="string">&quot;example.txt&quot;</span>, O_RDONLY);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (fd == <span class="number">-1</span>) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Error opening file (PID: &quot;</span> &lt;&lt; <span class="built_in">getpid</span>() &lt;&lt; <span class="string">&quot;): &quot;</span> &lt;&lt; <span class="built_in">strerror</span>(errno) &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>利用ftrace+kprobe获取调用栈及入参和返回值</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">CUR_DIR=$(<span class="built_in">pwd</span>)</span><br><span class="line"></span><br><span class="line">TRACING_DIR=/sys/kernel/debug/tracing</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启用debugfs</span></span><br><span class="line"><span class="keyword">if</span> [ ! -d <span class="variable">$TRACING_DIR</span> ]; <span class="keyword">then</span></span><br><span class="line">    mount -t debugfs none /sys/kernel/debug/</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> <span class="variable">$TRACING_DIR</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置tracer参数</span></span><br><span class="line"><span class="built_in">echo</span> function_graph &gt; current_tracer <span class="comment"># 抓取函数调用栈</span></span><br><span class="line"><span class="built_in">echo</span> do_sys_open &gt; set_graph_function <span class="comment"># 只抓取这个函数及其内部</span></span><br><span class="line"><span class="built_in">echo</span> funcgraph-proc &gt; trace_options <span class="comment"># 显示进程名列</span></span><br><span class="line"><span class="built_in">echo</span> funcgraph-tail &gt; trace_options <span class="comment"># 函数结束大括号处注释函数名</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 关闭所有event</span></span><br><span class="line"><span class="built_in">echo</span> 0 &gt; <span class="variable">$TRACING_DIR</span>/events/enable</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;p:pre_do_sys_open do_sys_open dfd=%di filename=+0(%si):string flags=%dx mode=%cx&#x27;</span> &gt; kprobe_events</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;r:post_do_sys_open do_sys_open fd=$retval&#x27;</span> &gt;&gt; kprobe_events</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;filename ~ &quot;example.txt&quot;&#x27;</span> &gt; events/kprobes/pre_do_sys_open/filter</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;p:pre_link_path_walk link_path_walk name=+0(%di):string name_hex=%di:x64&#x27;</span> &gt;&gt; kprobe_events</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;r:post_link_path_walk link_path_walk ret=$retval:x64&#x27;</span> &gt;&gt; kprobe_events</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;r:post_step_into step_into ret=+0($retval):string ret_hex=$retval:x64&#x27;</span> &gt;&gt; kprobe_events</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> 1 &gt; events/kprobes/pre_do_sys_open/enable</span><br><span class="line"><span class="built_in">echo</span> 1 &gt; events/kprobes/post_do_sys_open/enable</span><br><span class="line"><span class="built_in">echo</span> 1 &gt; events/kprobes/pre_link_path_walk/enable</span><br><span class="line"><span class="built_in">echo</span> 1 &gt; events/kprobes/post_link_path_walk/enable</span><br><span class="line"><span class="built_in">echo</span> 1 &gt; events/kprobes/post_step_into/enable</span><br><span class="line"></span><br><span class="line"><span class="comment"># 开启所有event</span></span><br><span class="line"><span class="comment"># echo 1 &gt; $TRACING_DIR/events/enable</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 清空trace历史记录</span></span><br><span class="line"><span class="built_in">echo</span> &gt; trace</span><br><span class="line"></span><br><span class="line"><span class="comment"># 开始trace</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;start tracer&quot;</span></span><br><span class="line"><span class="built_in">echo</span> 1 &gt; <span class="variable">$TRACING_DIR</span>/tracing_on</span><br><span class="line"></span><br><span class="line"><span class="comment"># 执行程序</span></span><br><span class="line"><span class="built_in">cd</span> <span class="variable">$CUR_DIR</span></span><br><span class="line">./a.out</span><br><span class="line"></span><br><span class="line"><span class="comment"># 停止trace</span></span><br><span class="line"><span class="built_in">echo</span> 0 &gt; <span class="variable">$TRACING_DIR</span>/tracing_on</span><br><span class="line"></span><br><span class="line"><span class="built_in">cat</span> <span class="variable">$TRACING_DIR</span>/trace &gt; trace.out</span><br><span class="line">gawk -F<span class="string">&#x27;|&#x27;</span> <span class="string">&#x27;&#123;print $3&#125;&#x27;</span> trace.out &gt; trace.func</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;stop tracer&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="Tracing-Events"><a href="#Tracing-Events" class="headerlink" title="Tracing Events"></a>Tracing Events</h1><p>official doc: <a href="https://www.kernel.org/doc/html/v4.19/trace/events.html#event-tracing">https://www.kernel.org/doc/html/v4.19/trace/events.html#event-tracing</a></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wqj@WQJ:/sys/kernel$ sudo <span class="built_in">ls</span> /sys/kernel/debug/tracing/events</span><br><span class="line">9p            btrfs       dev           exceptions  fs_dax        hyperv       iommu        kvm        msr      netvsc  page_isolation  ras           <span class="built_in">sched</span>   sock      thermal   workqueue</span><br><span class="line">alarmtimer    cgroup      dma_fence     ext4        fscache       i2c          irq          kvmmmu     napi     nfs     pagemap         raw_syscalls  scsi    sunrpc    timer     writeback</span><br><span class="line">block         cifs        drm           fib         ftrace        initcall     irq_matrix   migrate    neigh    nfs4    percpu          rcu           sctp    swiotlb   tlb       x86_fpu</span><br><span class="line">bpf_test_run  clk         <span class="built_in">enable</span>        fib6        header_event  intel_iommu  irq_vectors  mmap       net      nfsd    power           rpcgss        signal  syscalls  udp       xdp</span><br><span class="line">bpf_trace     compaction  erofs         filelock    header_page   io_uring     jbd2         mmap_lock  netfs    nmi     printk          rseq          skb     task      vmscan    xfs</span><br><span class="line">bridge        cpuhp       error_report  filemap     huge_memory   iomap        kmem         module     netlink  oom     qdisc           rtc           smbus   tcp       vsyscall  xfs_scrub</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wqj@WQJ:/sys/kernel$ sudo <span class="built_in">ls</span> /sys/kernel/debug/tracing/events/irq</span><br><span class="line"><span class="built_in">enable</span>  filter  irq_handler_entry  irq_handler_exit  softirq_entry  softirq_exit  softirq_raise</span><br></pre></td></tr></table></figure>
+
+<h1 id="trace-cmd"><a href="#trace-cmd" class="headerlink" title="trace-cmd"></a>trace-cmd</h1><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install trace-cmd</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">-p tracer</span><br><span class="line">           Specify a tracer. Tracers usually <span class="keyword">do</span> more than just trace an</span><br><span class="line">           event. Common tracers are: <span class="keyword">function</span>, function_graph,</span><br><span class="line">           preemptirqsoff, irqsoff, preemptoff and wakeup. A tracer must</span><br><span class="line">           be supported by the running kernel. To see a list of</span><br><span class="line">           available tracers, see trace-cmd-list(1).</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">trace-cmd record -p function_graph -n do_sys_open ./a.out</span><br></pre></td></tr></table></figure>
+
+<h1 id="Kprobe"><a href="#Kprobe" class="headerlink" title="Kprobe"></a>Kprobe</h1><p>ftrace能打印出内核函数调用栈，但是入参和返回值获取不到，这时候用kprobe。</p>
+<p>ref: <a href="https://docs.kernel.org/trace/kprobetrace.html">Kprobe-based Event Tracing &#8212; The Linux Kernel documentation</a></p>
+<p>add probe points</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&quot;&quot;</span> &gt;&gt; /sys/kernel/debug/tracing/kprobe_events</span><br></pre></td></tr></table></figure>
+
+<p>enable probe points</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> 1 &gt; /sys/kernel/debug/tracing/events/kprobes/&lt;EVENT&gt;/enabled.</span><br></pre></td></tr></table></figure>
+
+<p>To add a probe as a new event, write a new definition to kprobe_events as below.</p>
+<blockquote>
+<p>Note:</p>
+<p>The register&#x2F;stack entry assigned to each function argument depends on arch-specific ABI.</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;p:myprobe do_sys_open dfd=%ax filename=%dx flags=%cx mode=+4($stack)&#x27;</span> &gt; /sys/kernel/debug/tracing/kprobe_events</span><br><span class="line"></span><br><span class="line"><span class="comment"># 确认是否加上</span></span><br><span class="line">$ <span class="built_in">ls</span> /sys/kernel/debug/tracing/events/kprobes/myprobe/</span><br><span class="line"><span class="built_in">enable</span>  filter  format  <span class="built_in">id</span>  trigger</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;r:myretprobe do_sys_open $retval&#x27;</span> &gt;&gt; /sys/kernel/debug/tracing/kprobe_events</span><br></pre></td></tr></table></figure>
+
+<p>Right after definition, each event is disabled by default. For tracing these events, you need to enable it.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> 1 &gt; /sys/kernel/debug/tracing/events/kprobes/myprobe/enable</span><br><span class="line"><span class="built_in">echo</span> 1 &gt; /sys/kernel/debug/tracing/events/kprobes/myretprobe/enable</span><br></pre></td></tr></table></figure>
+
+<h2 id="开关event"><a href="#开关event" class="headerlink" title="开关event"></a>开关event</h2><p><a href="https://www.chiark.greenend.org.uk/doc/linux-doc-5.10/html/trace/events.html#via-the-enable-toggle">Event Tracing &mdash; The Linux Kernel documentation</a></p>
+<p>To enable event ‘sched_wakeup’:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> 1 &gt; /sys/kernel/debug/tracing/events/sched/sched_wakeup/enable</span><br></pre></td></tr></table></figure>
+
+<p>To disable it:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> 0 &gt; /sys/kernel/debug/tracing/events/sched/sched_wakeup/enable</span><br></pre></td></tr></table></figure>
+
+<p>To enable all events in sched subsystem:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> 1 &gt; /sys/kernel/debug/tracing/events/sched/enable</span><br></pre></td></tr></table></figure>
+
+<p>To enable all events:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> 1 &gt; /sys/kernel/debug/tracing/events/enable</span><br></pre></td></tr></table></figure>
+
+<p>When reading one of these enable files, there are four results:</p>
+<blockquote>
+<ul>
+<li><p>0 - all events this file affects are disabled</p>
+</li>
+<li><p>1 - all events this file affects are enabled</p>
+</li>
+<li><p>X - there is a mixture of events enabled and disabled</p>
+</li>
+<li><p>? - this file does not affect any event</p>
+</li>
+</ul>
+</blockquote>
+<h2 id="寄存器位长格式"><a href="#寄存器位长格式" class="headerlink" title="寄存器位长格式"></a>寄存器位长格式</h2><p>x86_64 寄存器如 rdx, rdi 带有 ‘r’ 前缀，但是加kprobe时，不识别’r’前缀，原因为kprobe自动识别位长，不用加前缀。</p>
+<p>转而可用类型转换指明想要的长度。</p>
+<blockquote>
+<p>After discussing with <code>kprobe</code> maintainer, I get the answer:</p>
+<p><code>ftrace-kprobe</code> interface does not accept bitwidth prefix like ‘<code>rax</code>‘ instead it accepts ‘<code>ax</code>‘. </p>
+<p>The bitwidth is automatically chosen by architecture. So please remove ‘<code>r</code>‘ from all arguments. </p>
+<p>If you’d like to access <code>eax</code> or <code>ax</code>, you can use typecast, like as <code>%ax:u32</code>.</p>
+<p><a href="https://stackoverflow.com/questions/33096225/how-to-use-registers-in-kprobe">linux - How to use registers in kprobe? - Stack Overflow</a></p>
+</blockquote>
+<h2 id="入参为结构体指针"><a href="#入参为结构体指针" class="headerlink" title="入参为结构体指针"></a>入参为结构体指针</h2><p>怎么知道内存布局从而取特定字段？用C版本kprobe应该行。</p>
+<h2 id="参数过滤"><a href="#参数过滤" class="headerlink" title="参数过滤"></a>参数过滤</h2><p><a href="https://www.chiark.greenend.org.uk/doc/linux-doc-5.10/html/trace/events.html#event-filtering">Event Tracing &mdash; The Linux Kernel documentation</a></p>
+<h2 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h2><h3 id="在内核函数内任意位置绑定回调"><a href="#在内核函数内任意位置绑定回调" class="headerlink" title="在内核函数内任意位置绑定回调"></a>在内核函数内任意位置绑定回调</h3><p><a href="https://medium.com/@hu3vjeen/modifying-kernel-behavior-using-kprobe-based-modules-2795b0716964">https://medium.com/@hu3vjeen/modifying-kernel-behavior-using-kprobe-based-modules-2795b0716964</a></p>
+]]></content>
       <tags>
         <tag>linux</tag>
       </tags>
@@ -1834,33 +1834,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Linux防火墙配置</title>
-    <url>/2024/02/19/note/linux/linux%20firewall/</url>
-    <content><![CDATA[<h1 id="linux-firewall"><a href="#linux-firewall" class="headerlink" title="linux firewall"></a>linux firewall</h1><p>To view open ports, use the following command.</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --list-ports</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>We use the following to see services whose ports are open.</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --list-services</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>We use the following to see services whose ports are open and see open ports</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --list-all</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>To add a service to the firewall, we use the following command, in which case the service will use any port to open in the firewall.</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --add-services=ntp</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>For this service to be permanently open we use the following command.</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd —add-service=ntp --permanent</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>To add a port, use the following command</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --add-port=132/tcp  --permanent</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>To run the firewall must be reloaded using the following command.</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --reload</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>linux</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Linux ld</title>
     <url>/2024/02/21/note/linux/ld/</url>
     <content><![CDATA[<p><a href="https://sourceware.org/binutils/docs/ld/index.html">LD用户手册</a></p>
@@ -1903,6 +1876,42 @@
       <tags>
         <tag>linux</tag>
         <tag>asm</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Linux防火墙配置</title>
+    <url>/2024/02/19/note/linux/linux%20firewall/</url>
+    <content><![CDATA[<h1 id="linux-firewall"><a href="#linux-firewall" class="headerlink" title="linux firewall"></a>linux firewall</h1><p>To view open ports, use the following command.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --list-ports</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>We use the following to see services whose ports are open.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --list-services</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>We use the following to see services whose ports are open and see open ports</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --list-all</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>To add a service to the firewall, we use the following command, in which case the service will use any port to open in the firewall.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --add-services=ntp</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>For this service to be permanently open we use the following command.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd —add-service=ntp --permanent</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>To add a port, use the following command</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --add-port=132/tcp  --permanent</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>To run the firewall must be reloaded using the following command.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">firewall-cmd --reload</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Linux tee cmd</title>
+    <url>/2024/02/19/note/linux/linux%20tee%20cmd/</url>
+    <content><![CDATA[<h1 id="linux-tee-cmd"><a href="#linux-tee-cmd" class="headerlink" title="linux tee cmd"></a>linux tee cmd</h1><p>tee 是 字母T的发音，将 | 左边的stdin 同时分流到 stdout 和 file 一份。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">wqj@ubuntu-server:~/demo$ echo <span class="string">&quot;hello&quot;</span> | tee demo.txt</span><br><span class="line">hello</span><br><span class="line">wqj@ubuntu-server:~/demo$ cat demo.txt </span><br><span class="line">hello</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>linux</tag>
       </tags>
   </entry>
   <entry>
@@ -1959,15 +1968,6 @@
 ]]></content>
       <tags>
         <tag>cpp</tag>
-        <tag>linux</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Linux tee cmd</title>
-    <url>/2024/02/19/note/linux/linux%20tee%20cmd/</url>
-    <content><![CDATA[<h1 id="linux-tee-cmd"><a href="#linux-tee-cmd" class="headerlink" title="linux tee cmd"></a>linux tee cmd</h1><p>tee 是 字母T的发音，将 | 左边的stdin 同时分流到 stdout 和 file 一份。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">wqj@ubuntu-server:~/demo$ echo <span class="string">&quot;hello&quot;</span> | tee demo.txt</span><br><span class="line">hello</span><br><span class="line">wqj@ubuntu-server:~/demo$ cat demo.txt </span><br><span class="line">hello</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
         <tag>linux</tag>
       </tags>
   </entry>
