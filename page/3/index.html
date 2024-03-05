@@ -179,6 +179,319 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/strace/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/linux/strace/" class="post-title-link" itemprop="url">Linux strace</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>302</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>1 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h1><h2 id="strace抓取ld链接器具体参数"><a href="#strace抓取ld链接器具体参数" class="headerlink" title="strace抓取ld链接器具体参数"></a>strace抓取ld链接器具体参数</h2><p><a target="_blank" rel="noopener" href="https://stackoverflow.com/a/62562907/11850070">详见</a></p>
+<p>strace参数解释：</p>
+<ul>
+<li><code>-o</code> forked.log save the output to forked.log  </li>
+<li><code>-s</code> 1024 variables shorter than 1024 chars are not truncated (default 32 was not enough)  </li>
+<li><code>-f</code> enables strace on forked processes  </li>
+<li><code>-e trace=/exec</code> - filter system calls so only ones starting with exec are shown</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -o forked.log -s 1024 -f -e trace=/exec gcc hello.c.s -o hello_gcc</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/nm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/linux/nm/" class="post-title-link" itemprop="url">Linux nm 命令</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>10 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Options"><a href="#Options" class="headerlink" title="Options"></a>Options</h1><p><code>-D</code> - Display the dynamic symbols rather than the normal symbols.  This is only meaningful for dynamic objects, such as certain types of shared libraries.</p>
+<h1 id="nm的使用"><a href="#nm的使用" class="headerlink" title="nm的使用"></a>nm的使用</h1><h2 id="按符号地址升序并demangle"><a href="#按符号地址升序并demangle" class="headerlink" title="按符号地址升序并demangle"></a>按符号地址升序并demangle</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-C demangle symbols</span><br><span class="line">-n 按地址升序</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ nm -n -C demo</span><br><span class="line">                 U __cxa_atexit@@GLIBC_2.2.5</span><br><span class="line">                 w __gmon_start__</span><br><span class="line">                 U __libc_start_main@@GLIBC_2.2.5</span><br><span class="line">                 U std::ios_base::Init::Init()@@GLIBCXX_3.4</span><br><span class="line">0000000000400708 T _init</span><br><span class="line">00000000004007c0 T _start</span><br><span class="line">...</span><br><span class="line">0000000000601171 b std::__ioinit</span><br><span class="line">0000000000601178 B _end</span><br></pre></td></tr></table></figure>
+
+<h2 id="分析C-vtable内容"><a href="#分析C-vtable内容" class="headerlink" title="分析C++ vtable内容"></a>分析C++ vtable内容</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> </span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;A::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span> : <span class="keyword">public</span> A</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;B::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span> : <span class="keyword">public</span> B</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;C::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	C c;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>先用objdump取出vtable内若干符号的地址，然后用nm找出地址对应的符号</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -C demangle</span></span><br><span class="line"><span class="comment"># -d disassemble</span></span><br><span class="line">[root@ZLPC-wangqingjia demo]<span class="comment"># objdump -C -d --section=.rodata demo</span></span><br><span class="line"></span><br><span class="line">demo:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line">Disassembly of section .rodata:</span><br><span class="line"></span><br><span class="line">00000000004009b0 &lt;_IO_stdin_used&gt;:</span><br><span class="line">  4009b0:       01 00 02 00 00 00 00 00                             ........        </span><br><span class="line"></span><br><span class="line">00000000004009b8 &lt;__dso_handle&gt;:</span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">00000000004009c0 &lt;std::piecewise_construct&gt;:</span><br><span class="line">  4009c0:       00 43 3a 3a 66 6f 6f 00                             .C::foo.        </span><br><span class="line"></span><br><span class="line">00000000004009c8 &lt;vtable <span class="keyword">for</span> C&gt;:</span><br><span class="line">        ...</span><br><span class="line">  4009d0:       e0 09 40 00 00 00 00 00 fa 08 40 00 00 00 00 00     ..@.......@.....</span><br><span class="line"></span><br><span class="line">00000000004009e0 &lt;typeinfo <span class="keyword">for</span> C&gt;:</span><br><span class="line">  4009e0:       b0 0d 60 00 00 00 00 00 f8 09 40 00 00 00 00 00     ..`.......@.....</span><br><span class="line">  4009f0:       00 0a 40 00 00 00 00 00                             ..@.....        </span><br><span class="line"></span><br><span class="line">00000000004009f8 &lt;typeinfo name <span class="keyword">for</span> C&gt;:</span><br><span class="line">  4009f8:       31 43 00 00 00 00 00 00                             1C......        </span><br><span class="line"></span><br><span class="line">0000000000400a00 &lt;typeinfo <span class="keyword">for</span> B&gt;:</span><br><span class="line">  400a00:       b0 0d 60 00 00 00 00 00 18 0a 40 00 00 00 00 00     ..`.......@.....</span><br><span class="line">  400a10:       20 0a 40 00 00 00 00 00                              .@.....        </span><br><span class="line"></span><br><span class="line">0000000000400a18 &lt;typeinfo name <span class="keyword">for</span> B&gt;:</span><br><span class="line">  400a18:       31 42 00 00 00 00 00 00                             1B......        </span><br><span class="line"></span><br><span class="line">0000000000400a20 &lt;typeinfo <span class="keyword">for</span> A&gt;:</span><br><span class="line">  400a20:       50 0d 60 00 00 00 00 00 30 0a 40 00 00 00 00 00     P.`.....0.@.....</span><br><span class="line"></span><br><span class="line">0000000000400a30 &lt;typeinfo name <span class="keyword">for</span> A&gt;:</span><br><span class="line">  400a30:       31 41 00                                            1A.</span><br><span class="line"></span><br><span class="line"><span class="comment"># 小端存储，数值低位在低地址</span></span><br><span class="line">[root@ZLPC-wangqingjia demo]<span class="comment"># nm -n -C demo | grep 4009e0</span></span><br><span class="line">00000000004009e0 V typeinfo <span class="keyword">for</span> C</span><br><span class="line">[root@ZLPC-wangqingjia demo]<span class="comment"># nm -n -C demo | grep 4008fa</span></span><br><span class="line">00000000004008fa W C::foo()</span><br></pre></td></tr></table></figure>
+
+<p>而用 g++ -S 生成的反汇编为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">vtable for C:</span><br><span class="line">	.quad	0</span><br><span class="line">	.quad	typeinfo for C</span><br><span class="line">	.quad	C::foo()</span><br><span class="line">	.weak	typeinfo for C</span><br><span class="line">	.section	.rodata._ZTI1C,&quot;aG&quot;,@progbits,typeinfo for C,comdat</span><br><span class="line">	.align 8</span><br><span class="line">	.type	typeinfo for C, @object</span><br><span class="line">	.size	typeinfo for C, 24</span><br></pre></td></tr></table></figure>
+
+<h1 id="nm输出解读"><a href="#nm输出解读" class="headerlink" title="nm输出解读"></a>nm输出解读</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]# nm a.out -C | grep &quot;std::_Sp_counted_base&quot;</span><br><span class="line">0000000000400e40 W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::_M_destroy()</span><br><span class="line">0000000000400d48 W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::_M_release()</span><br><span class="line">0000000000400dc4 W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::_M_add_ref_copy()</span><br><span class="line">0000000000401370 W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::_Sp_counted_base()</span><br><span class="line">0000000000401370 W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::_Sp_counted_base()</span><br><span class="line">0000000000400eee W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::~_Sp_counted_base()</span><br><span class="line">0000000000400ed6 W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::~_Sp_counted_base()</span><br><span class="line">0000000000400ed6 W std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::~_Sp_counted_base()</span><br><span class="line">00000000004018a8 V typeinfo for std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;</span><br><span class="line">00000000004018c0 V typeinfo name for std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;</span><br><span class="line">00000000004017f8 V vtable for std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;</span><br></pre></td></tr></table></figure>
+
+<p>每一列代表什么意思？</p>
+<ul>
+<li>符号值，即地址</li>
+<li>符号类型, 一般小写是local，大写是global(external), 例外是：”u”,”v”,”w” 这三个小写的是global的。<ul>
+<li>A - The symbol’s value is absolute, and will not be changed by further linking.</li>
+<li>B&#x2F;b - The symbol is in the uninitialized data section (known as BSS).</li>
+<li>C - The symbol is common.  Common symbols are uninitialized data.  When linking, multiple common symbols may appear with the same name.  If the symbol is defined anywhere, the common symbols are treated as undefined references. (没理解)</li>
+<li>D&#x2F;d - The symbol is in the initialized data section.</li>
+<li>G&#x2F;g - The symbol is in an initialized data section for small objects.  Some object file formats permit more efficient access to small data objects, such as a global int variable as opposed to a large global array.</li>
+<li>I - The symbol is an indirect reference to another symbol.</li>
+<li>i - For ELF format files this indicates that the symbol is an indirect function.  This is a GNU extension to the standard set of ELF symbol types.  It indicates a symbol which if referenced by a relocation does not evaluate to its address, but instead must be invoked at runtime. The runtime execution will then return the value to be used in the relocation.</li>
+<li>N - The symbol is a debugging symbol.</li>
+<li>p - The symbols is in a stack unwind section. (没理解)</li>
+<li>R&#x2F;r - The symbol is in a read only data section.</li>
+<li>S&#x2F;s - The symbol is in an uninitialized data section for small objects.</li>
+<li>T&#x2F;t - The symbol is in the text (code) section.</li>
+<li>U - The symbol is undefined.</li>
+<li>u - The symbol is a unique global symbol.  This is a GNU extension to the standard set of ELF symbol bindings.  For such a symbol the dynamic linker will make sure that in the entire process there is just one symbol with this name and type in use.</li>
+<li>V&#x2F;v - The symbol is a weak object.  When a weak defined symbol is linked with a normal defined symbol, the normal defined symbol is used with no error.  When a weak undefined symbol is linked and the symbol is not defined, the value of the weak symbol becomes zero with no error.  On some systems, uppercase indicates that a default value has been specified.</li>
+<li>W&#x2F;w - The symbol is a weak symbol that has not been specifically tagged as a weak object symbol.</li>
+<li>‘-‘ - The symbol is a stabs symbol in an a.out object file.  In this case, the next values printed are the stabs other field, the stabs desc field, and the stab type.  Stabs symbols are used to hold debugging information.</li>
+<li>‘?’ - The symbol type is unknown, or object file format specific.</li>
+</ul>
+</li>
+<li>符号名</li>
+</ul>
+<h1 id="nm原理"><a href="#nm原理" class="headerlink" title="nm原理"></a>nm原理</h1><p>我很好奇 <code>nm</code> 怎么从elf目标文件中获取的符号信息。</p>
+<p>用GDB跟一下，其实是调用 BFD 接口获取符号表。</p>
+<blockquote>
+<p>The first use is to read an object file. The object file readers are programs like ‘gdb’, ‘nm’, ‘objdump’, and ‘objcopy’. These programs use BFD to view an object file in a generic form. The official BFD interface is normally fully adequate for these programs. - bfd&#x2F;doc&#x2F;bfdint.texi</p>
+</blockquote>
+<p>gas、ld、nm、objdump、objcopy 这些工具，均借助BFD读写二进制目标文件。</p>
+<p>所以要看BFD怎么从elf目标文件中获取符号表。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/linux%20tee%20cmd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/linux/linux%20tee%20cmd/" class="post-title-link" itemprop="url">Linux tee cmd</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>159</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>1 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="linux-tee-cmd"><a href="#linux-tee-cmd" class="headerlink" title="linux tee cmd"></a>linux tee cmd</h1><p>tee 是 字母T的发音，将 | 左边的stdin 同时分流到 stdout 和 file 一份。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wqj@ubuntu-server:~/demo$ echo <span class="string">&quot;hello&quot;</span> | tee demo.txt</span><br><span class="line">hello</span><br><span class="line">wqj@ubuntu-server:~/demo$ cat demo.txt </span><br><span class="line">hello</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/objdump/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1070,333 +1383,6 @@
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">1</span>]Child found readable fd</span><br><span class="line">[<span class="number">2</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">2</span>]Child found readable fd</span><br><span class="line">[<span class="number">3</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">3</span>]Child found readable fd</span><br><span class="line">[<span class="number">4</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">4</span>]Child found readable fd</span><br><span class="line">[<span class="number">5</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">5</span>]Child found readable fd</span><br><span class="line">[<span class="number">6</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">6</span>]Child found readable fd</span><br><span class="line">[<span class="number">7</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">7</span>]Child found readable fd</span><br><span class="line">[<span class="number">8</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">8</span>]Child found readable fd</span><br><span class="line">[<span class="number">9</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">9</span>]Child found readable fd</span><br><span class="line">[<span class="number">10</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">10</span>]Child found readable fd</span><br></pre></td></tr></table></figure>
 
 <h1 id="为什么边沿触发效率更高"><a href="#为什么边沿触发效率更高" class="headerlink" title="为什么边沿触发效率更高"></a>为什么边沿触发效率更高</h1>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/PageCache%20/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/linux/PageCache%20/" class="post-title-link" itemprop="url">Linux page cache</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>1.6k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>3 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="PageCache"><a href="#PageCache" class="headerlink" title="PageCache"></a>PageCache</h1><h1 id="是什么？"><a href="#是什么？" class="headerlink" title="是什么？"></a>是什么？</h1><ul>
-<li>pagecache是最主要的一种disk cache</li>
-<li>通过程序的方式，当读&#x2F;写文件时，将文件<strong>部分</strong>内容以页为单位在内存中缓存一份，提高未来多个进程对该文件的读写速度，由于是以页为单位，因此缓存的文件页不一定是文件中连续的。</li>
-<li>如果有空闲内存，那么缓存的页一直常驻内存</li>
-<li>当把页写回块设备时，也缓存一份要写入的内容，但内核不是立即写入设备，而是推迟一会儿写入设备，因为每次写入硬盘的速度很慢，攒够一波再发车。</li>
-<li>read()和write()都用pagecache，除非是像数据库有数据立即写入硬盘需求，可以加O_DIRECT禁用pagecache。</li>
-<li>如果断电了，page cache中未写入硬盘的页全丢了</li>
-<li>dirty page写回硬盘的策略<ul>
-<li>page cache量超出阈值或者dirty page cache超出阈值</li>
-<li>dirty时常超出阈值</li>
-<li>用户程序调sync(), fsync(), fdatasync()系统调用</li>
-</ul>
-</li>
-<li>TODO：分析page cache工具 <a target="_blank" rel="noopener" href="https://www.percona.com/blog/using-linux-fincore-to-check-linux-page-cache-usage/">https://www.percona.com/blog/using-linux-fincore-to-check-linux-page-cache-usage/</a></li>
-<li>TODO: 实验page cache优化效果 <a target="_blank" rel="noopener" href="https://www.linuxatemyram.com/play.html">https://www.linuxatemyram.com/play.html</a></li>
-</ul>
-<h1 id="清空disk-cache"><a href="#清空disk-cache" class="headerlink" title="清空disk cache"></a>清空disk cache</h1><ul>
-<li><p>To free pagecache:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo 1 | sudo tee /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>To free dentries and inodes:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo 2 | sudo tee /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>To free pagecache, dentries and inodes:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo 3 | sudo tee /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure></li>
-</ul>
-<p>参考：</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://unix.stackexchange.com/a/87909/375713">https://unix.stackexchange.com/a/87909/375713</a></li>
-</ul>
-<h1 id="fincore"><a href="#fincore" class="headerlink" title="fincore"></a>fincore</h1><p>查看文件的pagecache情况</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建一个200MB的文件</span></span><br><span class="line">wqj@ubuntu-server:~/demo$ <span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=bigfile bs=1M count=200</span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ ll -h</span><br><span class="line">total 201M</span><br><span class="line">drwxrwxr-x  2 wqj wqj 4.0K Oct 16 09:51 ./</span><br><span class="line">drwxr-xr-x 12 wqj wqj 4.0K Oct 16 09:40 ../</span><br><span class="line">-rw-rw-r--  1 wqj wqj 200M Oct 16 09:43 bigfile      <span class="comment"># 有一个200M的文件</span></span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ fincore bigfile <span class="comment"># 没有生成pagecache</span></span><br><span class="line">RES PAGES  SIZE FILE</span><br><span class="line"> 0B     0  200M bigfile</span><br><span class="line"></span><br><span class="line">wqj@ubuntu-server:~/demo$ time <span class="built_in">cat</span> bigfile &gt; /dev/null <span class="comment"># 读这个文件（生成pagecache）</span></span><br><span class="line"></span><br><span class="line">real    0m0.242s</span><br><span class="line">user    0m0.011s</span><br><span class="line">sys     0m0.203s</span><br><span class="line">wqj@ubuntu-server:~/demo$ fincore bigfile <span class="comment"># 验证生成pagecache</span></span><br><span class="line">  RES PAGES  SIZE FILE</span><br><span class="line"> 200M 51200  200M bigfile</span><br><span class="line"></span><br><span class="line"><span class="comment"># 再次读这个文件，读的是pagecache，速度提升 0.242/0.032=7.56倍</span></span><br><span class="line">wqj@ubuntu-server:~/demo$ time <span class="built_in">cat</span> bigfile &gt; /dev/null </span><br><span class="line"></span><br><span class="line">real    0m0.032s</span><br><span class="line">user    0m0.000s</span><br><span class="line">sys     0m0.032s</span><br></pre></td></tr></table></figure>
-
-<h1 id="pcstat"><a href="#pcstat" class="headerlink" title="pcstat"></a>pcstat</h1><p><a target="_blank" rel="noopener" href="https://github.com/tobert/pcstat">https://github.com/tobert/pcstat</a></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">C++ 虚析构函数</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>3k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>5 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="虚析构函数"><a href="#虚析构函数" class="headerlink" title="虚析构函数"></a>虚析构函数</h1><blockquote>
-<p>何时声明类的析构函数为virtual？</p>
-</blockquote>
-<ul>
-<li>当要通过基类指针删除子类对象时，如果基类的析构函数没用virtual，则是未定义行为，大多数实现是把基类的析构函数当作普通非虚函数，因此只析构基类，导致子类资源泄露。</li>
-<li>因此Effective C++讲：只要基类有一个虚函数，就该考虑将其析构函数声明为virtual。从而确保从子类→基类的析构函数依次调用（构造顺序是先基类后子类，析构顺序正好相反，先子类后父类），否则只有基类析构，子类没析构，子类发生资源泄漏。</li>
-<li>也可以声明基类析构函数为protected，从而编译器禁止通过基类指针删除子类对象。</li>
-</ul>
-<blockquote>
-<p>那是否每个基类的析构函数都声明为virtual？</p>
-</blockquote>
-<ul>
-<li>不用，只要最上边的基类是virtual即可，其余子类的析构函数均继承了virtual修饰。</li>
-</ul>
-<h2 id="多态基类析构函数没加virtual"><a href="#多态基类析构函数没加virtual" class="headerlink" title="多态基类析构函数没加virtual"></a>多态基类析构函数没加virtual</h2><p>这种情况是未定义的，大多数实现是只析构基类了</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">// 这里去掉了virtual</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>输出：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line"><span class="built_in">MyCircle</span>()</span><br><span class="line"></span><br><span class="line">~<span class="built_in">Shape</span>() <span class="comment">// 要删除子类，结果只调了基类的析构函数</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="多态基类析构函数加上virtual后"><a href="#多态基类析构函数加上virtual后" class="headerlink" title="多态基类析构函数加上virtual后"></a>多态基类析构函数加上virtual后</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">// 这里加上virtual</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line"><span class="built_in">MyCircle</span>()</span><br><span class="line"></span><br><span class="line">~<span class="built_in">MyCircle</span>() <span class="comment">// 从子类到父类依次析构</span></span><br><span class="line">~<span class="built_in">Circle</span>()</span><br><span class="line">~<span class="built_in">Shape</span>()</span><br></pre></td></tr></table></figure>
-
-<h2 id="多态基类析构函数声明为protected"><a href="#多态基类析构函数声明为protected" class="headerlink" title="多态基类析构函数声明为protected"></a>多态基类析构函数声明为protected</h2><p>禁止从基类指针删除子类对象</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;source&gt;: In function <span class="string">&#x27;int main()&#x27;</span>:</span><br><span class="line">&lt;source&gt;:<span class="number">32</span>:<span class="number">12</span>: error: <span class="string">&#x27;Shape::~Shape()&#x27;</span> is <span class="keyword">protected</span> within <span class="keyword">this</span> context</span><br><span class="line">   <span class="number">32</span> |     <span class="keyword">delete</span> shape;</span><br><span class="line">      |            ^~~~~</span><br><span class="line">&lt;source&gt;:<span class="number">10</span>:<span class="number">5</span>: note: declared <span class="keyword">protected</span> here</span><br><span class="line">   <span class="number">10</span> |     ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">      |     ^</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E7%BB%9D%E4%B8%8D%E8%83%BD%E5%9C%A8%E6%9E%84%E9%80%A0%E5%92%8C%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%AD%E8%B0%83%E8%99%9A%E5%87%BD%E6%95%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/%E7%BB%9D%E4%B8%8D%E8%83%BD%E5%9C%A8%E6%9E%84%E9%80%A0%E5%92%8C%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%AD%E8%B0%83%E8%99%9A%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">C++ 绝不能在构造和析构函数中调虚函数</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>775</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>1 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>绝不在构造和析构过程中调用 virtual 函数，因为这类调用只会调用当前类的虚函数版本，从不下降至更下级子类（derived class）</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() </span><br><span class="line">    &#123; </span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="built_in">foo</span>(); <span class="comment">// 在构造函数中调虚函数，只会调该类的，不会向下走</span></span><br><span class="line">    &#125;</span><br><span class="line">    ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;Shape::foo()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;Circle::foo()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Circle c;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line">Shape::<span class="built_in">foo</span>() <span class="comment">// 构造是Circle，但调的是基类的虚函数</span></span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line">~<span class="built_in">Circle</span>()</span><br><span class="line">~<span class="built_in">Shape</span>()</span><br></pre></td></tr></table></figure>
       
     </div>
 

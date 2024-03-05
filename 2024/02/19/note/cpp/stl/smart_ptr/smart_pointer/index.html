@@ -18,15 +18,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="shared_ptr总结：内部是一个指向对象的指针，两个引用计数int（用atomic接口修改计数值，保证引用计数修改的线程安全），但是所指对象的线程安全没用保证。 打印shared_ptr p1的引用计数 12(gdb) p p1._M_refcount._M_pi._M_use_count$17 &#x3D; 1  gcc shared_ptr imp doc x86_64下一个shared_ptr是1">
+    <meta name="description" content="https:&#x2F;&#x2F;csguide.cn&#x2F;cpp&#x2F;memory&#x2F;shared_ptr.html#%E6%89%8B%E5%86%99-shared-ptr shared_ptr总结：内部是一个指向对象的指针，两个引用计数int（用atomic接口修改计数值，保证引用计数修改的线程安全），但是所指对象的线程安全没用保证。 打印shared_ptr p1的引用计数 12(gdb) p p1._M_refc">
 <meta property="og:type" content="article">
 <meta property="og:title" content="C++ std::shared_ptr">
 <meta property="og:url" content="http://example.com/2024/02/19/note/cpp/stl/smart_ptr/smart_pointer/index.html">
 <meta property="og:site_name" content="折纸飞向麦田的博客">
-<meta property="og:description" content="shared_ptr总结：内部是一个指向对象的指针，两个引用计数int（用atomic接口修改计数值，保证引用计数修改的线程安全），但是所指对象的线程安全没用保证。 打印shared_ptr p1的引用计数 12(gdb) p p1._M_refcount._M_pi._M_use_count$17 &#x3D; 1  gcc shared_ptr imp doc x86_64下一个shared_ptr是1">
+<meta property="og:description" content="https:&#x2F;&#x2F;csguide.cn&#x2F;cpp&#x2F;memory&#x2F;shared_ptr.html#%E6%89%8B%E5%86%99-shared-ptr shared_ptr总结：内部是一个指向对象的指针，两个引用计数int（用atomic接口修改计数值，保证引用计数修改的线程安全），但是所指对象的线程安全没用保证。 打印shared_ptr p1的引用计数 12(gdb) p p1._M_refc">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-02-19T12:08:28.138Z">
-<meta property="article:modified_time" content="2024-02-28T12:47:22.917Z">
+<meta property="article:modified_time" content="2024-03-04T13:08:41.481Z">
 <meta property="article:author" content="折纸飞向麦田">
 <meta property="article:tag" content="cpp">
 <meta name="twitter:card" content="summary">
@@ -222,7 +222,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
+      <time title="修改时间：2024-03-04 21:08:41" itemprop="dateModified" datetime="2024-03-04T21:08:41+08:00">2024-03-04</time>
     </span>
 
   
@@ -249,7 +249,8 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="shared-ptr"><a href="#shared-ptr" class="headerlink" title="shared_ptr"></a>shared_ptr</h1><p>总结：内部是一个指向对象的指针，两个引用计数int（用atomic接口修改计数值，保证引用计数修改的线程安全），但是所指对象的线程安全没用保证。</p>
+    <div class="post-body" itemprop="articleBody"><p><a target="_blank" rel="noopener" href="https://csguide.cn/cpp/memory/shared_ptr.html#%E6%89%8B%E5%86%99-shared-ptr">https://csguide.cn/cpp/memory/shared_ptr.html#%E6%89%8B%E5%86%99-shared-ptr</a></p>
+<h1 id="shared-ptr"><a href="#shared-ptr" class="headerlink" title="shared_ptr"></a>shared_ptr</h1><p>总结：内部是一个指向对象的指针，两个引用计数int（用atomic接口修改计数值，保证引用计数修改的线程安全），但是所指对象的线程安全没用保证。</p>
 <p>打印shared_ptr <code>p1</code>的引用计数</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) p p1._M_refcount._M_pi._M_use_count</span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">17 = 1</span></span><br></pre></td></tr></table></figure>
 

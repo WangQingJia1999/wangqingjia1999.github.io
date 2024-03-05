@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="关于这块，检索到的资料大都模棱两可，可信度很存疑，对这块的理解停留在道听途说的层面，不够深刻。 想了想，可以从汇编角度，看看编译器究竟为实现虚函数在背后默默做了什么。 本文分析 gcc version 9.4.0 的虚函数的实现方式。 基本原理：一个类只要声明了一个虚函数，则编译器为该类生成一个虚函数表（vtable），虚函数表中主要是该类的虚函数的定义地址，由该类所有的对象共享。每个对象内部存一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ 虚函数实现原理">
+<meta property="og:url" content="http://example.com/2024/02/29/note/cpp/%E8%99%9A%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="折纸飞向麦田的博客">
+<meta property="og:description" content="关于这块，检索到的资料大都模棱两可，可信度很存疑，对这块的理解停留在道听途说的层面，不够深刻。 想了想，可以从汇编角度，看看编译器究竟为实现虚函数在背后默默做了什么。 本文分析 gcc version 9.4.0 的虚函数的实现方式。 基本原理：一个类只要声明了一个虚函数，则编译器为该类生成一个虚函数表（vtable），虚函数表中主要是该类的虚函数的定义地址，由该类所有的对象共享。每个对象内部存一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240229091829.png">
+<meta property="article:published_time" content="2024-02-29T11:48:56.011Z">
+<meta property="article:modified_time" content="2024-02-29T11:48:56.011Z">
+<meta property="article:author" content="折纸飞向麦田">
+<meta property="article:tag" content="cpp">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240229091829.png">
+
+
+<link rel="canonical" href="http://example.com/2024/02/29/note/cpp/%E8%99%9A%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/02/29/note/cpp/%E8%99%9A%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/","path":"2024/02/29/note/cpp/虚函数实现原理/","title":"C++ 虚函数实现原理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>C++ 虚函数实现原理 | 折纸飞向麦田的博客</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?81afe862f494d24a95a49966a87c3b00"></script>
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">折纸飞向麦田的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8%E5%86%85%E5%AE%B9"><span class="nav-number">1.</span> <span class="nav-text">虚函数表内容</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E7%BC%96%E8%AF%91%E5%99%A8%E7%94%9F%E6%88%90%E6%B1%87%E7%BC%96%E4%BB%A3%E7%A0%81"><span class="nav-number">1.1.</span> <span class="nav-text">查看编译器生成汇编代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E6%9C%9F"><span class="nav-number">1.2.</span> <span class="nav-text">运行期</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GDB%E6%89%93%E5%8D%B0%E5%AF%B9%E8%B1%A1%E7%9A%84vtable"><span class="nav-number">1.2.1.</span> <span class="nav-text">GDB打印对象的vtable</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#gcc%E5%AF%BC%E5%87%BA%E7%B1%BB%E7%9A%84%E8%99%9A%E8%A1%A8%E6%9E%84%E6%88%90"><span class="nav-number">2.</span> <span class="nav-text">gcc导出类的虚表构成</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8%E5%9C%A8%E5%93%AA%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">虚函数表在哪？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8%E6%8C%87%E9%92%88%E5%9C%A8%E5%93%AA"><span class="nav-number">4.</span> <span class="nav-text">虚函数表指针在哪?</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E5%87%BD%E6%95%B0%E6%8C%87%E9%92%88%E7%A9%B6%E7%AB%9F%E5%9C%A8%E5%AF%B9%E8%B1%A1%E4%B8%AD%E5%93%AA%E9%87%8C%E5%AD%98%E7%9A%84"><span class="nav-number">5.</span> <span class="nav-text">虚函数指针究竟在对象中哪里存的?</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%9A%E7%BB%A7%E6%89%BF%E8%99%9A%E5%87%BD%E6%95%B0%E6%8C%87%E9%92%88%E6%80%8E%E4%B9%88%E5%88%86%E5%B8%83%EF%BC%9F"><span class="nav-number">6.</span> <span class="nav-text">多继承虚函数指针怎么分布？</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">折纸飞向麦田</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/29/note/cpp/%E8%99%9A%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="C++ 虚函数实现原理 | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++ 虚函数实现原理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-29 19:48:56" itemprop="dateCreated datePublished" datetime="2024-02-29T19:48:56+08:00">2024-02-29</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>8.1k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>13 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>关于这块，检索到的资料大都模棱两可，可信度很存疑，对这块的理解停留在道听途说的层面，不够深刻。</p>
+<p>想了想，可以从汇编角度，看看编译器究竟为实现虚函数在背后默默做了什么。</p>
+<p>本文分析 <code>gcc version 9.4.0</code> 的虚函数的实现方式。</p>
+<p>基本原理：一个类只要声明了一个虚函数，则编译器为该类生成一个虚函数表（vtable），虚函数表中主要是该类的虚函数的定义地址，由该类所有的对象共享。每个对象内部存一个虚函数表指针（vptr）指向该vtable。</p>
+<p>因此需要明确：虚函数表是属于类的，虚函数指针是属于单个对象。</p>
+<p>注意：c++标准没有规定必须用虚函数表这种形式实现，只是大多数编译器采用这种实现方式。</p>
+<h1 id="虚函数表内容"><a href="#虚函数表内容" class="headerlink" title="虚函数表内容"></a>虚函数表内容</h1><p>首先，看下虚函数表中究竟有什么。</p>
+<h2 id="查看编译器生成汇编代码"><a href="#查看编译器生成汇编代码" class="headerlink" title="查看编译器生成汇编代码"></a>查看编译器生成汇编代码</h2><p>测试代码:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// demo.cpp</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span> : <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Base* p = <span class="keyword">new</span> <span class="built_in">Derived</span>();</span><br><span class="line">    p-&gt;<span class="built_in">foo</span>();</span><br><span class="line">    p-&gt;<span class="built_in">bar</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用 -S 指示g++编译成功后立刻打住，保留汇编代码，不进行下一步汇编代码转二进制机器码的步骤。</p>
+<p>注意：g++ -S 输出的汇编代码中所有符号均已 name-mangled，因此需要用 c++filt 还原符号。</p>
+<p>将可读的汇编代码存到 demo.s 中</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">g++ -S -g demo.cpp -o demo.mangled.s</span><br><span class="line"><span class="built_in">cat</span> demo.mangled.s | c++filt &gt; demo.s</span><br></pre></td></tr></table></figure>
+
+<p>从汇编代码中摘出Base和Derived类的虚函数表。</p>
+<ul>
+<li><code>.quad expr</code> 告知汇编器开辟8字节内存空间，填充 expr</li>
+<li><code>.section</code> 指明该符号放在哪个section</li>
+</ul>
+<p>Derived的虚表大小共4*8 &#x3D; 32字节，后两个8字节是 <code>Derived::foo()</code> 与 <code>Base::bar()</code> 这两个符号的地址。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">vtable <span class="keyword">for</span> Derived:</span><br><span class="line">	.quad	<span class="number">0</span></span><br><span class="line">	.quad	typeinfo <span class="keyword">for</span> Derived</span><br><span class="line">	.<span class="function">quad	<span class="title">Derived::foo</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	.quad	<span class="title">Base::bar</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	.weak	vtable <span class="keyword">for</span> Base</span></span><br><span class="line"><span class="function">	.section	.data.rel.ro.local._ZTV4Base,&quot;awG&quot;,@progbits,vtable <span class="keyword">for</span> Base,comdat</span></span><br><span class="line"><span class="function">	.align 8</span></span><br><span class="line"><span class="function">	.type	vtable <span class="keyword">for</span> Base, @object</span></span><br><span class="line"><span class="function">	.size	vtable <span class="keyword">for</span> Base, 32</span></span><br><span class="line"><span class="function">vtable <span class="keyword">for</span> Base:</span></span><br><span class="line"><span class="function">	.quad	<span class="number">0</span></span></span><br><span class="line"><span class="function">	.quad	typeinfo for Base</span></span><br><span class="line"><span class="function">	.quad	Base::foo()</span></span><br><span class="line"><span class="function">	.quad	Base::bar()</span></span><br><span class="line"><span class="function">	.weak	typeinfo for Derived</span></span><br><span class="line"><span class="function">	.section	.data.rel.ro._ZTI7Derived,<span class="string">&quot;awG&quot;</span>,@progbits,typeinfo for Derived,comdat</span></span><br><span class="line"><span class="function">	.align <span class="number">8</span></span></span><br><span class="line"><span class="function">	.type	typeinfo for Derived, @object</span></span><br><span class="line"><span class="function">	.size	typeinfo for Derived, <span class="number">24</span></span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="运行期"><a href="#运行期" class="headerlink" title="运行期"></a>运行期</h2><h3 id="GDB打印对象的vtable"><a href="#GDB打印对象的vtable" class="headerlink" title="GDB打印对象的vtable"></a>GDB打印对象的vtable</h3><p>最简单直观的一种方式，在GDB中，可直接打印运行时，对象的虚函数表</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span> : <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Base* p = <span class="keyword">new</span> <span class="built_in">Derived</span>();</span><br><span class="line">    p-&gt;<span class="built_in">foo</span>();</span><br><span class="line">    p-&gt;<span class="built_in">bar</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info vtbl p</span><br><span class="line">vtable <span class="keyword">for</span> <span class="string">&#x27;Base&#x27;</span> @ <span class="number">0x555555556d18</span> (subobject @ <span class="number">0x555555569eb0</span>):</span><br><span class="line">[<span class="number">0</span>]: <span class="number">0x555555554a72</span> &lt;Derived::<span class="built_in">foo</span>()&gt;</span><br><span class="line">[<span class="number">1</span>]: <span class="number">0x555555554a62</span> &lt;Base::<span class="built_in">bar</span>()&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>直接看下最终生成的可执行文件，正好对应于gcc -S给出的vtable中前四个.quad汇编指示，所以直接看gcc -S生成的vtable更直观</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">objdump -C -j .rodata -z -S demo</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]# objdump -C -j .rodata -z -S demo</span><br><span class="line"></span><br><span class="line">demo:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line">Disassembly of section .rodata:</span><br><span class="line"></span><br><span class="line">0000000000400b50 &lt;vtable for C&gt;:</span><br><span class="line">  400b50:       00 00 00 00 00 00 00 00 b0 0b 40 00 00 00 00 00     ..........@.....</span><br><span class="line">  400b60:       02 0a 40 00 00 00 00 00 aa 09 40 00 00 00 00 00     ..@.......@.....</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]# objdump -C -t demo | grep 400bb0</span><br><span class="line">0000000000400bb0  w    O .rodata        0000000000000018              typeinfo for C</span><br><span class="line">[root@ZLPC-wangqingjia demo]# objdump -C -t demo | grep 400a02</span><br><span class="line">0000000000400a02  w    F .text  000000000000002b              C::foo()</span><br><span class="line">[root@ZLPC-wangqingjia demo]# objdump -C -t demo | grep 4009aa</span><br><span class="line">00000000004009aa  w    F .text  000000000000002b              A::bar()</span><br></pre></td></tr></table></figure>
+
+<h1 id="gcc导出类的虚表构成"><a href="#gcc导出类的虚表构成" class="headerlink" title="gcc导出类的虚表构成"></a>gcc导出类的虚表构成</h1><p>For GCC compiler in Linux run:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -fdump-lang-<span class="keyword">class</span> <span class="title class_">demo</span>.cpp</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>NOTE: Before GCC 8, the option is -fdump-class-hierarchy instead of -fdump-lang-class.</p>
+</blockquote>
+<p>输出与gcc反汇编一致</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Vtable for C</span><br><span class="line">C::vtable for C: 4 entries</span><br><span class="line">0     (int (*)(...))0</span><br><span class="line">8     (int (*)(...))(&amp; typeinfo for C)</span><br><span class="line">16    (int (*)(...))C::foo</span><br><span class="line">24    (int (*)(...))A::bar</span><br></pre></td></tr></table></figure>
+
+<h1 id="虚函数表在哪？"><a href="#虚函数表在哪？" class="headerlink" title="虚函数表在哪？"></a>虚函数表在哪？</h1><p>在 .rodata</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -t 打印该section内symbol table</span></span><br><span class="line">[root@ZLPC-WangQingJia demo]<span class="comment"># objdump -C -t a.out | grep vtable</span></span><br><span class="line">0000000000400bb0  w    O .rodata        0000000000000020              vtable <span class="keyword">for</span> A</span><br><span class="line">0000000000601d40  w    O .data.rel.ro   0000000000000058              vtable <span class="keyword">for</span> __cxxabiv1::__class_type_info@@CXXABI_1.3</span><br><span class="line">0000000000400b70  w    O .rodata        0000000000000020              vtable <span class="keyword">for</span> C</span><br><span class="line">0000000000601da0  w    O .data.rel.ro   0000000000000058              vtable <span class="keyword">for</span> __cxxabiv1::__si_class_type_info@@CXXABI_1.3</span><br><span class="line">0000000000400b90  w    O .rodata        0000000000000020              vtable <span class="keyword">for</span> B</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="虚函数表指针在哪"><a href="#虚函数表指针在哪" class="headerlink" title="虚函数表指针在哪?"></a>虚函数表指针在哪?</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> </span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;A::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;A::bar&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span> : <span class="keyword">public</span> A</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;B::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span> : <span class="keyword">public</span> B</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;C::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    B* b = <span class="keyword">new</span> C;</span><br><span class="line">    b-&gt;<span class="built_in">foo</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一个指向多态对象的指针，指向成员变量连续内存的起始地址，但由于vptr在成员变量列表最开始位置，因此实际是指向vptr。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">(gdb) p/x $rbp</span><br><span class="line">$24 = 0x7ffffffed780</span><br><span class="line"></span><br><span class="line">(gdb) p b</span><br><span class="line">$22 = (B *) 0x603030</span><br><span class="line">(gdb) p &amp;b</span><br><span class="line">$23 = (B **) 0x7ffffffed760  # 说明基类指针b本身存在栈中</span><br><span class="line">(gdb) x/xg 0x603030</span><br><span class="line">0x603030:       0x0000000000400b90  # 0x603030 应是虚函数表指针的地址，即 p 指向虚函数指针</span><br><span class="line">(gdb) x/xg 0x0000000000400b90</span><br><span class="line">0x400b90 &lt;_ZTV1C+16&gt;:   0x0000000000400a2e # 0x400b90 是虚表函数指针数组首个元素地址</span><br><span class="line">(gdb) dem _ZTV1C</span><br><span class="line">vtable for C</span><br><span class="line">(gdb) x/xg 0x0000000000400a2e</span><br><span class="line">0x400a2e &lt;C::foo()&gt;:    0x10ec8348e5894855 # 注意： 0x10ec8348e5894855 其实是一串汇编指令</span><br></pre></td></tr></table></figure>
+
+
+<p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240229091829.png" alt="image.png"></p>
+<h1 id="虚函数指针究竟在对象中哪里存的"><a href="#虚函数指针究竟在对象中哪里存的" class="headerlink" title="虚函数指针究竟在对象中哪里存的?"></a>虚函数指针究竟在对象中哪里存的?</h1><p>反汇编指令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">g++ -g -O0 demo.cpp -o demo</span><br><span class="line"></span><br><span class="line">g++ -S -g -O0 demo.cpp -o demo.s.tmp</span><br><span class="line"><span class="built_in">cat</span> demo.s.tmp | c++filt &gt; demo.gcc.s</span><br><span class="line"><span class="built_in">rm</span> demo.s.tmp</span><br><span class="line"></span><br><span class="line">objdump -C -d -S demo &gt; demo.s</span><br><span class="line">objdump -C -t demo &gt; demo.sym</span><br><span class="line">objdump -C -j .rodata -z -S demo &gt; demo.rodata.s</span><br><span class="line"></span><br><span class="line">g++ -fdump-lang-class demo.cpp</span><br><span class="line"><span class="built_in">cat</span> demo.cpp.001l.class | c++filt &gt; demo.class</span><br><span class="line"><span class="built_in">rm</span> demo.cpp.001l.class</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> </span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;A::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;A::bar&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span> : <span class="keyword">public</span> A</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;B::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span> : <span class="keyword">public</span> B</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">10</span>;</span><br><span class="line">    <span class="type">int</span> b = <span class="number">10</span>;</span><br><span class="line">    <span class="type">short</span> c = <span class="number">20</span>;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;C::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    A* a = <span class="keyword">new</span> <span class="built_in">C</span>();</span><br><span class="line">    a-&gt;<span class="built_in">foo</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在堆上构造含虚函数的对象</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">A* a = new C();</span><br><span class="line">     bc6:    bf 18 00 00 00           mov    $0x18,%edi       // 类大小为0x18=24字节</span><br><span class="line">     bcb:    e8 b0 fe ff ff           callq  a80 &lt;_init+0xa0&gt; // new 出内存</span><br><span class="line">     bd0:    48 89 c3                 mov    %rax,%rbx        // 申请的地址在 %rax 中</span><br><span class="line">     bd3:    48 c7 03 00 00 00 00     movq   $0x0,(%rbx)      // 类C虚函数表vptr</span><br><span class="line">     bda:    c7 43 08 00 00 00 00     movl   $0x0,0x8(%rbx)   // int a</span><br><span class="line">     be1:    c7 43 0c 00 00 00 00     movl   $0x0,0xc(%rbx)   // int b</span><br><span class="line">     be8:    66 c7 43 10 00 00        movw   $0x0,0x10(%rbx)  // short c </span><br><span class="line">     bee:    48 89 df                 mov    %rbx,%rdi        // 将对象的起始地址(在%rbx中暂存)传入C::C()构造函数</span><br><span class="line">     bf1:    e8 c6 01 00 00           callq  dbc &lt;C::C()&gt;</span><br></pre></td></tr></table></figure>
+
+<p>new出内存之后，调用 C::C() 构造对象之前：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(gdb) x/24xb $rbx</span><br><span class="line">0x555555569eb0: 0x00    0x00    0x00    0x00    0x00    0x00    0x00    0x00</span><br><span class="line">0x555555569eb8: 0x00    0x00    0x00    0x00    0x00    0x00    0x00    0x00</span><br><span class="line">0x555555569ec0: 0x00    0x00    0x00    0x00    0x00    0x00    0x00    0x00</span><br></pre></td></tr></table></figure>
+
+<p>调用 C::C() 之后</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">(gdb) x/24xb $rbx</span><br><span class="line">0x555555569eb0: 0xc8    0x6c    0x55    0x55    0x55    0x55    0x00    0x00</span><br><span class="line">0x555555569eb8: 0x0a    0x00    0x00    0x00    0x0a    0x00    0x00    0x00</span><br><span class="line">0x555555569ec0: 0x14    0x00    0x00    0x00    0x00    0x00    0x00    0x00</span><br><span class="line"></span><br><span class="line">// 最开头的8字节是vptr for C</span><br><span class="line">(gdb) x/gx 0x555555556cc8</span><br><span class="line">0x555555556cc8 &lt;_ZTV1C+16&gt;:     0x0000555555554d34</span><br><span class="line">(gdb) dem _ZTV1C</span><br><span class="line">vtable for C</span><br><span class="line">(gdb) x/gx 0x0000555555554d34</span><br><span class="line">0x555555554d34 &lt;C::foo()&gt;:      0xe5894855fa1e0ff3</span><br><span class="line"></span><br><span class="line">// 接下来8字节分别是 int a = 10 = 0x0a 和 int b = 10 = 0x0a</span><br><span class="line"></span><br><span class="line">// 最后8字节的低2字节: 0x14 = 20 即 int c = 20;</span><br></pre></td></tr></table></figure>
+
+<h1 id="多继承虚函数指针怎么分布？"><a href="#多继承虚函数指针怎么分布？" class="headerlink" title="多继承虚函数指针怎么分布？"></a>多继承虚函数指针怎么分布？</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> </span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">aFunc1</span><span class="params">()</span> </span>&#123; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">aFunc2</span><span class="params">()</span> </span>&#123; &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">aFunc3</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bFunc1</span><span class="params">()</span> </span>&#123; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bFunc2</span><span class="params">()</span> </span>&#123; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">D</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">dFunc1</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">dFunc2</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">E</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">eFunc1</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">eFunc2</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span> : <span class="keyword">public</span> A, <span class="keyword">public</span> B, <span class="keyword">public</span> D, <span class="keyword">public</span> E</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">aFunc2</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">cFunc1</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">dFunc1</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>gcc导出vtable</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">g++ -fdump-lang-<span class="keyword">class</span> <span class="title class_">demo</span>.cpp</span><br><span class="line">cat demo.cpp<span class="number">.001l</span>.<span class="keyword">class</span> | c++filt &gt; demo.<span class="keyword">class</span>  # 导出为demo.<span class="keyword">class</span></span><br><span class="line"><span class="title class_">rm</span> demo.cpp<span class="number">.001l</span>.<span class="keyword">class</span></span><br></pre></td></tr></table></figure>
+
+<p>C类继承4个父类，类C本身的虚函数跟在第一个父类指针数组后面，其余父类的虚函数依次排列，每个C类的对象含4个vptr，分别指向C类虚函表数组的四个地址。注意是全指向C类的虚表数组，数组中存的是虚函数地址，不涉及父类虚表。编译期就确定了某个类的虚表分布与构成。</p>
+<ol>
+<li>vtable+16</li>
+<li>vtable+64</li>
+<li>vtable+96</li>
+<li>vtable+128</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">Vtable <span class="keyword">for</span> C</span><br><span class="line">C::vtable <span class="keyword">for</span> C: <span class="number">18</span> entries</span><br><span class="line"><span class="number">0</span>     (<span class="built_in">int</span> (*)(...))<span class="number">0</span></span><br><span class="line"><span class="number">8</span>     (<span class="built_in">int</span> (*)(...))(&amp; typeinfo <span class="keyword">for</span> C)</span><br><span class="line"><span class="number">16</span>    (<span class="built_in">int</span> (*)(...))A::aFunc1</span><br><span class="line"><span class="number">24</span>    (<span class="built_in">int</span> (*)(...))C::aFunc2</span><br><span class="line"><span class="number">32</span>    (<span class="built_in">int</span> (*)(...))C::cFunc1</span><br><span class="line"><span class="number">40</span>    (<span class="built_in">int</span> (*)(...))C::dFunc1</span><br><span class="line"><span class="number">48</span>    (<span class="built_in">int</span> (*)(...))<span class="number">-8</span></span><br><span class="line"><span class="number">56</span>    (<span class="built_in">int</span> (*)(...))(&amp; typeinfo <span class="keyword">for</span> C)</span><br><span class="line"><span class="number">64</span>    (<span class="built_in">int</span> (*)(...))B::bFunc1</span><br><span class="line"><span class="number">72</span>    (<span class="built_in">int</span> (*)(...))B::bFunc2</span><br><span class="line"><span class="number">80</span>    (<span class="built_in">int</span> (*)(...))<span class="number">-16</span></span><br><span class="line"><span class="number">88</span>    (<span class="built_in">int</span> (*)(...))(&amp; typeinfo <span class="keyword">for</span> C)</span><br><span class="line"><span class="number">96</span>    (<span class="built_in">int</span> (*)(...))C::non-<span class="function"><span class="keyword">virtual</span> thunk to <span class="title">C::dFunc1</span><span class="params">()</span></span></span><br><span class="line"><span class="function">104   <span class="params">(<span class="type">int</span> (*)(...))</span>D::dFunc2</span></span><br><span class="line"><span class="function">112   <span class="params">(<span class="type">int</span> (*)(...))</span>-24</span></span><br><span class="line"><span class="function">120   <span class="params">(<span class="type">int</span> (*)(...))</span><span class="params">(&amp; typeinfo <span class="keyword">for</span> C)</span></span></span><br><span class="line"><span class="function">128   <span class="params">(<span class="type">int</span> (*)(...))</span>E::eFunc1</span></span><br><span class="line"><span class="function">136   <span class="params">(<span class="type">int</span> (*)(...))</span>E::eFunc2</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">Class C</span></span><br><span class="line"><span class="function">   size</span>=<span class="number">32</span> align=<span class="number">8</span></span><br><span class="line">   base size=<span class="number">32</span> base align=<span class="number">8</span></span><br><span class="line"><span class="built_in">C</span> (<span class="number">0x0</span>x7fa0d22ea900) <span class="number">0</span></span><br><span class="line">    vptr=((&amp; C::vtable <span class="keyword">for</span> C) + <span class="number">16</span>)</span><br><span class="line">  <span class="built_in">A</span> (<span class="number">0x0</span>x7fa0d2424e40) <span class="number">0</span> nearly-empty</span><br><span class="line">      primary-<span class="keyword">for</span> <span class="built_in">C</span> (<span class="number">0x0</span>x7fa0d22ea900)</span><br><span class="line">  <span class="built_in">B</span> (<span class="number">0x0</span>x7fa0d2424ea0) <span class="number">8</span> nearly-empty</span><br><span class="line">      vptr=((&amp; C::vtable <span class="keyword">for</span> C) + <span class="number">64</span>)</span><br><span class="line">  <span class="built_in">D</span> (<span class="number">0x0</span>x7fa0d2424f00) <span class="number">16</span> nearly-empty</span><br><span class="line">      vptr=((&amp; C::vtable <span class="keyword">for</span> C) + <span class="number">96</span>)</span><br><span class="line">  <span class="built_in">E</span> (<span class="number">0x0</span>x7fa0d2424f60) <span class="number">24</span> nearly-empty</span><br><span class="line">      vptr=((&amp; C::vtable <span class="keyword">for</span> C) + <span class="number">128</span>)</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/cpp/" rel="tag"># cpp</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/02/29/note/algo/%E5%93%88%E5%B8%8C%E5%86%B2%E7%AA%81/" rel="prev" title="哈希冲突处理">
+                  <i class="fa fa-angle-left"></i> 哈希冲突处理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/02/29/note/linux/soft_link_and_hard_link/" rel="next" title="Linux软链接和硬链接用法及区别">
+                  Linux软链接和硬链接用法及区别 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">折纸飞向麦田</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

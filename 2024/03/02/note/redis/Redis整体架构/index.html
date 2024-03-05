@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="基于 Redis 7.0.0 目录结构从目录结构可以了解一个系统的主要组成部分。 deps1234567deps&#x2F;├── fpconv├── hdr_histogram├── hiredis   &#x2F;&#x2F; Redis C 客户端├── jemalloc  &#x2F;&#x2F; Redis使用了jemalloc库替换了glibc库的内存分配器├── linenoise &#x2F;&#x2F; 类似readline└── lua">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis源码结构概览">
+<meta property="og:url" content="http://example.com/2024/03/02/note/redis/Redis%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84/index.html">
+<meta property="og:site_name" content="折纸飞向麦田的博客">
+<meta property="og:description" content="基于 Redis 7.0.0 目录结构从目录结构可以了解一个系统的主要组成部分。 deps1234567deps&#x2F;├── fpconv├── hdr_histogram├── hiredis   &#x2F;&#x2F; Redis C 客户端├── jemalloc  &#x2F;&#x2F; Redis使用了jemalloc库替换了glibc库的内存分配器├── linenoise &#x2F;&#x2F; 类似readline└── lua">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240302162406.png">
+<meta property="article:published_time" content="2024-03-02T08:04:02.032Z">
+<meta property="article:modified_time" content="2024-03-05T03:46:20.996Z">
+<meta property="article:author" content="折纸飞向麦田">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240302162406.png">
+
+
+<link rel="canonical" href="http://example.com/2024/03/02/note/redis/Redis%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/03/02/note/redis/Redis%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84/","path":"2024/03/02/note/redis/Redis整体架构/","title":"Redis源码结构概览"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Redis源码结构概览 | 折纸飞向麦田的博客</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?81afe862f494d24a95a49966a87c3b00"></script>
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">折纸飞向麦田的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">目录结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#deps"><span class="nav-number">1.1.</span> <span class="nav-text">deps</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#src"><span class="nav-number">1.2.</span> <span class="nav-text">src</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tests"><span class="nav-number">1.3.</span> <span class="nav-text">tests</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#utils"><span class="nav-number">1.4.</span> <span class="nav-text">utils</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#redis-conf"><span class="nav-number">1.5.</span> <span class="nav-text">redis.conf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sentinel-conf"><span class="nav-number">1.6.</span> <span class="nav-text">sentinel.conf</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97%E4%B8%8E%E6%BA%90%E7%A0%81%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB"><span class="nav-number">2.</span> <span class="nav-text">功能模块与源码对应关系</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8B"><span class="nav-number">2.1.</span> <span class="nav-text">服务器实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%B8%8E%E6%93%8D%E4%BD%9C"><span class="nav-number">2.2.</span> <span class="nav-text">数据类型与操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E5%8F%AF%E9%9D%A0%E4%B8%8E%E9%AB%98%E5%8F%AF%E6%89%A9%E5%B1%95"><span class="nav-number">2.3.</span> <span class="nav-text">高可靠与高可扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BE%85%E5%8A%A9%E5%B7%A5%E5%85%B7"><span class="nav-number">2.4.</span> <span class="nav-text">辅助工具</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">折纸飞向麦田</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/02/note/redis/Redis%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Redis源码结构概览 | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis源码结构概览
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-03-02 16:04:02" itemprop="dateCreated datePublished" datetime="2024-03-02T16:04:02+08:00">2024-03-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-03-05 11:46:20" itemprop="dateModified" datetime="2024-03-05T11:46:20+08:00">2024-03-05</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.1k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>基于 Redis 7.0.0</p>
+<h1 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h1><p>从目录结构可以了解一个系统的主要组成部分。</p>
+<h2 id="deps"><a href="#deps" class="headerlink" title="deps"></a>deps</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">deps/</span><br><span class="line">├── fpconv</span><br><span class="line">├── hdr_histogram</span><br><span class="line">├── hiredis   // Redis C 客户端</span><br><span class="line">├── jemalloc  // Redis使用了jemalloc库替换了glibc库的内存分配器</span><br><span class="line">├── linenoise // 类似readline</span><br><span class="line">└── lua       // lua源码</span><br></pre></td></tr></table></figure>
+
+<h2 id="src"><a href="#src" class="headerlink" title="src"></a>src</h2><p>Redis的源码文件都是在src目录下，没有再分下一级子目录。<br>Redis的功能模块实现是典型的C语言风格，不同功能模块之间不再设置目录分隔，而是通过头文件包含来相互调用。<br>好处是：这样模块相互间的相互引用很方便。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">      ---&gt; modules 实例代码</span><br><span class="line">src --|</span><br><span class="line">      ---&gt; 各功能模块源码</span><br></pre></td></tr></table></figure>
+
+<h2 id="tests"><a href="#tests" class="headerlink" title="tests"></a>tests</h2><p>测试用例用 <code>TCL</code> 编写。<code>assets</code>、<code>helpers</code>、<code>modules</code> 和 <code>support</code> 用来支持测试功能。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">tests/</span><br><span class="line">├── assets</span><br><span class="line">├── cluster      // 集群测试</span><br><span class="line">├── helpers</span><br><span class="line">├── integration  // 主从复制测试</span><br><span class="line">├── modules</span><br><span class="line">├── sentinel     // 哨兵功能测试</span><br><span class="line">├── support</span><br><span class="line">├── tmp</span><br><span class="line">└── unit         // 单元测试</span><br><span class="line"></span><br><span class="line">9 directories</span><br></pre></td></tr></table></figure>
+
+<h2 id="utils"><a href="#utils" class="headerlink" title="utils"></a>utils</h2><p>辅助工具</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">utils/</span><br><span class="line">├── create-cluster</span><br><span class="line">├── graphs</span><br><span class="line">├── hyperloglog</span><br><span class="line">├── lru</span><br><span class="line">├── releasetools</span><br><span class="line">└── srandmember</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="redis-conf"><a href="#redis-conf" class="headerlink" title="redis.conf"></a>redis.conf</h2><p>单个Redis实例的配置</p>
+<h2 id="sentinel-conf"><a href="#sentinel-conf" class="headerlink" title="sentinel.conf"></a>sentinel.conf</h2><p>哨兵的配置</p>
+<h1 id="功能模块与源码对应关系"><a href="#功能模块与源码对应关系" class="headerlink" title="功能模块与源码对应关系"></a>功能模块与源码对应关系</h1><h2 id="服务器实例"><a href="#服务器实例" class="headerlink" title="服务器实例"></a>服务器实例</h2><p>Redis-server的 <code>main()</code> 在 <code>server.h/c</code></p>
+<p>网络通信</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ae.h/c,</span><br><span class="line">ae_epoll.c,</span><br><span class="line">ae_evport.c,</span><br><span class="line">ae_kqueue.c,</span><br><span class="line">ae_select.c</span><br><span class="line">anet.h/c     // tcp socket</span><br><span class="line">networking.c // redis client</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据类型与操作"><a href="#数据类型与操作" class="headerlink" title="数据类型与操作"></a>数据类型与操作</h2><p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240302162406.png"></p>
+<p>数据库操作 <code>db.c</code><br>内存分配器 <code>zmalloc.h/c</code><br>key过期处理 <code>expire.c</code><br>为避免大量key同时过期，异步删除 <code>lazyfree.c</code><br>内存满了，key的lru淘汰 <code>evict.c</code></p>
+<h2 id="高可靠与高可扩展"><a href="#高可靠与高可扩展" class="headerlink" title="高可靠与高可扩展"></a>高可靠与高可扩展</h2><p>高可靠：</p>
+<ul>
+<li>持久化 <code>rdb.h/c</code>, <code>aof.c</code></li>
+<li>校验RDB和AOF文件 <code>redis-check-rdb.c</code> 和 <code>redis-check-aof.c</code></li>
+<li>主从复制 <code>replication.c</code></li>
+<li>主从集群在进行恢复时，主要是依赖于哨兵机制 <code>sentinel.c</code></li>
+</ul>
+<p>高可扩展通过集群实现 <code>cluster.h/c</code></p>
+<h2 id="辅助工具"><a href="#辅助工具" class="headerlink" title="辅助工具"></a>辅助工具</h2><p>操作延迟监控 <code>latency.h/c</code><br>慢命令监控 <code>slowlog.h/c</code><br>性能测试 <code>redis-benchmark.c</code></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/redis/" rel="tag"># redis</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/02/29/note/linux/ftrace/" rel="prev" title="Linux Ftrace">
+                  <i class="fa fa-angle-left"></i> Linux Ftrace
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/03/04/note/redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/" rel="next" title="Redis数据结构的底层实现">
+                  Redis数据结构的底层实现 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">折纸飞向麦田</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
