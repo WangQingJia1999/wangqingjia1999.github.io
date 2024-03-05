@@ -179,7 +179,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/Universal%20Reference%20Forwarding%20Reference/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/Template%20Type%20Deduction%20/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -197,7 +197,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/Universal%20Reference%20Forwarding%20Reference/" class="post-title-link" itemprop="url">C++ Universal Reference vs Forwarding Reference</a>
+          <a href="/2024/02/19/note/cpp/Template%20Type%20Deduction%20/" class="post-title-link" itemprop="url">C++ 模板类型推导</a>
         </h2>
 
         <div class="post-meta-container">
@@ -225,7 +225,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>1.2k</span>
+      <span>1.3k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
@@ -243,28 +243,42 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="Universal-Reference-Forwarding-Reference"><a href="#Universal-Reference-Forwarding-Reference" class="headerlink" title="Universal Reference &#x2F; Forwarding Reference"></a>Universal Reference &#x2F; Forwarding Reference</h1><p>两个名词指同一个东西，Universal Reference 是 Scott Meyers 提出的，而标准用的是Forwarding Reference，来源：<a target="_blank" rel="noopener" href="https://stackoverflow.com/a/39552345/11850070">https://stackoverflow.com/a/39552345/11850070</a></p>
-<h1 id="什么是通用引用（Universal-Reference）"><a href="#什么是通用引用（Universal-Reference）" class="headerlink" title="什么是通用引用（Universal Reference）"></a>什么是通用引用（Universal Reference）</h1><p>T&amp;&amp;形式且有类型推导，有函数模板通用引用参数和auto通用引用，通用引用可以绑定左值或者右值，配合std::forward实现完美转发。</p>
-<h1 id="怎么辨别Universal-Reference"><a href="#怎么辨别Universal-Reference" class="headerlink" title="怎么辨别Universal Reference"></a>怎么辨别Universal Reference</h1><h2 id="函数模板"><a href="#函数模板" class="headerlink" title="函数模板"></a>函数模板</h2><ul>
-<li><p>一定要有类型推导</p>
+          <h1 id="Template-Type-Deduction"><a href="#Template-Type-Deduction" class="headerlink" title="Template Type Deduction"></a>Template Type Deduction</h1><p>例子见：<a target="_blank" rel="noopener" href="https://stackoverflow.com/a/47125430/11850070">https://stackoverflow.com/a/47125430/11850070</a></p>
+<p>用 godbolt 直接看生成汇编，call void f<int>(int&amp;) 尖括号里是T，圆括号里是ParamType。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(ParamType param)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">f</span>(expr);    <span class="comment">// deduce T and ParamType from expr</span></span><br></pre></td></tr></table></figure>
+
+<p>Three cases:</p>
 <ul>
-<li><p>std::vector::push_back没有类型推导，不是通用引用</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">Allocator</span> = allocator&lt;T&gt;&gt;</span><br><span class="line"><span class="keyword">class</span> vector &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">void</span> <span class="built_in">push_back</span>(T&amp;&amp; x);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">std::vector&lt;Widget&gt; v; <span class="comment">// 因为声明std::vector时就指明了T，没有类型推导</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 其实实例化后的类是如下，push_back的参数是rvalue ref,不是universal ref</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">vector</span>&lt;Widget, allocator&lt;Widget&gt;&gt; &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">push_back</span><span class="params">(Widget&amp;&amp; x)</span></span>; <span class="comment">// rvalue reference</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 但 emplace_back 是通用引用</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">Allocator</span> = allocator&lt;T&gt;&gt;</span><br><span class="line"><span class="keyword">class</span> vector &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span>... Args&gt;</span><br><span class="line">    <span class="type">void</span> <span class="built_in">emplace_back</span>(Args&amp;&amp;... args); <span class="comment">// emplace_back不依赖T，每处调用都要推断Args，因此是通用引用</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>ParamType is either a pointer or a reference, but not a universal reference.</li>
+<li>ParamType is a universal reference.</li>
+<li>ParamType is neither a pointer nor a reference.</li>
 </ul>
-</li>
-<li><p>一定要是T&amp;&amp;</p>
+<h1 id="Case-1-ParamType-is-or-but-not"><a href="#Case-1-ParamType-is-or-but-not" class="headerlink" title="Case 1: ParamType is * or &amp; but not &amp;&amp;"></a>Case 1: ParamType is * or &amp; but not &amp;&amp;</h1><ol>
+<li>If expr’s type is a reference, ignore the reference part.</li>
+<li>Then pattern-match expr’s type against ParamType to determine T.</li>
+</ol>
+<p>e.g.</p>
 <ul>
-<li><p>形式不对：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(std::vector&lt;T&gt;&amp;&amp; param)</span></span>; <span class="comment">// param is an rvalue reference</span></span><br></pre></td></tr></table></figure>
+<li><a target="_blank" rel="noopener" href="https://godbolt.org/z/11bhh1fob">https://godbolt.org/z/11bhh1fob</a></li>
+</ul>
+<h1 id="Case-2-ParamType-is"><a href="#Case-2-ParamType-is" class="headerlink" title="Case 2: ParamType is &amp;&amp;"></a>Case 2: ParamType is &amp;&amp;</h1><ol>
+<li>If expr is an lvalue, both T and ParamType are deduced to be lvalue references.<ul>
+<li>That’s doubly unusual.<ol>
+<li>First, it’s the only situation in template type deduction<br>where <strong>T is deduced to be a reference</strong>. </li>
+<li>Second, although ParamType is declared using the syntax for an rvalue reference, its deduced type is an lvalue reference.</li>
+</ol>
 </li>
-<li><p>有const就不是了</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(<span class="type">const</span> T&amp;&amp; param)</span></span>; <span class="comment">// param is an rvalue reference</span></span><br></pre></td></tr></table></figure></li>
 </ul>
 </li>
-</ul>
-<h2 id="auto关键字"><a href="#auto关键字" class="headerlink" title="auto关键字"></a>auto关键字</h2><ul>
-<li>形式一定是 auto&amp;&amp;</li>
-</ul>
+<li>If expr is an rvalue,  ignore &amp;&amp; and pattern-match expr’s type against ParamType to determine T. That is when an rvalue is passed, T is deduced to be a non-reference.</li>
+</ol>
+<h1 id="Case-3-ParamType-is-neither-a-pointer-nor-a-reference"><a href="#Case-3-ParamType-is-neither-a-pointer-nor-a-reference" class="headerlink" title="Case 3: ParamType is neither a pointer nor a reference"></a>Case 3: ParamType is neither a pointer nor a reference</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(T param)</span></span>; <span class="comment">// param is passed by value</span></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>If the type of <code>expr</code> is a reference, ignore the reference part as before.</li>
+<li>After ignoring the reference-ness of <code>expr</code>, if it is <code>const</code>, ignore that as well. If it is <code>volatile</code>, ignore that too.</li>
+</ol>
+<p>总结就是忽略ref，const，volatile修饰。</p>
 
       
     </div>
