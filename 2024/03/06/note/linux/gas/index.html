@@ -21,27 +21,27 @@
     <meta name="description" content="备忘Linux下 AT&amp;T 汇编语法。 GAS文档GAS文档 hello world!汇编打印 “hello world” 123456789101112131415161718.section .data    hello_world:        .string &quot;Hello world!\n&quot;    hello_world_len &#x3D; . - hello_wor">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux GAS">
-<meta property="og:url" content="http://example.com/2024/02/23/note/linux/gas/index.html">
+<meta property="og:url" content="http://example.com/2024/03/06/note/linux/gas/index.html">
 <meta property="og:site_name" content="折纸飞向麦田的博客">
 <meta property="og:description" content="备忘Linux下 AT&amp;T 汇编语法。 GAS文档GAS文档 hello world!汇编打印 “hello world” 123456789101112131415161718.section .data    hello_world:        .string &quot;Hello world!\n&quot;    hello_world_len &#x3D; . - hello_wor">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240223064438.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240223064352.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240223064329.png">
-<meta property="article:published_time" content="2024-02-23T03:26:49.220Z">
-<meta property="article:modified_time" content="2024-02-23T03:26:49.220Z">
+<meta property="article:published_time" content="2024-03-06T12:05:32.263Z">
+<meta property="article:modified_time" content="2024-03-06T12:05:32.263Z">
 <meta property="article:author" content="折纸飞向麦田">
 <meta property="article:tag" content="linux">
-<meta property="article:tag" content="asm">
+<meta property="article:tag" content="汇编">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240223064438.png">
 
 
-<link rel="canonical" href="http://example.com/2024/02/23/note/linux/gas/">
+<link rel="canonical" href="http://example.com/2024/03/06/note/linux/gas/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/02/23/note/linux/gas/","path":"2024/02/23/note/linux/gas/","title":"Linux GAS"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/03/06/note/linux/gas/","path":"2024/03/06/note/linux/gas/","title":"Linux GAS"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>Linux GAS | 折纸飞向麦田的博客</title>
@@ -158,13 +158,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-count">63</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -191,7 +191,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/23/note/linux/gas/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/06/note/linux/gas/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -220,7 +220,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2024-02-23 11:26:49" itemprop="dateCreated datePublished" datetime="2024-02-23T11:26:49+08:00">2024-02-23</time>
+      <time title="创建时间：2024-03-06 20:05:32" itemprop="dateCreated datePublished" datetime="2024-03-06T20:05:32+08:00">2024-03-06</time>
     </span>
 
   
@@ -378,20 +378,20 @@
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/linux/" rel="tag"># linux</a>
-              <a href="/tags/asm/" rel="tag"># asm</a>
+              <a href="/tags/%E6%B1%87%E7%BC%96/" rel="tag"># 汇编</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2024/02/23/note/linux/xxd/" rel="prev" title="Linux xxd">
-                  <i class="fa fa-angle-left"></i> Linux xxd
+                <a href="/2024/03/06/note/cpp/%E5%86%85%E8%81%94%E6%B1%87%E7%BC%96/" rel="prev" title="C++内联汇编">
+                  <i class="fa fa-angle-left"></i> C++内联汇编
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2024/02/23/note/linux/Kprobe/" rel="next" title="Linux Kprobe">
-                  Linux Kprobe <i class="fa fa-angle-right"></i>
+                <a href="/2024/03/06/note/cpp/%E8%99%9A%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" rel="next" title="从汇编角度理解 C++ 虚函数实现原理">
+                  从汇编角度理解 C++ 虚函数实现原理 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
           </div>

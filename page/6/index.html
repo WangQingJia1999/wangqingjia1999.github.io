@@ -147,13 +147,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-count">63</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -170,6 +170,245 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/cpp%20lambda/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/cpp%20lambda/" class="post-title-link" itemprop="url">C++ lambda 中 mutable 关键字</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>6 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="lambda-“mutable”-keyword"><a href="#lambda-“mutable”-keyword" class="headerlink" title="lambda “mutable” keyword"></a>lambda “mutable” keyword</h1><p>lamda按值捕获的变量不能修改</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> x = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">auto</span> func = [x]() &#123;</span><br><span class="line">        ++x;</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">func</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">func</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">func</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">--------------------</span><br><span class="line">&lt;source&gt;: In lambda function:</span><br><span class="line">&lt;source&gt;:<span class="number">7</span>:<span class="number">11</span>: error: increment of read-only variable <span class="string">&#x27;x&#x27;</span></span><br><span class="line">    <span class="number">7</span> |         ++x;</span><br><span class="line">      |           ^</span><br></pre></td></tr></table></figure>
+
+<p>除非加上mutable</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> x = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">auto</span> func = [x]() <span class="keyword">mutable</span> &#123;</span><br><span class="line">        ++x;</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">func</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">func</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">func</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">--------------------</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<p>You have to understand what capture means! it’s capturing not argument passing! let’s look at some code samples:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> x = <span class="number">5</span>;</span><br><span class="line">    <span class="type">int</span> y;</span><br><span class="line">    <span class="keyword">auto</span> lamb = [x]() &#123;<span class="keyword">return</span> x + <span class="number">5</span>; &#125;;</span><br><span class="line"></span><br><span class="line">    y= <span class="built_in">lamb</span>();</span><br><span class="line">    cout &lt;&lt; y&lt;&lt;<span class="string">&quot;,&quot;</span>&lt;&lt; x &lt;&lt; endl; <span class="comment">//outputs 10,5</span></span><br><span class="line">    x = <span class="number">20</span>;</span><br><span class="line">    y = <span class="built_in">lamb</span>();</span><br><span class="line">    cout &lt;&lt; y &lt;&lt; <span class="string">&quot;,&quot;</span> &lt;&lt; x &lt;&lt; endl; <span class="comment">//output 10,20</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>两处lamb()调用其实用的同一个对象，且对象中按值捕获的成员x不能修改（operator()带有const修饰）。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="type">int</span> x = <span class="number">5</span>;</span><br><span class="line">  <span class="type">int</span> y;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">class</span> <span class="title class_">__lambda_9_17</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">public</span>: </span><br><span class="line">    <span class="keyword">inline</span> <span class="comment">/*constexpr */</span> <span class="function"><span class="type">int</span> <span class="title">operator</span><span class="params">()</span><span class="params">()</span> <span class="type">const</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> x + <span class="number">5</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>: </span><br><span class="line">    <span class="type">int</span> x;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">    __lambda_9_17(<span class="type">int</span> &amp; _x)</span><br><span class="line">    : x&#123;_x&#125;</span><br><span class="line">    &#123;&#125;</span><br><span class="line"></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  __lambda_9_17 lamb = __lambda_9_17&#123;x&#125;;</span><br><span class="line">  y = lamb.<span class="built_in">operator</span>()();</span><br><span class="line">  std::<span class="keyword">operator</span>&lt;&lt;(std::cout.<span class="keyword">operator</span>&lt;&lt;(y), <span class="string">&quot;,&quot;</span>).<span class="keyword">operator</span>&lt;&lt;(x).<span class="keyword">operator</span>&lt;&lt;(std::endl);</span><br><span class="line">  x = <span class="number">20</span>;</span><br><span class="line">  y = lamb.<span class="built_in">operator</span>()();</span><br><span class="line">  std::<span class="keyword">operator</span>&lt;&lt;(std::cout.<span class="keyword">operator</span>&lt;&lt;(y), <span class="string">&quot;,&quot;</span>).<span class="keyword">operator</span>&lt;&lt;(x).<span class="keyword">operator</span>&lt;&lt;(std::endl);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>As you can see even though <code>x</code> has been changed to <code>20</code> the lambda is still returning 10 ( <code>x</code> is still <code>5</code> inside the lambda) Changing <code>x</code> inside the lambda means changing the lambda itself at each call (the lambda is mutating at each call). To enforce correctness the standard introduced the <code>mutable</code> keyword. By specifying a lambda as mutable you are saying that each call to the lambda could cause a change in the lambda itself. Let see another example:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> x = <span class="number">5</span>;</span><br><span class="line">    <span class="type">int</span> y;</span><br><span class="line">    <span class="keyword">auto</span> lamb = [x]() <span class="keyword">mutable</span> &#123;<span class="keyword">return</span> x++ + <span class="number">5</span>; &#125;;</span><br><span class="line"></span><br><span class="line">    y= <span class="built_in">lamb</span>();</span><br><span class="line">    cout &lt;&lt; y&lt;&lt;<span class="string">&quot;,&quot;</span>&lt;&lt; x &lt;&lt; endl; <span class="comment">//outputs 10,5</span></span><br><span class="line">    x = <span class="number">20</span>;</span><br><span class="line">    y = <span class="built_in">lamb</span>();</span><br><span class="line">    cout &lt;&lt; y &lt;&lt; <span class="string">&quot;,&quot;</span> &lt;&lt; x &lt;&lt; endl; <span class="comment">//outputs 11,20</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>加了mutable后，operator()没有const修饰，可以在内部修改按值捕获的x</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="type">int</span> x = <span class="number">5</span>;</span><br><span class="line">  <span class="type">int</span> y;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">class</span> <span class="title class_">__lambda_9_17</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">public</span>: </span><br><span class="line">    <span class="keyword">inline</span> <span class="comment">/*constexpr */</span> <span class="function"><span class="type">int</span> <span class="title">operator</span><span class="params">()</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> x++ + <span class="number">5</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>: </span><br><span class="line">    <span class="type">int</span> x;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">    __lambda_9_17(<span class="type">int</span> &amp; _x)</span><br><span class="line">    : x&#123;_x&#125;</span><br><span class="line">    &#123;&#125;</span><br><span class="line"></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  __lambda_9_17 lamb = __lambda_9_17&#123;x&#125;;</span><br><span class="line">  y = lamb.<span class="built_in">operator</span>()();</span><br><span class="line">  std::<span class="keyword">operator</span>&lt;&lt;(std::cout.<span class="keyword">operator</span>&lt;&lt;(y), <span class="string">&quot;,&quot;</span>).<span class="keyword">operator</span>&lt;&lt;(x).<span class="keyword">operator</span>&lt;&lt;(std::endl);</span><br><span class="line">  x = <span class="number">20</span>;</span><br><span class="line">  y = lamb.<span class="built_in">operator</span>()();</span><br><span class="line">  std::<span class="keyword">operator</span>&lt;&lt;(std::cout.<span class="keyword">operator</span>&lt;&lt;(y), <span class="string">&quot;,&quot;</span>).<span class="keyword">operator</span>&lt;&lt;(x).<span class="keyword">operator</span>&lt;&lt;(std::endl);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>The above example shows that by making the lambda mutable, changing <code>x</code> inside the lambda “mutates” the lambda at each call with a new value of <code>x</code> that has no thing to do with the actual value of <code>x</code> in the main function</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/cpp_inline/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/cpp_inline/" class="post-title-link" itemprop="url">C++ inline 关键字</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.7k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p><code>extern</code>, <code>static</code>, <code>inline</code> are linkage directives, used almost exclusively by the linker, not the compiler.</p>
+</blockquote>
+<ul>
+<li><p>static - the variable&#x2F;function name cannot be used in other translation units. Linker needs to make sure it doesn’t accidentally use a statically defined variable&#x2F;function from another translation unit.</p>
+</li>
+<li><p>extern - use this variable&#x2F;function name in this translation unit but don’t complain if it isn’t defined. The linker will sort it out and make sure all the code that tried to use some extern symbol has its address.</p>
+</li>
+<li><p>inline - this function will be defined in multiple translation units, don’t worry about it. The linker needs to make sure all translation units use a single instance of the variable&#x2F;function.</p>
+</li>
+</ul>
+<h1 id="inline-func"><a href="#inline-func" class="headerlink" title="inline func"></a>inline func</h1><h1 id="gcc-always-inline"><a href="#gcc-always-inline" class="headerlink" title="gcc always inline"></a>gcc always inline</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((always_inline)) <span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">10</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="汇编层面看inline"><a href="#汇编层面看inline" class="headerlink" title="汇编层面看inline"></a>汇编层面看inline</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line">__attribute__((always_inline)) <span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">10</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">10</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">foo</span>();</span><br><span class="line"></span><br><span class="line">    <span class="built_in">bar</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">bar</span>():</span><br><span class="line">        pushq   %rbp</span><br><span class="line">        movq    %rsp, %rbp</span><br><span class="line">        movl    $<span class="number">10</span>, <span class="number">-4</span>(%rbp)</span><br><span class="line">        nop</span><br><span class="line">        popq    %rbp</span><br><span class="line">        ret</span><br><span class="line">main:</span><br><span class="line">        pushq   %rbp</span><br><span class="line">        movq    %rsp, %rbp</span><br><span class="line">        subq    $<span class="number">16</span>, %rsp</span><br><span class="line"></span><br><span class="line">        movl    $<span class="number">10</span>, <span class="number">-4</span>(%rbp)  <span class="comment">// 调用被 inline 的foo()，省去了栈操作汇编指令</span></span><br><span class="line">        <span class="function">nop                    </span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">        call    <span class="title">bar</span><span class="params">()</span>          <span class="comment">// 调用没有 inline 的bar()</span></span></span><br><span class="line"><span class="function">        movl    $0, %eax</span></span><br><span class="line"><span class="function">        leave</span></span><br><span class="line"><span class="function">        ret</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="类成员函数是否全默认inline"><a href="#类成员函数是否全默认inline" class="headerlink" title="类成员函数是否全默认inline"></a>类成员函数是否全默认inline</h1><p>成员函数不是默认全inline。</p>
+<p>启用inline情况</p>
+<ul>
+<li>显式：用inline关键字</li>
+<li>隐式：在类声明时直接定义</li>
+</ul>
+<p>两种情况都必须将inline成员定义在头文件，除非是这个成员函数只用在一个特定的cpp文件中这种极其特殊的情况。因为如果把inline成员定义在cpp文件中，那么其他cpp调了该成员，链接器就报错 “undefined reference to xxx”. &#x2F;link</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">C</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 隐式inline: 在类的声明内定义</span></span><br><span class="line">    __attribute__((always_inline)) <span class="function"><span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="type">int</span> a = <span class="number">123</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 显式inline: 在类的声明外定义且加inline关键字</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">bar</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 显式inline: 在类的声明内定义且加inline关键字</span></span><br><span class="line">    __attribute__((always_inline)) <span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">yar</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="type">int</span> a = <span class="number">456</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">__attribute__((always_inline)) <span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">C::bar</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">234</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    C c;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">asm</span>(<span class="string">&quot;-------------------&quot;</span>);</span><br><span class="line">    c.<span class="built_in">foo</span>();</span><br><span class="line">    <span class="built_in">asm</span>(<span class="string">&quot;-------------------&quot;</span>);</span><br><span class="line">    c.<span class="built_in">bar</span>();</span><br><span class="line">    <span class="built_in">asm</span>(<span class="string">&quot;-------------------&quot;</span>);</span><br><span class="line">    c.<span class="built_in">yar</span>();</span><br><span class="line">    <span class="built_in">asm</span>(<span class="string">&quot;-------------------&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">main:</span><br><span class="line">        pushq   %rbp</span><br><span class="line">        movq    %rsp, %rbp</span><br><span class="line">        -------------------</span><br><span class="line">        movl    $<span class="number">123</span>, <span class="number">-12</span>(%rbp)</span><br><span class="line">        nop</span><br><span class="line">        -------------------</span><br><span class="line">        movl    $<span class="number">234</span>, <span class="number">-8</span>(%rbp)</span><br><span class="line">        nop</span><br><span class="line">        -------------------</span><br><span class="line">        movl    $<span class="number">456</span>, <span class="number">-4</span>(%rbp)</span><br><span class="line">        nop</span><br><span class="line">        -------------------</span><br><span class="line">        movl    $<span class="number">0</span>, %eax</span><br><span class="line">        popq    %rbp</span><br><span class="line">        ret</span><br></pre></td></tr></table></figure>
+
+<h1 id="类成员在cpp文件中用inline报错复现"><a href="#类成员在cpp文件中用inline报错复现" class="headerlink" title="类成员在cpp文件中用inline报错复现"></a>类成员在cpp文件中用inline报错复现</h1><p><code>inline.h</code></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> once</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">foo</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">bar</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><code>inline.cpp</code></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;inline.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">inline</span> __attribute__((always_inline)) <span class="function"><span class="type">void</span> <span class="title">C::foo</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;C::foo\n&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">C::bar</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;C::bar\n&quot;</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">foo</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>use-inline.cpp</code></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;inline.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    C c;</span><br><span class="line"></span><br><span class="line">    c.<span class="built_in">bar</span>();</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Uncomment the following line to see the error:</span></span><br><span class="line">    <span class="comment">// c.foo();</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ use-<span class="keyword">inline</span>.cpp <span class="keyword">inline</span>.cpp</span><br></pre></td></tr></table></figure>
+
+<h2 id="虚函数（virtual）可以是内联函数（inline）吗？"><a href="#虚函数（virtual）可以是内联函数（inline）吗？" class="headerlink" title="虚函数（virtual）可以是内联函数（inline）吗？"></a>虚函数（virtual）可以是内联函数（inline）吗？</h2>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -419,102 +658,6 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/cpp%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/cpp%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F/" class="post-title-link" itemprop="url">C++静态变量</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>262</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>1 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="存哪里了？"><a href="#存哪里了？" class="headerlink" title="存哪里了？"></a>存哪里了？</h1><ul>
-<li>未初始化或初始化为0的存 <code>.bss</code></li>
-<li>初始化为非0的存 <code>.data</code></li>
-</ul>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> s_null;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> s_0 = <span class="number">0</span>;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> s_1 = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// objdump -C -t demo | grep s_</span></span><br><span class="line"></span><br><span class="line"><span class="number">0000000000601034</span> l     O .bss   <span class="number">0000000000000004</span>              s_null</span><br><span class="line"><span class="number">0000000000601038</span> l     O .bss   <span class="number">0000000000000004</span>              s_0</span><br><span class="line"><span class="number">000000000060102</span>c l     O .data  <span class="number">0000000000000004</span>              s_1</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/cpp_volatile/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -609,6 +752,102 @@
 
 <p>这次乖乖取取内存中值，<code>some_int</code> 本身是存在栈内存中。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">.LC0:</span><br><span class="line">        .string &quot;foo()\n&quot;</span><br><span class="line">foo():</span><br><span class="line">        subq    $8, %rsp</span><br><span class="line">        movl    $6, %edx</span><br><span class="line">        movl    $.LC0, %esi</span><br><span class="line">        movl    $_ZSt4cout, %edi</span><br><span class="line">        call    std::basic_ostream&lt;char, std::char_traits&lt;char&gt; &gt;&amp; std::__ostream_insert&lt;char, std::char_traits&lt;char&gt; &gt;(std::basic_ostream&lt;char, std::char_traits&lt;char&gt; &gt;&amp;, char const*, long)</span><br><span class="line">        addq    $8, %rsp</span><br><span class="line">        ret</span><br><span class="line">main:</span><br><span class="line">        subq    $24, %rsp</span><br><span class="line">        movl    $100, 12(%rsp)</span><br><span class="line">        movl    12(%rsp), %eax</span><br><span class="line">        cmpl    $100, %eax</span><br><span class="line">        je      .L6</span><br><span class="line">.L4:</span><br><span class="line">        movl    $0, %eax</span><br><span class="line">        addq    $24, %rsp</span><br><span class="line">        ret</span><br><span class="line">.L6:</span><br><span class="line">        call    foo()</span><br><span class="line">        jmp     .L4</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/cpp%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/cpp%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F/" class="post-title-link" itemprop="url">C++静态变量</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>262</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>1 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="存哪里了？"><a href="#存哪里了？" class="headerlink" title="存哪里了？"></a>存哪里了？</h1><ul>
+<li>未初始化或初始化为0的存 <code>.bss</code></li>
+<li>初始化为非0的存 <code>.data</code></li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> s_null;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> s_0 = <span class="number">0</span>;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> s_1 = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// objdump -C -t demo | grep s_</span></span><br><span class="line"></span><br><span class="line"><span class="number">0000000000601034</span> l     O .bss   <span class="number">0000000000000004</span>              s_null</span><br><span class="line"><span class="number">0000000000601038</span> l     O .bss   <span class="number">0000000000000004</span>              s_0</span><br><span class="line"><span class="number">000000000060102</span>c l     O .data  <span class="number">0000000000000004</span>              s_1</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -1120,212 +1359,6 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">func(int, int, int, int, int, int):</span><br><span class="line"></span><br><span class="line">        pushq   %rbp</span><br><span class="line"></span><br><span class="line">        movq    %rsp, %rbp</span><br><span class="line"></span><br><span class="line">        movl    %edi, -4(%rbp)</span><br><span class="line"></span><br><span class="line">        movl    %esi, -8(%rbp)</span><br><span class="line"></span><br><span class="line">        movl    %edx, -12(%rbp)</span><br><span class="line"></span><br><span class="line">        movl    %ecx, -16(%rbp)</span><br><span class="line"></span><br><span class="line">        movl    %r8d, -20(%rbp)</span><br><span class="line"></span><br><span class="line">        movl    %r9d, -24(%rbp)</span><br><span class="line"></span><br><span class="line">        nop</span><br><span class="line"></span><br><span class="line">        popq    %rbp</span><br><span class="line"></span><br><span class="line">        ret</span><br><span class="line"></span><br><span class="line">main:</span><br><span class="line"></span><br><span class="line">        pushq   %rbp</span><br><span class="line"></span><br><span class="line">        movq    %rsp, %rbp</span><br><span class="line"></span><br><span class="line">        movl    $6, %r9d</span><br><span class="line"></span><br><span class="line">        movl    $5, %r8d</span><br><span class="line"></span><br><span class="line">        movl    $4, %ecx</span><br><span class="line"></span><br><span class="line">        movl    $3, %edx</span><br><span class="line"></span><br><span class="line">        movl    $2, %esi</span><br><span class="line"></span><br><span class="line">        movl    $1, %edi</span><br><span class="line"></span><br><span class="line">        call    func(int, int, int, int, int, int)</span><br><span class="line"></span><br><span class="line">        movl    $0, %eax</span><br><span class="line"></span><br><span class="line">        popq    %rbp</span><br><span class="line"></span><br><span class="line">        ret</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <h1 id="Return-value"><a href="#Return-value" class="headerlink" title="Return value"></a>Return value</h1><p>on x86 the EAX register is normally used for return values. On x86-64, it’s RAX.</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/CMake%20/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/CMake%20/" class="post-title-link" itemprop="url">CMake备忘</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-02-28 20:33:18" itemprop="dateModified" datetime="2024-02-28T20:33:18+08:00">2024-02-28</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>213</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>1 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>add cxx flags for a target</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">target_compile_options(scope_lock_exe PRIVATE -std=c++20 -Wall -Wextra -pedantic-errors -fsanitize=thread -g)</span><br><span class="line">target_link_libraries(scope_lock_exe PRIVATE tsan)</span><br></pre></td></tr></table></figure>
-
-<p>list all targets</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmake --build . --target help</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/Universal%20Reference%20Forwarding%20Reference/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/Universal%20Reference%20Forwarding%20Reference/" class="post-title-link" itemprop="url">C++ Universal Reference vs Forwarding Reference</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>1.2k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>2 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="Universal-Reference-Forwarding-Reference"><a href="#Universal-Reference-Forwarding-Reference" class="headerlink" title="Universal Reference &#x2F; Forwarding Reference"></a>Universal Reference &#x2F; Forwarding Reference</h1><p>两个名词指同一个东西，Universal Reference 是 Scott Meyers 提出的，而标准用的是Forwarding Reference，来源：<a target="_blank" rel="noopener" href="https://stackoverflow.com/a/39552345/11850070">https://stackoverflow.com/a/39552345/11850070</a></p>
-<h1 id="什么是通用引用（Universal-Reference）"><a href="#什么是通用引用（Universal-Reference）" class="headerlink" title="什么是通用引用（Universal Reference）"></a>什么是通用引用（Universal Reference）</h1><p>T&amp;&amp;形式且有类型推导，有函数模板通用引用参数和auto通用引用，通用引用可以绑定左值或者右值，配合std::forward实现完美转发。</p>
-<h1 id="怎么辨别Universal-Reference"><a href="#怎么辨别Universal-Reference" class="headerlink" title="怎么辨别Universal Reference"></a>怎么辨别Universal Reference</h1><h2 id="函数模板"><a href="#函数模板" class="headerlink" title="函数模板"></a>函数模板</h2><ul>
-<li><p>一定要有类型推导</p>
-<ul>
-<li><p>std::vector::push_back没有类型推导，不是通用引用</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">Allocator</span> = allocator&lt;T&gt;&gt;</span><br><span class="line"><span class="keyword">class</span> vector &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">void</span> <span class="built_in">push_back</span>(T&amp;&amp; x);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">std::vector&lt;Widget&gt; v; <span class="comment">// 因为声明std::vector时就指明了T，没有类型推导</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 其实实例化后的类是如下，push_back的参数是rvalue ref,不是universal ref</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">vector</span>&lt;Widget, allocator&lt;Widget&gt;&gt; &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">push_back</span><span class="params">(Widget&amp;&amp; x)</span></span>; <span class="comment">// rvalue reference</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 但 emplace_back 是通用引用</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">Allocator</span> = allocator&lt;T&gt;&gt;</span><br><span class="line"><span class="keyword">class</span> vector &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span>... Args&gt;</span><br><span class="line">    <span class="type">void</span> <span class="built_in">emplace_back</span>(Args&amp;&amp;... args); <span class="comment">// emplace_back不依赖T，每处调用都要推断Args，因此是通用引用</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>一定要是T&amp;&amp;</p>
-<ul>
-<li><p>形式不对：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(std::vector&lt;T&gt;&amp;&amp; param)</span></span>; <span class="comment">// param is an rvalue reference</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>有const就不是了</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(<span class="type">const</span> T&amp;&amp; param)</span></span>; <span class="comment">// param is an rvalue reference</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ul>
-<h2 id="auto关键字"><a href="#auto关键字" class="headerlink" title="auto关键字"></a>auto关键字</h2><ul>
-<li>形式一定是 auto&amp;&amp;</li>
-</ul>
 
       
     </div>

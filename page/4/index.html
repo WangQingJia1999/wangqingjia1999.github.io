@@ -147,13 +147,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-count">63</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -170,6 +170,456 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/glibc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/linux/glibc/" class="post-title-link" itemprop="url">Linux glibc 编译</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.6k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="编译glibc"><a href="#编译glibc" class="headerlink" title="编译glibc"></a>编译glibc</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git://sourceware.org/git/glibc.git</span><br><span class="line"><span class="built_in">cd</span> glibc</span><br><span class="line">git checkout glibc-2.32</span><br><span class="line"><span class="built_in">mkdir</span> build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line"><span class="built_in">export</span> glibc_install=<span class="string">&quot;<span class="subst">$(pwd)</span>/install&quot;</span></span><br><span class="line">../configure --prefix <span class="string">&quot;<span class="variable">$glibc_install</span>&quot;</span></span><br><span class="line">make -j `<span class="built_in">nproc</span>`</span><br><span class="line">make install -j `<span class="built_in">nproc</span>`</span><br></pre></td></tr></table></figure>
+
+<h2 id="用linux自带的gcc编译程序并链接glibc"><a href="#用linux自带的gcc编译程序并链接glibc" class="headerlink" title="用linux自带的gcc编译程序并链接glibc"></a>用linux自带的gcc编译程序并链接glibc</h2><p>test_glibc.c</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;assert.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;gnu/libc-version.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdatomic.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;threads.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">atomic_int</span> acnt;</span><br><span class="line"><span class="type">int</span> cnt;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">f</span><span class="params">(<span class="type">void</span>* thr_data)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> n = <span class="number">0</span>; n &lt; <span class="number">1000</span>; ++n) &#123;</span><br><span class="line">        ++cnt;</span><br><span class="line">        ++acnt;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span> &#123;</span><br><span class="line">    <span class="comment">/* Basic library version check. */</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;gnu_get_libc_version() = %s\n&quot;</span>, gnu_get_libc_version());</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Exercise thrd_create from -pthread,</span></span><br><span class="line"><span class="comment">     * which is not present in glibc 2.27 in Ubuntu 18.04.</span></span><br><span class="line"><span class="comment">     * https://stackoverflow.com/questions/56810/how-do-i-start-threads-in-plain-c/52453291#52453291 */</span></span><br><span class="line">    <span class="type">thrd_t</span> thr[<span class="number">10</span>];</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> n = <span class="number">0</span>; n &lt; <span class="number">10</span>; ++n)</span><br><span class="line">        thrd_create(&amp;thr[n], f, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> n = <span class="number">0</span>; n &lt; <span class="number">10</span>; ++n)</span><br><span class="line">        thrd_join(thr[n], <span class="literal">NULL</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;The atomic counter is %u\n&quot;</span>, acnt);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;The non-atomic counter is %u\n&quot;</span>, cnt);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>test_glibc.sh</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env bash</span></span><br><span class="line"><span class="built_in">set</span> -eux</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> glibc_install=<span class="string">&quot;<span class="subst">$(pwd)</span>/build/install&quot;</span></span><br><span class="line"></span><br><span class="line">gcc \</span><br><span class="line">  -L <span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/lib&quot;</span> \</span><br><span class="line">  -I <span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/include&quot;</span> \</span><br><span class="line">  -Wl,--rpath=<span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/lib&quot;</span> \</span><br><span class="line">  -Wl,--dynamic-linker=<span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/lib/ld-linux-x86-64.so.2&quot;</span> \</span><br><span class="line">  -std=c11 \</span><br><span class="line">  -o test_glibc.out \</span><br><span class="line">  -v \</span><br><span class="line">  test_glibc.c \</span><br><span class="line">  -pthread \</span><br><span class="line">;</span><br><span class="line">ldd ./test_glibc.out</span><br><span class="line">./test_glibc.out</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/inode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/linux/inode/" class="post-title-link" itemprop="url">Linux文件系统的Inode</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-28 20:38:12" itemprop="dateModified" datetime="2024-02-28T20:38:12+08:00">2024-02-28</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>5 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Inode-Iindex-Node"><a href="#Inode-Iindex-Node" class="headerlink" title="Inode (Iindex Node)"></a>Inode (Iindex Node)</h1><p>同一个文件系统内inode唯一。</p>
+<h2 id="Inode上限"><a href="#Inode上限" class="headerlink" title="Inode上限"></a>Inode上限</h2><p>在文件系统创建时确定上限，一旦确定后，不能改了，因此要留意当前文件系统内inode数量。</p>
+<h2 id="Inode结构"><a href="#Inode结构" class="headerlink" title="Inode结构"></a>Inode结构</h2><ul>
+<li>File type</li>
+<li>File size</li>
+<li>Owner ID</li>
+<li>Group ID</li>
+<li>Read, write and execute permissions</li>
+<li>Last access time</li>
+<li>Last change time</li>
+<li>Last modification time</li>
+</ul>
+<h2 id="有关命令"><a href="#有关命令" class="headerlink" title="有关命令"></a>有关命令</h2><blockquote>
+<p>查看文件的inode号</p>
+</blockquote>
+<p>用 <code>stat</code> 命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-WangQingJia cpp]<span class="comment"># stat demo.o </span></span><br><span class="line">  File: ‘demo.o’</span><br><span class="line">  Size: 138120          Blocks: 480        IO Block: 4096   regular file</span><br><span class="line">Device: 2h/2d   Inode: 2814749768200812  Links: 1</span><br><span class="line">Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)</span><br><span class="line">Access: 2024-02-06 11:27:22.232719400 +0800</span><br><span class="line">Modify: 2024-02-06 10:22:58.208382800 +0800</span><br><span class="line">Change: 2024-02-06 10:22:58.208382800 +0800</span><br><span class="line"> Birth: -</span><br></pre></td></tr></table></figure>
+
+<p>也可以用 <code>ls -i</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-WangQingJia cpp]<span class="comment"># ll -i</span></span><br><span class="line">total 4172</span><br><span class="line">200410183418259079 -rwxr-xr-x 1 root root     300 Feb  6 11:44 build.sh  </span><br><span class="line">  2814749768200812 -rw-r--r-- 1 root root  138120 Feb  6 10:22 demo.o    </span><br><span class="line"> 20829148276678876 -rw-r--r-- 1 root root      27 Feb  6 11:45 lib.cpp   </span><br><span class="line">  6755399442050607 -rw-r--r-- 1 root root    2576 Feb  6 11:46 lib.o     </span><br><span class="line">186617909559210440 -rw-r--r-- 1 root root    8585 Feb  6 11:46 lib.o.s   </span><br><span class="line"> 14355223812957764 -rw-r--r-- 1 root root     129 Feb  6 11:46 main.cpp  </span><br><span class="line">  3096224744960750 -rwxr-xr-x 1 root root   94744 Feb  6 11:46 main.exe  </span><br><span class="line"> 49539595902153707 -rw-r--r-- 1 root root 1865435 Feb  6 11:46 main.exe.s</span><br><span class="line"> 12947848928836777 -rw-r--r-- 1 root root  138448 Feb  6 11:46 main.o    </span><br><span class="line">247697979505656983 -rw-r--r-- 1 root root 1896009 Feb  6 11:46 main.o.s  </span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>查看文件夹inode号</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-WangQingJia cpp]<span class="comment"># ls -id .</span></span><br><span class="line">19140298416923551 .</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>查看所有文件系统的inode数量</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-WangQingJia cpp]<span class="comment"># df -i</span></span><br><span class="line">Filesystem     Inodes   IUsed   IFree IUse% Mounted on</span><br><span class="line">rootfs            999 -999001 1000000     - /</span><br><span class="line">none              999 -999001 1000000     - /dev</span><br><span class="line">none              999 -999001 1000000     - /run</span><br><span class="line">none              999 -999001 1000000     - /run/lock</span><br><span class="line">none              999 -999001 1000000     - /run/shm</span><br><span class="line">none              999 -999001 1000000     - /run/user</span><br><span class="line">tmpfs             999 -999001 1000000     - /sys/fs/cgroup</span><br><span class="line">C:\               999 -999001 1000000     - /mnt/c</span><br><span class="line">D:\               999 -999001 1000000     - /mnt/d</span><br><span class="line">E:\               999 -999001 1000000     - /mnt/e</span><br><span class="line">F:\               999 -999001 1000000     - /mnt/f</span><br><span class="line">H:\               999 -999001 1000000     - /mnt/h</span><br></pre></td></tr></table></figure>
+
+<h2 id="inode-复用问题"><a href="#inode-复用问题" class="headerlink" title="inode 复用问题"></a>inode 复用问题</h2><p>TLDF：跟文件系统相关，有的复用，有的不会。</p>
+<p>删除文件后，新建个同名文件(内容即使与删除的不一样)，会复用原来的inode号，在xfs文件系统中复现。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 logs]$ ll -i file </span><br><span class="line">319997802 -rw-rw-r-- 1 game game 0 Feb  6 17:20 file</span><br><span class="line">[game@vm10-245-65-72 logs]$ <span class="built_in">rm</span> -f file &amp;&amp; <span class="built_in">touch</span> file &amp;&amp; ll -i file</span><br><span class="line">319997802 -rw-rw-r-- 1 game game 0 Feb  6 17:20 file</span><br><span class="line">[game@vm10-245-65-72 logs]$ <span class="built_in">rm</span> -f file &amp;&amp; <span class="built_in">touch</span> file &amp;&amp; ll -i file</span><br><span class="line">319997802 -rw-rw-r-- 1 game game 0 Feb  6 17:20 file</span><br><span class="line"></span><br><span class="line">[game@vm10-245-65-72 logs]$ <span class="built_in">df</span> -T .</span><br><span class="line">Filesystem     Type 1K-blocks      Used Available Use% Mounted on</span><br><span class="line">/dev/vdb       xfs  524032000 422586164 101445836  81% /export</span><br></pre></td></tr></table></figure>
+
+<p>但在wsl1中无法复现，文件系统为 wslfs</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># ll -i</span></span><br><span class="line">total 0</span><br><span class="line">94575592174828964 -rw-r--r-- 1 root root 0 Feb  6 17:19 file</span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># rm -f file &amp;&amp; touch file &amp;&amp; ll -i file</span></span><br><span class="line">94857067151539620 -rw-r--r-- 1 root root 0 Feb  6 17:23 file</span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># rm -f file &amp;&amp; touch file &amp;&amp; ll -i file</span></span><br><span class="line">95138542128250276 -rw-r--r-- 1 root root 0 Feb  6 17:23 file</span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># rm -f file &amp;&amp; touch file &amp;&amp; ll -i file</span></span><br><span class="line">95420017104960932 -rw-r--r-- 1 root root 0 Feb  6 17:23 file</span><br><span class="line"></span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># df -T .</span></span><br><span class="line">Filesystem     Type  1K-blocks      Used Available Use% Mounted on</span><br><span class="line">rootfs         wslfs 487945212 405172080  82773132  84% /</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/a/51019769/11850070">ext4也复用</a></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/linux%20firewall/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/linux/linux%20firewall/" class="post-title-link" itemprop="url">Linux防火墙配置</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-23 17:39:26" itemprop="dateModified" datetime="2024-02-23T17:39:26+08:00">2024-02-23</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>631</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>1 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="linux-firewall"><a href="#linux-firewall" class="headerlink" title="linux firewall"></a>linux firewall</h1><p>To view open ports, use the following command.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --list-ports</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>We use the following to see services whose ports are open.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --list-services</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>We use the following to see services whose ports are open and see open ports</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --list-all</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>To add a service to the firewall, we use the following command, in which case the service will use any port to open in the firewall.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --add-services=ntp</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>For this service to be permanently open we use the following command.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd —add-service=ntp --permanent</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>To add a port, use the following command</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --add-port=132/tcp  --permanent</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>To run the firewall must be reloaded using the following command.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --reload</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/epoll/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/linux/epoll/" class="post-title-link" itemprop="url">Linux epoll 学习</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-28 20:35:35" itemprop="dateModified" datetime="2024-02-28T20:35:35+08:00">2024-02-28</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>12k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>20 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a>epoll</h1><h1 id="边沿触发和水平触发"><a href="#边沿触发和水平触发" class="headerlink" title="边沿触发和水平触发"></a>边沿触发和水平触发</h1><p>只有epoll有这两种模式，select和poll均只有水平触发。</p>
+<h2 id="一次write，水平触发，不read，"><a href="#一次write，水平触发，不read，" class="headerlink" title="一次write，水平触发，不read，"></a>一次write，水平触发，不read，</h2><p>写者调一次write，读者以默认的水平触发监听写事件，但不调read去读，结果就是epoll_wait一直在唤醒。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstring&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/epoll.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/prctl.h&gt;</span> <span class="comment">// prctl(), PR_SET_PDEATHSIG</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span> <span class="comment">// signals</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span> <span class="comment">// fork()</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span>  <span class="comment">// perror()</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> pipe_fd[<span class="number">2</span>];</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">pipe</span>(pipe_fd) == <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">&quot;pipe&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">pid_t</span> parent_pid = <span class="built_in">getpid</span>();</span><br><span class="line">    <span class="type">pid_t</span> child_pid = fork();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (child_pid == <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">&quot;fork&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (child_pid == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="type">int</span> r = <span class="built_in">prctl</span>(PR_SET_PDEATHSIG, SIGTERM);</span><br><span class="line">        <span class="keyword">if</span> (r == <span class="number">-1</span>) &#123; <span class="built_in">perror</span>(<span class="number">0</span>); <span class="built_in">exit</span>(<span class="number">1</span>); &#125;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">getppid</span>() != parent_pid)</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Child process (Receiver)</span></span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">1</span>]); <span class="comment">// Close the write end of the pipe in the child</span></span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> epoll_fd = <span class="built_in">epoll_create</span>(<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">if</span> (epoll_fd == <span class="number">-1</span>) &#123;</span><br><span class="line">            <span class="built_in">perror</span>(<span class="string">&quot;epoll_create&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">struct</span> <span class="title class_">epoll_event</span> ev;</span><br><span class="line"></span><br><span class="line">        ev.events = EPOLLIN;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// ev.events |= EPOLLET; // Use ET mode</span></span><br><span class="line"></span><br><span class="line">        ev.data.fd = pipe_fd[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">epoll_ctl</span>(epoll_fd, EPOLL_CTL_ADD, pipe_fd[<span class="number">0</span>], &amp;ev) == <span class="number">-1</span>) &#123;</span><br><span class="line">            <span class="built_in">perror</span>(<span class="string">&quot;epoll_ctl&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">fcntl</span>(pipe_fd[<span class="number">0</span>], F_SETFL, O_NONBLOCK);</span><br><span class="line"></span><br><span class="line">        <span class="type">char</span> buffer[<span class="number">256</span>];</span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">            <span class="keyword">struct</span> <span class="title class_">epoll_event</span> events;</span><br><span class="line">            <span class="type">int</span> nfds = <span class="built_in">epoll_wait</span>(epoll_fd, &amp;events, <span class="number">1</span>, <span class="number">-1</span>);</span><br><span class="line">            <span class="keyword">if</span> (nfds == <span class="number">-1</span>) &#123;</span><br><span class="line">                <span class="built_in">perror</span>(<span class="string">&quot;epoll_wait&quot;</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (nfds &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                std::cout &lt;&lt; <span class="string">&quot;Child found readable fd&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">close</span>(epoll_fd);</span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">0</span>]);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// Parent process (Sender)</span></span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">0</span>]); <span class="comment">// Close the read end of the pipe in the parent</span></span><br><span class="line"></span><br><span class="line">        <span class="type">const</span> <span class="type">char</span>* message = <span class="string">&quot;Hello, Child!&quot;</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Write the message to the pipe</span></span><br><span class="line">        <span class="type">ssize_t</span> bytes_written = <span class="built_in">write</span>(pipe_fd[<span class="number">1</span>], message, <span class="built_in">strlen</span>(message));</span><br><span class="line">        <span class="keyword">if</span> (bytes_written == <span class="number">-1</span>) &#123;</span><br><span class="line">            <span class="built_in">perror</span>(<span class="string">&quot;write&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Parent wrote: &quot;</span> &lt;&lt; message &lt;&lt; std::endl;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span>(;;)&#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Close the write end of the pipe in the parent to signal the end</span></span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Parent wrote: Hello, Child!</span><br><span class="line">Child found readable fd</span><br><span class="line">Child found readable fd</span><br><span class="line">Child found readable fd</span><br><span class="line">Child found readable fd</span><br><span class="line">Child found readable fd</span><br><span class="line">Child found readable fd</span><br><span class="line">...</span><br><span class="line">Child found readable fd</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h2 id="一次write，边沿触发，不read"><a href="#一次write，边沿触发，不read" class="headerlink" title="一次write，边沿触发，不read"></a>一次write，边沿触发，不read</h2><p>写者调一次write，读者以边沿触发监听写事件，但不调read去读，结果就是epoll_wait只在写着调用完write后唤醒一次。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstring&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/epoll.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/prctl.h&gt;</span> <span class="comment">// prctl(), PR_SET_PDEATHSIG</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span> <span class="comment">// signals</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span> <span class="comment">// fork()</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span>  <span class="comment">// perror()</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> pipe_fd[<span class="number">2</span>];</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">pipe</span>(pipe_fd) == <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">&quot;pipe&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">pid_t</span> parent_pid = <span class="built_in">getpid</span>();</span><br><span class="line">    <span class="type">pid_t</span> child_pid = fork();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (child_pid == <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">&quot;fork&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (child_pid == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="type">int</span> r = <span class="built_in">prctl</span>(PR_SET_PDEATHSIG, SIGTERM);</span><br><span class="line">        <span class="keyword">if</span> (r == <span class="number">-1</span>) &#123; <span class="built_in">perror</span>(<span class="number">0</span>); <span class="built_in">exit</span>(<span class="number">1</span>); &#125;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">getppid</span>() != parent_pid)</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Child process (Receiver)</span></span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">1</span>]); <span class="comment">// Close the write end of the pipe in the child</span></span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> epoll_fd = <span class="built_in">epoll_create</span>(<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">if</span> (epoll_fd == <span class="number">-1</span>) &#123;</span><br><span class="line">            <span class="built_in">perror</span>(<span class="string">&quot;epoll_create&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">struct</span> <span class="title class_">epoll_event</span> ev;</span><br><span class="line"></span><br><span class="line">        ev.events = EPOLLIN;</span><br><span class="line"></span><br><span class="line">        ev.events |= EPOLLET; <span class="comment">// Use ET mode</span></span><br><span class="line"></span><br><span class="line">        ev.data.fd = pipe_fd[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">epoll_ctl</span>(epoll_fd, EPOLL_CTL_ADD, pipe_fd[<span class="number">0</span>], &amp;ev) == <span class="number">-1</span>) &#123;</span><br><span class="line">            <span class="built_in">perror</span>(<span class="string">&quot;epoll_ctl&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">fcntl</span>(pipe_fd[<span class="number">0</span>], F_SETFL, O_NONBLOCK);</span><br><span class="line"></span><br><span class="line">        <span class="type">char</span> buffer[<span class="number">256</span>];</span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">            <span class="keyword">struct</span> <span class="title class_">epoll_event</span> events;</span><br><span class="line">            <span class="type">int</span> nfds = <span class="built_in">epoll_wait</span>(epoll_fd, &amp;events, <span class="number">1</span>, <span class="number">-1</span>);</span><br><span class="line">            <span class="keyword">if</span> (nfds == <span class="number">-1</span>) &#123;</span><br><span class="line">                <span class="built_in">perror</span>(<span class="string">&quot;epoll_wait&quot;</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (nfds &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                std::cout &lt;&lt; <span class="string">&quot;Child found readable fd&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">close</span>(epoll_fd);</span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">0</span>]);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// Parent process (Sender)</span></span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">0</span>]); <span class="comment">// Close the read end of the pipe in the parent</span></span><br><span class="line"></span><br><span class="line">        <span class="type">const</span> <span class="type">char</span>* message = <span class="string">&quot;Hello, Child!&quot;</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Write the message to the pipe</span></span><br><span class="line">        <span class="type">ssize_t</span> bytes_written = <span class="built_in">write</span>(pipe_fd[<span class="number">1</span>], message, <span class="built_in">strlen</span>(message));</span><br><span class="line">        <span class="keyword">if</span> (bytes_written == <span class="number">-1</span>) &#123;</span><br><span class="line">            <span class="built_in">perror</span>(<span class="string">&quot;write&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Parent wrote: &quot;</span> &lt;&lt; message &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(;;)&#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Close the write end of the pipe in the parent to signal the end</span></span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Parent wrote: Hello, Child!</span><br><span class="line">Child found readable fd</span><br></pre></td></tr></table></figure>
+
+<h2 id="连续write，边沿触发，不read"><a href="#连续write，边沿触发，不read" class="headerlink" title="连续write，边沿触发，不read"></a>连续write，边沿触发，不read</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstring&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/epoll.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/prctl.h&gt;</span> <span class="comment">// prctl(), PR_SET_PDEATHSIG</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span>    <span class="comment">// signals</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span>    <span class="comment">// fork()</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span>     <span class="comment">// perror()</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> pipe_fd[<span class="number">2</span>];</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">pipe</span>(pipe_fd) == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">&quot;pipe&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">pid_t</span> parent_pid = <span class="built_in">getpid</span>();</span><br><span class="line">    <span class="type">pid_t</span> child_pid = fork();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (child_pid == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">&quot;fork&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (child_pid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> r = <span class="built_in">prctl</span>(PR_SET_PDEATHSIG, SIGTERM);</span><br><span class="line">        <span class="keyword">if</span> (r == <span class="number">-1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">perror</span>(<span class="number">0</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">getppid</span>() != parent_pid)</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Child process (Receiver)</span></span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">1</span>]); <span class="comment">// Close the write end of the pipe in the child</span></span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> epoll_fd = <span class="built_in">epoll_create</span>(<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">if</span> (epoll_fd == <span class="number">-1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">perror</span>(<span class="string">&quot;epoll_create&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">struct</span> <span class="title class_">epoll_event</span> ev;</span><br><span class="line"></span><br><span class="line">        ev.events = EPOLLIN;</span><br><span class="line"></span><br><span class="line">        ev.events |= EPOLLET; <span class="comment">// Use ET mode</span></span><br><span class="line"></span><br><span class="line">        ev.data.fd = pipe_fd[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">epoll_ctl</span>(epoll_fd, EPOLL_CTL_ADD, pipe_fd[<span class="number">0</span>], &amp;ev) == <span class="number">-1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">perror</span>(<span class="string">&quot;epoll_ctl&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">fcntl</span>(pipe_fd[<span class="number">0</span>], F_SETFL, O_NONBLOCK);</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line">        <span class="type">char</span> buffer[<span class="number">256</span>];</span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">struct</span> <span class="title class_">epoll_event</span> events;</span><br><span class="line">            <span class="type">int</span> nfds = <span class="built_in">epoll_wait</span>(epoll_fd, &amp;events, <span class="number">1</span>, <span class="number">-1</span>);</span><br><span class="line">            <span class="keyword">if</span> (nfds == <span class="number">-1</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">perror</span>(<span class="string">&quot;epoll_wait&quot;</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (nfds &gt; <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                ++count;</span><br><span class="line">                std::cout &lt;&lt; <span class="string">&quot;[&quot;</span> &lt;&lt; count &lt;&lt; <span class="string">&quot;]&quot;</span> &lt;&lt; <span class="string">&quot;Child found readable fd&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">close</span>(epoll_fd);</span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">0</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Parent process (Sender)</span></span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">0</span>]); <span class="comment">// Close the read end of the pipe in the parent</span></span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (;;)</span><br><span class="line">        &#123;</span><br><span class="line">            ++count;</span><br><span class="line"></span><br><span class="line">            <span class="type">const</span> <span class="type">char</span> *message = <span class="string">&quot;Hello, Child!&quot;</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Write the message to the pipe</span></span><br><span class="line">            <span class="type">ssize_t</span> bytes_written = <span class="built_in">write</span>(pipe_fd[<span class="number">1</span>], message, <span class="built_in">strlen</span>(message));</span><br><span class="line">            <span class="keyword">if</span> (bytes_written == <span class="number">-1</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">perror</span>(<span class="string">&quot;write&quot;</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;[&quot;</span> &lt;&lt; count &lt;&lt; <span class="string">&quot;]&quot;</span> &lt;&lt; <span class="string">&quot;Parent wrote: &quot;</span> &lt;&lt; message &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// sleep(1);</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Close the write end of the pipe in the parent to signal the end</span></span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>会发现，存在连续若干次的write合并为一次可读事件</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">[<span class="number">5040</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">4558</span>]Child found readable fd</span><br></pre></td></tr></table></figure>
+
+<h2 id="每秒一次write，水平触发，不read"><a href="#每秒一次write，水平触发，不read" class="headerlink" title="每秒一次write，水平触发，不read"></a>每秒一次write，水平触发，不read</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstring&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/epoll.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/prctl.h&gt;</span> <span class="comment">// prctl(), PR_SET_PDEATHSIG</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span>    <span class="comment">// signals</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span>    <span class="comment">// fork()</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span>     <span class="comment">// perror()</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> pipe_fd[<span class="number">2</span>];</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">pipe</span>(pipe_fd) == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">&quot;pipe&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">pid_t</span> parent_pid = <span class="built_in">getpid</span>();</span><br><span class="line">    <span class="type">pid_t</span> child_pid = fork();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (child_pid == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">&quot;fork&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (child_pid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> r = <span class="built_in">prctl</span>(PR_SET_PDEATHSIG, SIGTERM);</span><br><span class="line">        <span class="keyword">if</span> (r == <span class="number">-1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">perror</span>(<span class="number">0</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">getppid</span>() != parent_pid)</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Child process (Receiver)</span></span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">1</span>]); <span class="comment">// Close the write end of the pipe in the child</span></span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> epoll_fd = <span class="built_in">epoll_create</span>(<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">if</span> (epoll_fd == <span class="number">-1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">perror</span>(<span class="string">&quot;epoll_create&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">struct</span> <span class="title class_">epoll_event</span> ev;</span><br><span class="line"></span><br><span class="line">        ev.events = EPOLLIN;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// ev.events |= EPOLLET; // Use ET mode</span></span><br><span class="line"></span><br><span class="line">        ev.data.fd = pipe_fd[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">epoll_ctl</span>(epoll_fd, EPOLL_CTL_ADD, pipe_fd[<span class="number">0</span>], &amp;ev) == <span class="number">-1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">perror</span>(<span class="string">&quot;epoll_ctl&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">fcntl</span>(pipe_fd[<span class="number">0</span>], F_SETFL, O_NONBLOCK);</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line">        <span class="type">char</span> buffer[<span class="number">256</span>];</span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">struct</span> <span class="title class_">epoll_event</span> events;</span><br><span class="line">            <span class="type">int</span> nfds = <span class="built_in">epoll_wait</span>(epoll_fd, &amp;events, <span class="number">1</span>, <span class="number">-1</span>);</span><br><span class="line">            <span class="keyword">if</span> (nfds == <span class="number">-1</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">perror</span>(<span class="string">&quot;epoll_wait&quot;</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (nfds &gt; <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                ++count;</span><br><span class="line">                std::cout &lt;&lt; <span class="string">&quot;[&quot;</span> &lt;&lt; count &lt;&lt; <span class="string">&quot;]&quot;</span> &lt;&lt; <span class="string">&quot;Child found readable fd&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">close</span>(epoll_fd);</span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">0</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Parent process (Sender)</span></span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">0</span>]); <span class="comment">// Close the read end of the pipe in the parent</span></span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (;;)</span><br><span class="line">        &#123;</span><br><span class="line">            ++count;</span><br><span class="line"></span><br><span class="line">            <span class="type">const</span> <span class="type">char</span> *message = <span class="string">&quot;Hello, Child!&quot;</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Write the message to the pipe</span></span><br><span class="line">            <span class="type">ssize_t</span> bytes_written = <span class="built_in">write</span>(pipe_fd[<span class="number">1</span>], message, <span class="built_in">strlen</span>(message));</span><br><span class="line">            <span class="keyword">if</span> (bytes_written == <span class="number">-1</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">perror</span>(<span class="string">&quot;write&quot;</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;[&quot;</span> &lt;&lt; count &lt;&lt; <span class="string">&quot;]&quot;</span> &lt;&lt; <span class="string">&quot;Parent wrote: &quot;</span> &lt;&lt; message &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">            <span class="built_in">sleep</span>(<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Close the write end of the pipe in the parent to signal the end</span></span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>写者以每秒1次调write，读者如果没及时调read，epoll_wait会一直唤醒</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">1</span>]Child found readable fd</span><br><span class="line">[<span class="number">2</span>]Child found readable fd</span><br><span class="line">...</span><br><span class="line">[<span class="number">34190</span>]Child found readable fd</span><br><span class="line">[<span class="number">34191</span>]Child found readable fd</span><br><span class="line">[<span class="number">2</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">34192</span>]Child found readable fd</span><br><span class="line">[<span class="number">34193</span>]Child found readable fd</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h2 id="每秒一次write，边沿触发，不read"><a href="#每秒一次write，边沿触发，不read" class="headerlink" title="每秒一次write，边沿触发，不read"></a>每秒一次write，边沿触发，不read</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstring&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/epoll.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/prctl.h&gt;</span> <span class="comment">// prctl(), PR_SET_PDEATHSIG</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span>    <span class="comment">// signals</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span>    <span class="comment">// fork()</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span>     <span class="comment">// perror()</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> pipe_fd[<span class="number">2</span>];</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">pipe</span>(pipe_fd) == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">&quot;pipe&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">pid_t</span> parent_pid = <span class="built_in">getpid</span>();</span><br><span class="line">    <span class="type">pid_t</span> child_pid = fork();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (child_pid == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">&quot;fork&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (child_pid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> r = <span class="built_in">prctl</span>(PR_SET_PDEATHSIG, SIGTERM);</span><br><span class="line">        <span class="keyword">if</span> (r == <span class="number">-1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">perror</span>(<span class="number">0</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">getppid</span>() != parent_pid)</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Child process (Receiver)</span></span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">1</span>]); <span class="comment">// Close the write end of the pipe in the child</span></span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> epoll_fd = <span class="built_in">epoll_create</span>(<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">if</span> (epoll_fd == <span class="number">-1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">perror</span>(<span class="string">&quot;epoll_create&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">struct</span> <span class="title class_">epoll_event</span> ev;</span><br><span class="line"></span><br><span class="line">        ev.events = EPOLLIN;</span><br><span class="line"></span><br><span class="line">        ev.events |= EPOLLET; <span class="comment">// Use ET mode</span></span><br><span class="line"></span><br><span class="line">        ev.data.fd = pipe_fd[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">epoll_ctl</span>(epoll_fd, EPOLL_CTL_ADD, pipe_fd[<span class="number">0</span>], &amp;ev) == <span class="number">-1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">perror</span>(<span class="string">&quot;epoll_ctl&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">fcntl</span>(pipe_fd[<span class="number">0</span>], F_SETFL, O_NONBLOCK);</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line">        <span class="type">char</span> buffer[<span class="number">256</span>];</span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">struct</span> <span class="title class_">epoll_event</span> events;</span><br><span class="line">            <span class="type">int</span> nfds = <span class="built_in">epoll_wait</span>(epoll_fd, &amp;events, <span class="number">1</span>, <span class="number">-1</span>);</span><br><span class="line">            <span class="keyword">if</span> (nfds == <span class="number">-1</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">perror</span>(<span class="string">&quot;epoll_wait&quot;</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (nfds &gt; <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                ++count;</span><br><span class="line">                std::cout &lt;&lt; <span class="string">&quot;[&quot;</span> &lt;&lt; count &lt;&lt; <span class="string">&quot;]&quot;</span> &lt;&lt; <span class="string">&quot;Child found readable fd&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">close</span>(epoll_fd);</span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">0</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Parent process (Sender)</span></span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">0</span>]); <span class="comment">// Close the read end of the pipe in the parent</span></span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (;;)</span><br><span class="line">        &#123;</span><br><span class="line">            ++count;</span><br><span class="line"></span><br><span class="line">            <span class="type">const</span> <span class="type">char</span> *message = <span class="string">&quot;Hello, Child!&quot;</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Write the message to the pipe</span></span><br><span class="line">            <span class="type">ssize_t</span> bytes_written = <span class="built_in">write</span>(pipe_fd[<span class="number">1</span>], message, <span class="built_in">strlen</span>(message));</span><br><span class="line">            <span class="keyword">if</span> (bytes_written == <span class="number">-1</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">perror</span>(<span class="string">&quot;write&quot;</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;[&quot;</span> &lt;&lt; count &lt;&lt; <span class="string">&quot;]&quot;</span> &lt;&lt; <span class="string">&quot;Parent wrote: &quot;</span> &lt;&lt; message &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">            <span class="built_in">sleep</span>(<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Close the write end of the pipe in the parent to signal the end</span></span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>只有写者调用write时，epoll_wait才唤醒一次</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">1</span>]Child found readable fd</span><br><span class="line">[<span class="number">2</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">2</span>]Child found readable fd</span><br><span class="line">[<span class="number">3</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">3</span>]Child found readable fd</span><br><span class="line">[<span class="number">4</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">4</span>]Child found readable fd</span><br><span class="line">[<span class="number">5</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">5</span>]Child found readable fd</span><br><span class="line">[<span class="number">6</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">6</span>]Child found readable fd</span><br><span class="line">[<span class="number">7</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">7</span>]Child found readable fd</span><br><span class="line">[<span class="number">8</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">8</span>]Child found readable fd</span><br><span class="line">[<span class="number">9</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">9</span>]Child found readable fd</span><br><span class="line">[<span class="number">10</span>]Parent wrote: Hello, Child!</span><br><span class="line">[<span class="number">10</span>]Child found readable fd</span><br></pre></td></tr></table></figure>
+
+<h1 id="为什么边沿触发效率更高"><a href="#为什么边沿触发效率更高" class="headerlink" title="为什么边沿触发效率更高"></a>为什么边沿触发效率更高</h1>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -332,7 +782,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
+      <time title="修改时间：2024-03-06 20:51:33" itemprop="dateModified" datetime="2024-03-06T20:51:33+08:00">2024-03-06</time>
     </span>
 
   
@@ -342,14 +792,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>3k</span>
+      <span>3.5k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>5 分钟</span>
+      <span>6 分钟</span>
     </span>
 </div>
 
@@ -360,34 +810,47 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="虚析构函数"><a href="#虚析构函数" class="headerlink" title="虚析构函数"></a>虚析构函数</h1><blockquote>
-<p>何时声明类的析构函数为virtual？</p>
-</blockquote>
+          <h1 id="适用于什么情况？"><a href="#适用于什么情况？" class="headerlink" title="适用于什么情况？"></a>适用于什么情况？</h1><blockquote>
+<p>Virtual destructors are useful when you might potentially delete an instance of a derived class through a pointer to base class. In most implementations, the call to the destructor will be resolved like any non-virtual code, meaning that the destructor of the base class will be called but not the one of the derived class, resulting in a resources leak.</p>
 <ul>
-<li>当要通过基类指针删除子类对象时，如果基类的析构函数没用virtual，则是未定义行为，大多数实现是把基类的析构函数当作普通非虚函数，因此只析构基类，导致子类资源泄露。</li>
-<li>因此Effective C++讲：只要基类有一个虚函数，就该考虑将其析构函数声明为virtual。从而确保从子类→基类的析构函数依次调用（构造顺序是先基类后子类，析构顺序正好相反，先子类后父类），否则只有基类析构，子类没析构，子类发生资源泄漏。</li>
-<li>也可以声明基类析构函数为protected，从而编译器禁止通过基类指针删除子类对象。</li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/a/461224/11850070">https://stackoverflow.com/a/461224/11850070</a></li>
 </ul>
-<blockquote>
-<p>那是否每个基类的析构函数都声明为virtual？</p>
 </blockquote>
+<p>当准备通过基类指针删除子类对象时，如果基类的析构函数没加virtual，则是未定义行为，大多数编译器的实现是把基类的析构函数当作普通非虚函数，因此只析构基类，导致子类未析构，子类资源泄漏。</p>
+<p>实测下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">// 这里去掉了virtual</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>子类 <code>Circle</code> 与 <code>MyCircle</code> 未析构</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Shape()</span><br><span class="line">Circle()</span><br><span class="line">MyCircle()</span><br><span class="line">~Shape() </span><br></pre></td></tr></table></figure>
+
+<p>父类析构函数加上 <code>virtual</code> 后</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">// 这里加上virtual</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>析构与构造对称，没有资源泄漏</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line"><span class="built_in">MyCircle</span>()</span><br><span class="line">~<span class="built_in">MyCircle</span>()</span><br><span class="line">~<span class="built_in">Circle</span>()</span><br><span class="line">~<span class="built_in">Shape</span>()</span><br></pre></td></tr></table></figure>
+
+<h1 id="如何禁止通过父类指针删除子类对象？"><a href="#如何禁止通过父类指针删除子类对象？" class="headerlink" title="如何禁止通过父类指针删除子类对象？"></a>如何禁止通过父类指针删除子类对象？</h1><blockquote>
+<p>If you want to prevent the deletion of an instance through a base class pointer, you can make the base class destructor protected and nonvirtual; by doing so, the compiler won’t let you call <code>delete</code> on a base class pointer. </p>
 <ul>
-<li>不用，只要最上边的基类是virtual即可，其余子类的析构函数均继承了virtual修饰。</li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/a/461224/11850070">https://stackoverflow.com/a/461224/11850070</a></li>
 </ul>
-<h2 id="多态基类析构函数没加virtual"><a href="#多态基类析构函数没加virtual" class="headerlink" title="多态基类析构函数没加virtual"></a>多态基类析构函数没加virtual</h2><p>这种情况是未定义的，大多数实现是只析构基类了</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">// 这里去掉了virtual</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>声明基类的析构函数为protected，从而编译器禁止通过基类指针删除子类对象。</p>
+<p>测试代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>输出：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line"><span class="built_in">MyCircle</span>()</span><br><span class="line"></span><br><span class="line">~<span class="built_in">Shape</span>() <span class="comment">// 要删除子类，结果只调了基类的析构函数</span></span><br></pre></td></tr></table></figure>
+<p>编译器报错：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;source&gt;: In function <span class="string">&#x27;int main()&#x27;</span>:</span><br><span class="line">&lt;source&gt;:<span class="number">30</span>:<span class="number">12</span>: error: <span class="string">&#x27;Shape::~Shape()&#x27;</span> is <span class="keyword">protected</span> within <span class="keyword">this</span> context</span><br><span class="line">   <span class="number">30</span> |     <span class="keyword">delete</span> shape;</span><br><span class="line">      |            ^~~~~</span><br><span class="line">&lt;source&gt;:<span class="number">10</span>:<span class="number">5</span>: note: declared <span class="keyword">protected</span> here</span><br><span class="line">   <span class="number">10</span> |     ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">      |     ^</span><br></pre></td></tr></table></figure>
 
-<h2 id="多态基类析构函数加上virtual后"><a href="#多态基类析构函数加上virtual后" class="headerlink" title="多态基类析构函数加上virtual后"></a>多态基类析构函数加上virtual后</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">// 这里加上virtual</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line"><span class="built_in">MyCircle</span>()</span><br><span class="line"></span><br><span class="line">~<span class="built_in">MyCircle</span>() <span class="comment">// 从子类到父类依次析构</span></span><br><span class="line">~<span class="built_in">Circle</span>()</span><br><span class="line">~<span class="built_in">Shape</span>()</span><br></pre></td></tr></table></figure>
+<h1 id="是否每个基类的析构函数都要加virtual？"><a href="#是否每个基类的析构函数都要加virtual？" class="headerlink" title="是否每个基类的析构函数都要加virtual？"></a>是否每个基类的析构函数都要加virtual？</h1><blockquote>
+<p>The default destructor is not virtual. If you declare the destructor of your base class as virtual, the destructors of the subclasses will be overrides, and thus also be virtual even without explicitly declaring them to be. </p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/a/5610164/11850070">https://stackoverflow.com/a/5610164/11850070</a></li>
+</ul>
+</blockquote>
+<p>不用，只要最上边的基类加 <code>virtual</code> 即可，其余子类的析构函数均继承了 <code>virtual</code>。</p>
 
-<h2 id="多态基类析构函数声明为protected"><a href="#多态基类析构函数声明为protected" class="headerlink" title="多态基类析构函数声明为protected"></a>多态基类析构函数声明为protected</h2><p>禁止从基类指针删除子类对象</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;source&gt;: In function <span class="string">&#x27;int main()&#x27;</span>:</span><br><span class="line">&lt;source&gt;:<span class="number">32</span>:<span class="number">12</span>: error: <span class="string">&#x27;Shape::~Shape()&#x27;</span> is <span class="keyword">protected</span> within <span class="keyword">this</span> context</span><br><span class="line">   <span class="number">32</span> |     <span class="keyword">delete</span> shape;</span><br><span class="line">      |            ^~~~~</span><br><span class="line">&lt;source&gt;:<span class="number">10</span>:<span class="number">5</span>: note: declared <span class="keyword">protected</span> here</span><br><span class="line">   <span class="number">10</span> |     ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">      |     ^</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -799,437 +1262,6 @@
 
 <p>因此总的原则是，按从类型从大到小的顺序依次声明成员变量。</p>
 
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E5%86%85%E8%81%94%E6%B1%87%E7%BC%96/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/%E5%86%85%E8%81%94%E6%B1%87%E7%BC%96/" class="post-title-link" itemprop="url">C++内联汇编</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-03-05 20:03:44" itemprop="dateModified" datetime="2024-03-05T20:03:44+08:00">2024-03-05</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>1.6k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>3 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><a target="_blank" rel="noopener" href="https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html">Extended Asm (Using the GNU Compiler Collection (GCC))</a></p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> a = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> b = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> result;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Inline assembly to add &#x27;a&#x27; and &#x27;b&#x27; and store the result in &#x27;result&#x27;</span></span><br><span class="line"></span><br><span class="line">    __asm__(</span><br><span class="line"></span><br><span class="line">        <span class="string">&quot;add %1, %2\\n&quot;</span>     <span class="comment">// b = a + b</span></span><br><span class="line"></span><br><span class="line">        <span class="string">&quot;mov %2, %0\\n&quot;</span>     <span class="comment">// result = b</span></span><br><span class="line"></span><br><span class="line">        : <span class="string">&quot;=r&quot;</span>(result)       <span class="comment">// Output operand</span></span><br><span class="line"></span><br><span class="line">        : <span class="string">&quot;r&quot;</span>(a), <span class="string">&quot;r&quot;</span>(b)     <span class="comment">// Input operands</span></span><br><span class="line"></span><br><span class="line">        : <span class="string">&quot;cc&quot;</span>               <span class="comment">// The clobber &quot;cc&quot; informs the compiler that the assembly code may modify the condition codes (flags).</span></span><br><span class="line"></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>Great example to help to understand RAX:RDX pair used in instructions like <code>MUL</code>.</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstdint&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="type">uint64_t</span> a = <span class="number">0xFFFFFFFFFFFFFFFF</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">uint64_t</span> b = <span class="number">0x0000000000000002</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">uint64_t</span> result_low, result_high;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Multiply &#x27;a&#x27; and &#x27;b&#x27; using inline assembly and store the 128-bit result</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// in the RDX:RAX register pair</span></span><br><span class="line"></span><br><span class="line">    __asm__(</span><br><span class="line"></span><br><span class="line">        <span class="string">&quot;mulq %3&quot;</span>            <span class="comment">// Multiply RAX (implicitly) with &#x27;b&#x27;, result stored in RDX:RAX</span></span><br><span class="line"></span><br><span class="line">        : <span class="string">&quot;=a&quot;</span>(result_low),  <span class="comment">// Output operand for the lower 64 bits (RAX)</span></span><br><span class="line"></span><br><span class="line">          <span class="string">&quot;=d&quot;</span>(result_high)  <span class="comment">// Output operand for the upper 64 bits (RDX)</span></span><br><span class="line"></span><br><span class="line">        : <span class="string">&quot;0&quot;</span>(a),            <span class="comment">// Input operand for &#x27;a&#x27; (placed in RAX)</span></span><br><span class="line"></span><br><span class="line">          <span class="string">&quot;rm&quot;</span>(b)            <span class="comment">// Input operand for &#x27;b&#x27;</span></span><br><span class="line"></span><br><span class="line">        : <span class="string">&quot;cc&quot;</span>               <span class="comment">// Clobbers</span></span><br><span class="line"></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Result (high): 0x&quot;</span> &lt;&lt; std::hex &lt;&lt; result_high &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Result (low):  0x&quot;</span> &lt;&lt; std::hex &lt;&lt; result_low &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>cmpxchg8b m64<br>当 DA &#x3D;&#x3D; m64 时，把 BC 存入 m64</p>
-<ul>
-<li>m64 - 待比较和更新值的内存地址</li>
-<li>EDX:EAX - 如果EDX:EAX !&#x3D; m64, 则把m64存到EDX:EAX</li>
-<li>ECX:EBX - 如果EDX:EAX &#x3D;&#x3D; m64，则把该新值存入 m64</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E6%93%8D%E4%BD%9C%E7%AC%A6%E4%BC%98%E5%85%88%E7%BA%A7/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/%E6%93%8D%E4%BD%9C%E7%AC%A6%E4%BC%98%E5%85%88%E7%BA%A7/" class="post-title-link" itemprop="url">C++ 运算符优先级</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>378</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>1 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>注意 <code>i--</code> 与等号运算符共用时的优先级问题</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; nums&#123; <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span> &#125;;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">0</span>;</span><br><span class="line">    nums[j + <span class="number">1</span>] = nums[j--];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span>&amp; num : nums)</span><br><span class="line">        cout &lt;&lt; num &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>输出</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1 2 3 4 </span><br></pre></td></tr></table></figure>
-
-<p>解释：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">nums[j + <span class="number">1</span>] = nums[j--];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 1. 取 nums[j]，即 nums[0] = 1</span></span><br><span class="line"><span class="comment">// 2. j--，此时 j 为 -1</span></span><br><span class="line"><span class="comment">// 3. 将 1 赋值给 nums[j+1] = nums[-1+1] = nums[0]，所以是自己赋值给自己，数组没有任何变化</span></span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/stl/smart_ptr/smart_pointer/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/stl/smart_ptr/smart_pointer/" class="post-title-link" itemprop="url">C++ std::shared_ptr</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-03-04 21:08:41" itemprop="dateModified" datetime="2024-03-04T21:08:41+08:00">2024-03-04</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>4.4k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>7 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><a target="_blank" rel="noopener" href="https://csguide.cn/cpp/memory/shared_ptr.html#%E6%89%8B%E5%86%99-shared-ptr">https://csguide.cn/cpp/memory/shared_ptr.html#%E6%89%8B%E5%86%99-shared-ptr</a></p>
-<h1 id="shared-ptr"><a href="#shared-ptr" class="headerlink" title="shared_ptr"></a>shared_ptr</h1><p>总结：内部是一个指向对象的指针，两个引用计数int（用atomic接口修改计数值，保证引用计数修改的线程安全），但是所指对象的线程安全没用保证。</p>
-<p>打印shared_ptr <code>p1</code>的引用计数</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) p p1._M_refcount._M_pi._M_use_count</span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">17 = 1</span></span><br></pre></td></tr></table></figure>
-
-<p><a target="_blank" rel="noopener" href="https://gcc.gnu.org/onlinedocs/libstdc++/manual/memory.html#shared_ptr.thread">gcc shared_ptr imp doc</a></p>
-<p>x86_64下一个shared_ptr是16字节</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(gdb) pt /o p1</span><br><span class="line">/* offset    |  size */  type = class std::shared_ptr&lt;int&gt; [with _Tp = int] : public std::__shared_ptr&lt;_Tp, (__gnu_cxx::_Lock_policy)2&gt; &#123;</span><br><span class="line"></span><br><span class="line">/* total size (bytes):   16 */</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>具体构成:</p>
-<ul>
-<li>真正的指针8字节</li>
-<li>use_count4字节</li>
-<li>weak_count4字节<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">(gdb) pt /o p1._M_refcount</span><br><span class="line">/* offset    |  size */  type = class std::__shared_count&lt;(__gnu_cxx::_Lock_policy)2&gt; &#123;</span><br><span class="line">                         private:</span><br><span class="line">/*    0      |     8 */    std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt; *_M_pi;</span><br><span class="line"></span><br><span class="line">/* total size (bytes):    8 */</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">(gdb) pt /o p1._M_ptr</span><br><span class="line">type = int *</span><br><span class="line"></span><br><span class="line">(gdb) pt /o p1._M_refcount._M_pi</span><br><span class="line">type = class std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt; : public std::_Mutex_base&lt;(__gnu_cxx::_Lock_policy)2&gt; &#123;</span><br><span class="line">                         private:</span><br><span class="line">/*    8      |     4 */    _Atomic_word _M_use_count;</span><br><span class="line">/*   12      |     4 */    _Atomic_word _M_weak_count;</span><br><span class="line"></span><br><span class="line"> /* total size (bytes):   16 */</span><br><span class="line">&#125; *</span><br></pre></td></tr></table></figure></li>
-</ul>
-<p>完整的内存布局为:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/*    0      |     8 */    int * _M_ptr</span><br><span class="line">/*    8      |     4 */    _Atomic_word _M_use_count;</span><br><span class="line">/*   12      |     4 */    _Atomic_word _M_weak_count;</span><br></pre></td></tr></table></figure>
-
-<p><code>0x0000000000604020</code> 是 _M_ptr 所指地址，这么看，两个counter是放在了对象的前面（地址小于对象指针）</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">(gdb) p &amp;p1</span><br><span class="line">$23 = (std::shared_ptr&lt;int&gt; *) 0x7ffffffed730</span><br><span class="line"></span><br><span class="line">(gdb) p sizeof(p1)</span><br><span class="line">$24 = 16</span><br><span class="line"></span><br><span class="line">(gdb) p p1._M_ptr</span><br><span class="line">$14 = (std::__shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt;::element_type *) 0x604020</span><br><span class="line"></span><br><span class="line">(gdb) x/2gx &amp;p1._M_ptr</span><br><span class="line">0x7ffffffed730: 0x0000000000604020      0x0000000000604010</span><br><span class="line"></span><br><span class="line">(gdb) x/2gx 0x0000000000604020</span><br><span class="line">0x604020:       0x000000000000000a      0x0000000000020fe1</span><br><span class="line"></span><br><span class="line">(gdb) p *p1</span><br><span class="line">$25 = 10</span><br><span class="line"></span><br><span class="line">(gdb) p/x &#123;&amp;p1, &amp;p1._M_ptr&#125;</span><br><span class="line">$26 = &#123;0x7ffffffed730, 0x7ffffffed730&#125;</span><br><span class="line"></span><br><span class="line">(gdb) p &amp;p1._M_refcount._M_pi._M_weak_count</span><br><span class="line">$16 = (_Atomic_word *) 0x60401c</span><br><span class="line">(gdb) p &amp;p1._M_refcount._M_pi._M_use_count</span><br><span class="line">$17 = (_Atomic_word *) 0x604018</span><br></pre></td></tr></table></figure>
-
-<h2 id="std-shared-ptr-成员构成"><a href="#std-shared-ptr-成员构成" class="headerlink" title="std::shared_ptr 成员构成"></a>std::shared_ptr 成员构成</h2><p><code>std::shared_ptr</code> 本身是空的，成员都继承自 <code>std::__shared_ptr</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(gdb) pt /mt p1</span><br><span class="line">type = class std::shared_ptr&lt;int&gt; [with _Tp = int] : public std::__shared_ptr&lt;_Tp, (__gnu_cxx::_Lock_policy)2&gt; &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>std::__shared_ptr</code> 里面是：</p>
-<ul>
-<li>指向实际对象的 <code>_M_ptr</code></li>
-<li>引用计数 <code>_M_refcount</code>, 这个包了一个指向两个引用计数int的指针。</li>
-</ul>
-<p>注意:</p>
-<ul>
-<li>pt能直接打印实例化的类型，注意替换 <code>_Tp</code> 为 <code>int</code></li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(gdb) pt /mt std::__shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt;</span><br><span class="line">type = class std::__shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; [with _Tp = int] : public std::__shared_ptr_access&lt;_Tp, (__gnu_cxx::_Lock_policy)2, false, false&gt; &#123;</span><br><span class="line">  private:</span><br><span class="line">    _Tp *_M_ptr;</span><br><span class="line">    std::__shared_count&lt;(__gnu_cxx::_Lock_policy)2&gt; _M_refcount;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>_M_ptr</code> 就是指向实际对象的指针。这里实例化为 int*</p>
-<p><code>_M_refcount</code> 里是 <code>_M_pi</code>指针</p>
-<ul>
-<li>pi could stand for “pointer to implementation”</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(gdb) pt /mt std::__shared_count&lt;(__gnu_cxx::_Lock_policy)2&gt;</span><br><span class="line">type = class std::__shared_count&lt;(__gnu_cxx::_Lock_policy)2&gt; &#123;</span><br><span class="line">  private:</span><br><span class="line">    std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt; *_M_pi;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>_M_pi</code>指向两个<code>int</code>的结构体, 这是引用计数变量。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(gdb) pt /mt std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;</span><br><span class="line">type = class std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt; : public std::_Mutex_base&lt;(__gnu_cxx::_Lock_policy)2&gt; &#123;</span><br><span class="line">  private:</span><br><span class="line">    _Atomic_word _M_use_count;</span><br><span class="line">    _Atomic_word _M_weak_count;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">(gdb) pt _Atomic_word</span><br><span class="line">type = int</span><br></pre></td></tr></table></figure>
-
-<h2 id="引用计数机制"><a href="#引用计数机制" class="headerlink" title="引用计数机制"></a>引用计数机制</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::shared_ptr&lt;<span class="type">int</span>&gt; p1 = std::<span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;(<span class="number">10</span>);</span><br><span class="line">    std::shared_ptr&lt;<span class="type">int</span>&gt; p2 = p1;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> a = <span class="number">10</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>执行 <code>std::shared_ptr&lt;int&gt; p2 = p1;</code>，底层调用 <code>std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::_M_add_ref_copy</code> 增加引用计数。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(gdb) bt</span><br><span class="line">#<span class="number">0</span>  __gnu_cxx::__atomic_add_dispatch (__mem=<span class="number">0x55555556aeb8</span>, __val=<span class="number">1</span>) at /usr/include/c++/<span class="number">9</span>/ext/atomicity.h:<span class="number">98</span></span><br><span class="line">#<span class="number">1</span>  <span class="number">0x000055555555520d</span> in std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt;::_M_add_ref_copy (<span class="keyword">this</span>=<span class="number">0x55555556aeb0</span>) at /usr/include/c++/<span class="number">9</span>/bits/shared_ptr_base.h:<span class="number">139</span></span><br><span class="line">#<span class="number">2</span>  <span class="number">0x00005555555550d3</span> in std::__shared_count&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt;::__shared_count (<span class="keyword">this</span>=<span class="number">0x7fffffffe278</span>, __r=...) at /usr/include/c++/<span class="number">9</span>/bits/shared_ptr_base.h:<span class="number">737</span></span><br><span class="line">#<span class="number">3</span>  <span class="number">0x0000555555554f9b</span> in std::__shared_ptr&lt;<span class="type">int</span>, (__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt;::__shared_ptr (<span class="keyword">this</span>=<span class="number">0x7fffffffe270</span>) at /usr/include/c++/<span class="number">9</span>/bits/shared_ptr_base.h:<span class="number">1167</span></span><br><span class="line">#<span class="number">4</span>  <span class="number">0x0000555555554fc5</span> in std::shared_ptr&lt;<span class="type">int</span>&gt;::<span class="built_in">shared_ptr</span> (<span class="keyword">this</span>=<span class="number">0x7fffffffe270</span>) at /usr/include/c++/<span class="number">9</span>/bits/shared_ptr.h:<span class="number">129</span></span><br><span class="line">#<span class="number">5</span>  <span class="number">0x0000555555554d50</span> <span class="function">in <span class="title">main</span> <span class="params">()</span> at shared_ptr.cpp:<span class="number">6</span></span></span><br></pre></td></tr></table></figure>
-
-<p>多个 <code>shared_ptr</code> 共享 <code>_M_pi</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(gdb) p p1._M_refcount._M_pi</span><br><span class="line">$11 = (std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt; *) 0x55555556aeb0</span><br><span class="line">(gdb) p p2._M_refcount._M_pi</span><br><span class="line">$12 = (std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt; *) 0x55555556aeb0</span><br></pre></td></tr></table></figure>
-
-<h1 id="unique-ptr"><a href="#unique-ptr" class="headerlink" title="unique_ptr"></a>unique_ptr</h1><p>unique_ptr的拷贝构造函数和拷贝赋值运算符函数都是delete。</p>
-<p>用std::tuple保存指针和deleter，tuple可以通过空基类优化做到在使用默认的deleter时，只占用一个指针的大小。</p>
-<h2 id="实现unique-ptr"><a href="#实现unique-ptr" class="headerlink" title="实现unique_ptr"></a>实现unique_ptr</h2>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/stl/emplace_back/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/stl/emplace_back/" class="post-title-link" itemprop="url">C++ std::vector::emplace_back</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>1.4k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>2 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>emplace_back可传入对象的参数列表，在容器末尾的位置用 placement new 原地构造，连move都省去了。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">President</span></span><br><span class="line">&#123;</span><br><span class="line">    std::string name;</span><br><span class="line">    std::string country;</span><br><span class="line">    <span class="type">int</span> year;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(std::string p_name, std::string p_country, <span class="type">int</span> p_year)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(p_name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(p_country)), <span class="built_in">year</span>(p_year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; name &lt;&lt; <span class="string">&quot; being constructed.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(President&amp;&amp; other)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(other.name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(other.country)), <span class="built_in">year</span>(other.year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; name &lt;&lt; <span class="string">&quot; being moved.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    President&amp; <span class="keyword">operator</span>=(<span class="type">const</span> President&amp; other) = <span class="keyword">default</span>;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::vector&lt;President&gt; elections;</span><br><span class="line">    elections.<span class="built_in">reserve</span>(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;emplace_back obj&#x27;s args:\n&quot;</span>;</span><br><span class="line">    elections.<span class="built_in">emplace_back</span>(<span class="string">&quot;Nelson&quot;</span>, <span class="string">&quot;South Africa&quot;</span>, <span class="number">1994</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果emplace_back一个对象，则是先构造，后移动</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\nemplace_back an obj:\n&quot;</span>;</span><br><span class="line">    elections.<span class="built_in">emplace_back</span>(<span class="built_in">President</span>(<span class="string">&quot;aaa&quot;</span>, <span class="string">&quot;usa&quot;</span>, <span class="number">2000</span>));</span><br><span class="line">    </span><br><span class="line"> </span><br><span class="line">    std::vector&lt;President&gt; reElections;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\npush_back:\n&quot;</span>;</span><br><span class="line">    reElections.<span class="built_in">push_back</span>(<span class="built_in">President</span>(<span class="string">&quot;Franklin&quot;</span>, <span class="string">&quot;the USA&quot;</span>, <span class="number">1936</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>输出：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">emplace_back obj&#x27;s args:</span><br><span class="line">Nelson being constructed.</span><br><span class="line"></span><br><span class="line">emplace_back an obj:</span><br><span class="line">aaa being constructed.</span><br><span class="line">aaa being moved.</span><br><span class="line"></span><br><span class="line">push_back:</span><br><span class="line">Franklin being constructed.</span><br><span class="line">Franklin being moved.</span><br></pre></td></tr></table></figure>
       
     </div>
 

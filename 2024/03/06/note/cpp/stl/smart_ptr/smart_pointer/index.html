@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="https:&#x2F;&#x2F;csguide.cn&#x2F;cpp&#x2F;memory&#x2F;shared_ptr.html#%E6%89%8B%E5%86%99-shared-ptr shared_ptr总结：内部是一个指向对象的指针，两个引用计数int（用atomic接口修改计数值，保证引用计数修改的线程安全），但是所指对象的线程安全没有保证。 打印shared_ptr p1的引用计数 12(gdb) p p1._M_refc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ std::shared_ptr">
+<meta property="og:url" content="http://example.com/2024/03/06/note/cpp/stl/smart_ptr/smart_pointer/index.html">
+<meta property="og:site_name" content="折纸飞向麦田的博客">
+<meta property="og:description" content="https:&#x2F;&#x2F;csguide.cn&#x2F;cpp&#x2F;memory&#x2F;shared_ptr.html#%E6%89%8B%E5%86%99-shared-ptr shared_ptr总结：内部是一个指向对象的指针，两个引用计数int（用atomic接口修改计数值，保证引用计数修改的线程安全），但是所指对象的线程安全没有保证。 打印shared_ptr p1的引用计数 12(gdb) p p1._M_refc">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-03-06T12:05:32.257Z">
+<meta property="article:modified_time" content="2024-03-06T12:05:32.257Z">
+<meta property="article:author" content="折纸飞向麦田">
+<meta property="article:tag" content="cpp">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2024/03/06/note/cpp/stl/smart_ptr/smart_pointer/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/03/06/note/cpp/stl/smart_ptr/smart_pointer/","path":"2024/03/06/note/cpp/stl/smart_ptr/smart_pointer/","title":"C++ std::shared_ptr"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>C++ std::shared_ptr | 折纸飞向麦田的博客</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?81afe862f494d24a95a49966a87c3b00"></script>
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">折纸飞向麦田的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#shared-ptr"><span class="nav-number">1.</span> <span class="nav-text">shared_ptr</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#std-shared-ptr-%E6%88%90%E5%91%98%E6%9E%84%E6%88%90"><span class="nav-number">1.1.</span> <span class="nav-text">std::shared_ptr 成员构成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%9C%BA%E5%88%B6"><span class="nav-number">1.2.</span> <span class="nav-text">引用计数机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E7%AE%80%E6%98%93%E7%89%88-shared-ptr"><span class="nav-number">1.3.</span> <span class="nav-text">实现简易版 shared_ptr</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#unique-ptr"><span class="nav-number">2.</span> <span class="nav-text">unique_ptr</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0unique-ptr"><span class="nav-number">2.1.</span> <span class="nav-text">实现unique_ptr</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">折纸飞向麦田</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/06/note/cpp/stl/smart_ptr/smart_pointer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="C++ std::shared_ptr | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++ std::shared_ptr
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-03-06 20:05:32" itemprop="dateCreated datePublished" datetime="2024-03-06T20:05:32+08:00">2024-03-06</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>4.4k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>7 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><a target="_blank" rel="noopener" href="https://csguide.cn/cpp/memory/shared_ptr.html#%E6%89%8B%E5%86%99-shared-ptr">https://csguide.cn/cpp/memory/shared_ptr.html#%E6%89%8B%E5%86%99-shared-ptr</a></p>
+<h1 id="shared-ptr"><a href="#shared-ptr" class="headerlink" title="shared_ptr"></a>shared_ptr</h1><p>总结：内部是一个指向对象的指针，两个引用计数int（用atomic接口修改计数值，保证引用计数修改的线程安全），但是所指对象的线程安全没有保证。</p>
+<p>打印shared_ptr <code>p1</code>的引用计数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) p p1._M_refcount._M_pi._M_use_count</span><br><span class="line">$<span class="number">17</span> = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://gcc.gnu.org/onlinedocs/libstdc++/manual/memory.html#shared_ptr.thread">gcc shared_ptr imp doc</a></p>
+<p>x86_64下一个shared_ptr是16字节</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(gdb) pt /o p1</span><br><span class="line"><span class="comment">/* offset    |  size */</span>  type = class <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="type">int</span>&gt; [with _Tp = <span class="type">int</span>] : public <span class="built_in">std</span>::__shared_ptr&lt;_Tp, (__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt; &#123;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* total size (bytes):   16 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>具体构成:</p>
+<ul>
+<li>真正的指针8字节</li>
+<li>use_count4字节</li>
+<li>weak_count4字节<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">(gdb) pt /o p1._M_refcount</span><br><span class="line"><span class="comment">/* offset    |  size */</span>  type = class <span class="built_in">std</span>::__shared_count&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt; &#123;</span><br><span class="line">                         private:</span><br><span class="line"><span class="comment">/*    0      |     8 */</span>    <span class="built_in">std</span>::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt; *_M_pi;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* total size (bytes):    8 */</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">(gdb) pt /o p1._M_ptr</span><br><span class="line">type = <span class="type">int</span> *</span><br><span class="line"></span><br><span class="line">(gdb) pt /o p1._M_refcount._M_pi</span><br><span class="line">type = class <span class="built_in">std</span>::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt; : public <span class="built_in">std</span>::_Mutex_base&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt; &#123;</span><br><span class="line">                         private:</span><br><span class="line"><span class="comment">/*    8      |     4 */</span>    _Atomic_word _M_use_count;</span><br><span class="line"><span class="comment">/*   12      |     4 */</span>    _Atomic_word _M_weak_count;</span><br><span class="line"></span><br><span class="line"> <span class="comment">/* total size (bytes):   16 */</span></span><br><span class="line">&#125; *</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>完整的内存布局为:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*    0      |     8 */</span>    <span class="type">int</span> * _M_ptr</span><br><span class="line"><span class="comment">/*    8      |     4 */</span>    _Atomic_word _M_use_count;</span><br><span class="line"><span class="comment">/*   12      |     4 */</span>    _Atomic_word _M_weak_count;</span><br></pre></td></tr></table></figure>
+
+<p><code>0x0000000000604020</code> 是 _M_ptr 所指地址，这么看，两个counter是放在了对象的前面（地址小于对象指针）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">(gdb) p &amp;p1</span><br><span class="line">$<span class="number">23</span> = (<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="type">int</span>&gt; *) <span class="number">0x7ffffffed730</span></span><br><span class="line"></span><br><span class="line">(gdb) p <span class="keyword">sizeof</span>(p1)</span><br><span class="line">$<span class="number">24</span> = <span class="number">16</span></span><br><span class="line"></span><br><span class="line">(gdb) p p1._M_ptr</span><br><span class="line">$<span class="number">14</span> = (<span class="built_in">std</span>::__shared_ptr&lt;<span class="type">int</span>, (__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt;::element_type *) <span class="number">0x604020</span></span><br><span class="line"></span><br><span class="line">(gdb) x/<span class="number">2</span>gx &amp;p1._M_ptr</span><br><span class="line"><span class="number">0x7ffffffed730</span>: <span class="number">0x0000000000604020</span>      <span class="number">0x0000000000604010</span></span><br><span class="line"></span><br><span class="line">(gdb) x/<span class="number">2</span>gx <span class="number">0x0000000000604020</span></span><br><span class="line"><span class="number">0x604020</span>:       <span class="number">0x000000000000000a</span>      <span class="number">0x0000000000020fe1</span></span><br><span class="line"></span><br><span class="line">(gdb) p *p1</span><br><span class="line">$<span class="number">25</span> = <span class="number">10</span></span><br><span class="line"></span><br><span class="line">(gdb) p/x &#123;&amp;p1, &amp;p1._M_ptr&#125;</span><br><span class="line">$<span class="number">26</span> = &#123;<span class="number">0x7ffffffed730</span>, <span class="number">0x7ffffffed730</span>&#125;</span><br><span class="line"></span><br><span class="line">(gdb) p &amp;p1._M_refcount._M_pi._M_weak_count</span><br><span class="line">$<span class="number">16</span> = (_Atomic_word *) <span class="number">0x60401c</span></span><br><span class="line">(gdb) p &amp;p1._M_refcount._M_pi._M_use_count</span><br><span class="line">$<span class="number">17</span> = (_Atomic_word *) <span class="number">0x604018</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="std-shared-ptr-成员构成"><a href="#std-shared-ptr-成员构成" class="headerlink" title="std::shared_ptr 成员构成"></a>std::shared_ptr 成员构成</h2><p><code>std::shared_ptr</code> 本身是空的，成员都继承自 <code>std::__shared_ptr</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(gdb) pt /mt p1</span><br><span class="line">type = class <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="type">int</span>&gt; [with _Tp = <span class="type">int</span>] : public <span class="built_in">std</span>::__shared_ptr&lt;_Tp, (__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt; &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::__shared_ptr</code> 里面是：</p>
+<ul>
+<li>指向实际对象的 <code>_M_ptr</code></li>
+<li>引用计数 <code>_M_refcount</code>, 这个包了一个指向两个引用计数int的指针。</li>
+</ul>
+<p>注意:</p>
+<ul>
+<li>pt能直接打印实例化的类型，注意替换 <code>_Tp</code> 为 <code>int</code></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(gdb) pt /mt <span class="built_in">std</span>::__shared_ptr&lt;<span class="type">int</span>, (__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt;</span><br><span class="line">type = class <span class="built_in">std</span>::__shared_ptr&lt;<span class="type">int</span>, (__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt; [with _Tp = <span class="type">int</span>] : public <span class="built_in">std</span>::__shared_ptr_access&lt;_Tp, (__gnu_cxx::_Lock_policy)<span class="number">2</span>, <span class="literal">false</span>, <span class="literal">false</span>&gt; &#123;</span><br><span class="line">  private:</span><br><span class="line">    _Tp *_M_ptr;</span><br><span class="line">    <span class="built_in">std</span>::__shared_count&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt; _M_refcount;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>_M_ptr</code> 就是指向实际对象的指针。这里实例化为 int*</p>
+<p><code>_M_refcount</code> 里是 <code>_M_pi</code>指针</p>
+<ul>
+<li>pi could stand for “pointer to implementation”</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(gdb) pt /mt <span class="built_in">std</span>::__shared_count&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt;</span><br><span class="line">type = class <span class="built_in">std</span>::__shared_count&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt; &#123;</span><br><span class="line">  private:</span><br><span class="line">    <span class="built_in">std</span>::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt; *_M_pi;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>_M_pi</code>指向两个<code>int</code>的结构体, 这是引用计数变量。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(gdb) pt /mt <span class="built_in">std</span>::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt;</span><br><span class="line">type = class <span class="built_in">std</span>::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt; : public <span class="built_in">std</span>::_Mutex_base&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt; &#123;</span><br><span class="line">  private:</span><br><span class="line">    _Atomic_word _M_use_count;</span><br><span class="line">    _Atomic_word _M_weak_count;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">(gdb) pt _Atomic_word</span><br><span class="line">type = <span class="type">int</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="引用计数机制"><a href="#引用计数机制" class="headerlink" title="引用计数机制"></a>引用计数机制</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::shared_ptr&lt;<span class="type">int</span>&gt; p1 = std::<span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;(<span class="number">10</span>);</span><br><span class="line">    std::shared_ptr&lt;<span class="type">int</span>&gt; p2 = p1;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> a = <span class="number">10</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行 <code>std::shared_ptr&lt;int&gt; p2 = p1;</code>，底层调用 <code>std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)2&gt;::_M_add_ref_copy</code> 增加引用计数。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(gdb) bt</span><br><span class="line">#<span class="number">0</span>  __gnu_cxx::__atomic_add_dispatch (__mem=<span class="number">0x55555556aeb8</span>, __val=<span class="number">1</span>) at /usr/include/c++/<span class="number">9</span>/ext/atomicity.h:<span class="number">98</span></span><br><span class="line">#<span class="number">1</span>  <span class="number">0x000055555555520d</span> in std::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt;::_M_add_ref_copy (<span class="keyword">this</span>=<span class="number">0x55555556aeb0</span>) at /usr/include/c++/<span class="number">9</span>/bits/shared_ptr_base.h:<span class="number">139</span></span><br><span class="line">#<span class="number">2</span>  <span class="number">0x00005555555550d3</span> in std::__shared_count&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt;::__shared_count (<span class="keyword">this</span>=<span class="number">0x7fffffffe278</span>, __r=...) at /usr/include/c++/<span class="number">9</span>/bits/shared_ptr_base.h:<span class="number">737</span></span><br><span class="line">#<span class="number">3</span>  <span class="number">0x0000555555554f9b</span> in std::__shared_ptr&lt;<span class="type">int</span>, (__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt;::__shared_ptr (<span class="keyword">this</span>=<span class="number">0x7fffffffe270</span>) at /usr/include/c++/<span class="number">9</span>/bits/shared_ptr_base.h:<span class="number">1167</span></span><br><span class="line">#<span class="number">4</span>  <span class="number">0x0000555555554fc5</span> in std::shared_ptr&lt;<span class="type">int</span>&gt;::<span class="built_in">shared_ptr</span> (<span class="keyword">this</span>=<span class="number">0x7fffffffe270</span>) at /usr/include/c++/<span class="number">9</span>/bits/shared_ptr.h:<span class="number">129</span></span><br><span class="line">#<span class="number">5</span>  <span class="number">0x0000555555554d50</span> <span class="function">in <span class="title">main</span> <span class="params">()</span> at shared_ptr.cpp:<span class="number">6</span></span></span><br></pre></td></tr></table></figure>
+
+<p>多个 <code>shared_ptr</code> 共享 <code>_M_pi</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(gdb) p p1._M_refcount._M_pi</span><br><span class="line">$<span class="number">11</span> = (<span class="built_in">std</span>::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt; *) <span class="number">0x55555556aeb0</span></span><br><span class="line">(gdb) p p2._M_refcount._M_pi</span><br><span class="line">$<span class="number">12</span> = (<span class="built_in">std</span>::_Sp_counted_base&lt;(__gnu_cxx::_Lock_policy)<span class="number">2</span>&gt; *) <span class="number">0x55555556aeb0</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="实现简易版-shared-ptr"><a href="#实现简易版-shared-ptr" class="headerlink" title="实现简易版 shared_ptr"></a>实现简易版 shared_ptr</h2><h1 id="unique-ptr"><a href="#unique-ptr" class="headerlink" title="unique_ptr"></a>unique_ptr</h1><p>unique_ptr的拷贝构造函数和拷贝赋值运算符函数都是delete。</p>
+<p>用std::tuple保存指针和deleter，tuple可以通过空基类优化做到在使用默认的deleter时，只占用一个指针的大小。</p>
+<h2 id="实现unique-ptr"><a href="#实现unique-ptr" class="headerlink" title="实现unique_ptr"></a>实现unique_ptr</h2>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/cpp/" rel="tag"># cpp</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/03/06/note/cpp/GDB/" rel="prev" title="GDB指令备忘">
+                  <i class="fa fa-angle-left"></i> GDB指令备忘
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/03/06/note/cpp/%E5%86%85%E8%81%94%E6%B1%87%E7%BC%96/" rel="next" title="C++内联汇编">
+                  C++内联汇编 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">折纸飞向麦田</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="从汇编角度，分析编译器（本文基于 gcc version 9.4.0）如何实现c++的虚函数机制。 注意：c++标准没有规定必须用虚函数表这种形式实现，只是大多数编译器都会采用这种实现方式。 原理概述：一个类只要声明了一个虚函数，则编译器为该类生成一个虚函数表，虚函数表本质是一个函数指针数组，包含该类所有成员函数的最终入口地址。每个对象在构造时，额外存一个虚函数表指针，指向虚函数表起始地址。调用每">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从汇编角度理解 C++ 虚函数实现原理">
+<meta property="og:url" content="http://example.com/2024/03/06/note/cpp/%E8%99%9A%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="折纸飞向麦田的博客">
+<meta property="og:description" content="从汇编角度，分析编译器（本文基于 gcc version 9.4.0）如何实现c++的虚函数机制。 注意：c++标准没有规定必须用虚函数表这种形式实现，只是大多数编译器都会采用这种实现方式。 原理概述：一个类只要声明了一个虚函数，则编译器为该类生成一个虚函数表，虚函数表本质是一个函数指针数组，包含该类所有成员函数的最终入口地址。每个对象在构造时，额外存一个虚函数表指针，指向虚函数表起始地址。调用每">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-03-06T12:05:32.263Z">
+<meta property="article:modified_time" content="2024-03-06T12:23:57.454Z">
+<meta property="article:author" content="折纸飞向麦田">
+<meta property="article:tag" content="cpp">
+<meta property="article:tag" content="汇编">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2024/03/06/note/cpp/%E8%99%9A%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/03/06/note/cpp/%E8%99%9A%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/","path":"2024/03/06/note/cpp/虚函数实现原理/","title":"从汇编角度理解 C++ 虚函数实现原理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>从汇编角度理解 C++ 虚函数实现原理 | 折纸飞向麦田的博客</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?81afe862f494d24a95a49966a87c3b00"></script>
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">折纸飞向麦田的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8%E5%86%85%E5%AE%B9"><span class="nav-number">1.</span> <span class="nav-text">虚函数表内容</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E6%9F%A5%E7%9C%8B"><span class="nav-number">1.1.</span> <span class="nav-text">动态查看</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E6%9F%A5%E7%9C%8B"><span class="nav-number">1.2.</span> <span class="nav-text">静态查看</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#g-%E6%94%AF%E6%8C%81%E5%AF%BC%E5%87%BA%E7%B1%BB%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8"><span class="nav-number">1.2.1.</span> <span class="nav-text">g++支持导出类的虚函数表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B4%E6%8E%A5%E6%9F%A5%E7%9C%8B%E7%BC%96%E8%AF%91%E5%99%A8%E7%94%9F%E6%88%90%E6%B1%87%E7%BC%96%E4%BB%A3%E7%A0%81"><span class="nav-number">1.2.2.</span> <span class="nav-text">直接查看编译器生成汇编代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E6%B1%87%E7%BC%96ELF%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6"><span class="nav-number">1.2.3.</span> <span class="nav-text">反汇编ELF可执行文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8%E6%8C%87%E9%92%88%E5%9C%A8%E5%93%AA%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">虚函数表指针在哪？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E8%BF%87%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">虚函数调用过程</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">折纸飞向麦田</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/06/note/cpp/%E8%99%9A%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="从汇编角度理解 C++ 虚函数实现原理 | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          从汇编角度理解 C++ 虚函数实现原理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-03-06 20:05:32 / 修改时间：20:23:57" itemprop="dateCreated datePublished" datetime="2024-03-06T20:05:32+08:00">2024-03-06</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>7.3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>12 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>从汇编角度，分析编译器（本文基于 <code>gcc version 9.4.0</code>）如何实现c++的虚函数机制。</p>
+<p>注意：c++标准没有规定必须用虚函数表这种形式实现，只是大多数编译器都会采用这种实现方式。</p>
+<p>原理概述：一个类只要声明了一个虚函数，则编译器为该类生成一个虚函数表，虚函数表本质是一个函数指针数组，包含该类所有成员函数的最终入口地址。每个对象在构造时，额外存一个虚函数表指针，指向虚函数表起始地址。调用每个成员函数时，查虚函数表，确定真正的函数入口地址。</p>
+<p>需要明确：虚函数表本身在只读数据段内，独一份，由该类所有对象实例共享，而虚函数指针在单个对象实例内，每个对象人手一份。</p>
+<h1 id="虚函数表内容"><a href="#虚函数表内容" class="headerlink" title="虚函数表内容"></a>虚函数表内容</h1><p>首先，看下虚函数表中究竟有什么。</p>
+<h2 id="动态查看"><a href="#动态查看" class="headerlink" title="动态查看"></a>动态查看</h2><p>最简单直观的一种方式，在GDB中，可打印运行时的虚函数表</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span> : <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Base* p = <span class="keyword">new</span> <span class="built_in">Derived</span>();</span><br><span class="line">    p-&gt;<span class="built_in">foo</span>();</span><br><span class="line">    p-&gt;<span class="built_in">bar</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info vtbl p</span><br><span class="line">vtable <span class="keyword">for</span> <span class="string">&#x27;Base&#x27;</span> @ <span class="number">0x555555556d18</span> (subobject @ <span class="number">0x555555569eb0</span>):</span><br><span class="line">[<span class="number">0</span>]: <span class="number">0x555555554a72</span> &lt;Derived::<span class="built_in">foo</span>()&gt;</span><br><span class="line">[<span class="number">1</span>]: <span class="number">0x555555554a62</span> &lt;Base::<span class="built_in">bar</span>()&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="静态查看"><a href="#静态查看" class="headerlink" title="静态查看"></a>静态查看</h2><h3 id="g-支持导出类的虚函数表"><a href="#g-支持导出类的虚函数表" class="headerlink" title="g++支持导出类的虚函数表"></a>g++支持导出类的虚函数表</h3><p>编译时加上参数：<code>-fdump-lang-class</code></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -fdump-lang-<span class="keyword">class</span> <span class="title class_">demo</span>.cpp</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>NOTE: Before GCC 8, the option is -fdump-class-hierarchy instead of -fdump-lang-class.</p>
+</blockquote>
+<p>测试代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// demo.cpp</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span> : <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Base* p = <span class="keyword">new</span> <span class="built_in">Derived</span>();</span><br><span class="line">    p-&gt;<span class="built_in">foo</span>();</span><br><span class="line">    p-&gt;<span class="built_in">bar</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，GDB的输出是省略了虚函数表的前两项，只输出成员函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Vtable <span class="keyword">for</span> Derived</span><br><span class="line">Derived::_ZTV7Derived: <span class="number">4</span> entries</span><br><span class="line"><span class="number">0</span>     (<span class="type">int</span> (*)(...))<span class="number">0</span></span><br><span class="line"><span class="number">8</span>     (<span class="type">int</span> (*)(...))(&amp; _ZTI7Derived)</span><br><span class="line"><span class="number">16</span>    (<span class="type">int</span> (*)(...))Derived::foo</span><br><span class="line"><span class="number">24</span>    (<span class="type">int</span> (*)(...))Base::bar</span><br><span class="line"></span><br><span class="line"><span class="meta"># c++filt _ZTI7Derived</span></span><br><span class="line">typeinfo <span class="keyword">for</span> Derived</span><br></pre></td></tr></table></figure>
+
+<h3 id="直接查看编译器生成汇编代码"><a href="#直接查看编译器生成汇编代码" class="headerlink" title="直接查看编译器生成汇编代码"></a>直接查看编译器生成汇编代码</h3><p>通过分析编译器生成汇编代码，静态分析虚函数表中内容。</p>
+<p>测试代码:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// demo.cpp</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span> : <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Base* p = <span class="keyword">new</span> <span class="built_in">Derived</span>();</span><br><span class="line">    p-&gt;<span class="built_in">foo</span>();</span><br><span class="line">    p-&gt;<span class="built_in">bar</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用 -S 指示g++编译成功后停止，只输出汇编代码，不汇编。</p>
+<p>注意：g++ -S 输出的汇编代码中所有符号均已 name-mangled，因此需要用 <code>c++filt</code> 还原符号。</p>
+<p>将可读的汇编代码存到 <code>demo.s</code> 中</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">g++ -S -g demo.cpp -o demo.mangled.s</span><br><span class="line"><span class="built_in">cat</span> demo.mangled.s | c++filt &gt; demo.s</span><br></pre></td></tr></table></figure>
+
+<p>从汇编代码中摘出Base和Derived类的虚函数表（与 <code>g++ -fdump-lang-class</code> 给出的结果一致）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">vtable <span class="keyword">for</span> Derived:</span><br><span class="line">	.quad	<span class="number">0</span>                    <span class="comment">// 填充8字节的 0x0 </span></span><br><span class="line">	.quad	typeinfo <span class="keyword">for</span> Derived <span class="comment">// 符号 `typeinfo for Derived` 的地址（8字节）</span></span><br><span class="line">	.quad	<span class="title function_">Derived::foo</span><span class="params">()</span>       <span class="comment">// 符号 `Derived::foo()` 的地址</span></span><br><span class="line">	.quad	<span class="title function_">Base::bar</span><span class="params">()</span>          <span class="comment">// 继承父类的 `Base::bar()`</span></span><br><span class="line">	.weak	vtable <span class="keyword">for</span> Base</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 指明 `vtable for Derived` 存放于 `.data.rel.ro.local` 节</span></span><br><span class="line">	.section	.data.rel.ro.local._ZTV4Base,&quot;awG&quot;,@progbits,vtable <span class="keyword">for</span> Base,comdat</span><br><span class="line">	.align 8</span><br><span class="line">	.type	vtable <span class="keyword">for</span> Base, @object</span><br><span class="line">	.size	vtable <span class="keyword">for</span> Base, 32  <span class="comment">// 该虚函数表长度为32字节，4个8字节的地址。</span></span><br><span class="line"></span><br><span class="line">vtable <span class="keyword">for</span> Base:</span><br><span class="line">	.quad	0</span><br><span class="line">	.quad	typeinfo <span class="keyword">for</span> Base</span><br><span class="line">	.quad	<span class="title function_">Base::foo</span><span class="params">()</span></span><br><span class="line">	.quad	<span class="title function_">Base::bar</span><span class="params">()</span></span><br><span class="line">	.weak	typeinfo <span class="keyword">for</span> Derived</span><br><span class="line">	.section	.data.rel.ro._ZTI7Derived,&quot;awG&quot;,@progbits,typeinfo <span class="keyword">for</span> Derived,comdat</span><br><span class="line">	.align 8</span><br><span class="line">	.type	typeinfo <span class="keyword">for</span> Derived, @object</span><br><span class="line">	.size	typeinfo <span class="keyword">for</span> Derived, 24</span><br></pre></td></tr></table></figure>
+
+<h3 id="反汇编ELF可执行文件"><a href="#反汇编ELF可执行文件" class="headerlink" title="反汇编ELF可执行文件"></a>反汇编ELF可执行文件</h3><p>对编译链接后的可执行文件反汇编，看下最终的静态虚函数表长什么样。</p>
+<p>虚函数表 <code>vtable for Derived</code> 位于: <code>[0x1d28, 0x1d28 + 0x20 = 0x1d48]</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ objdump -t -C | grep <span class="string">&quot;vtable&quot;</span></span><br><span class="line"><span class="number">0000000000001</span>d48  w    O .data.rel.ro.local     <span class="number">0000000000000020</span>              vtable <span class="keyword">for</span> Base</span><br><span class="line"><span class="number">0000000000001</span>d28  w    O .data.rel.ro.local     <span class="number">0000000000000020</span>              vtable <span class="keyword">for</span> Derived</span><br></pre></td></tr></table></figure>
+
+<p><code>.data.rel.ro.local</code> 是数据节，内容如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ objdump -C -j .data.rel.ro.local -s a.out</span><br><span class="line"></span><br><span class="line">a.out:     file format elf64-x86<span class="number">-64</span></span><br><span class="line"></span><br><span class="line">Contents of section .data.rel.ro.local:</span><br><span class="line"> <span class="comment">// 这32字节是虚函数表 vtable for Derived 的内容</span></span><br><span class="line"> <span class="number">1</span>d28 <span class="number">00000000</span> <span class="number">00000000</span> <span class="number">781</span>d0000 <span class="number">00000000</span>  ........x.......</span><br><span class="line"> <span class="number">1</span>d38 dc080000 <span class="number">00000000</span> cc080000 <span class="number">00000000</span>  ................</span><br><span class="line"></span><br><span class="line"> <span class="comment">// 这32字节是虚函数表 vtable for Base 的内容</span></span><br><span class="line"> <span class="number">1</span>d48 <span class="number">00000000</span> <span class="number">00000000</span> <span class="number">901</span>d0000 <span class="number">00000000</span>  ................</span><br><span class="line"> <span class="number">1</span>d58 bc080000 <span class="number">00000000</span> cc080000 <span class="number">00000000</span>  ................</span><br></pre></td></tr></table></figure>
+
+<p>解析 <code>vtable for Derived</code> 内四个按小端存储的地址：</p>
+<ul>
+<li><code>0x0</code></li>
+<li><code>0x1d78</code></li>
+<li><code>0x8dc</code></li>
+<li><code>0x8cc</code></li>
+</ul>
+<p>正是 <code>Derived</code> 的成员函数符号地址，与 <code>g++ -S</code> 给出的汇编代码一致。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ objdump -C -t a.out | egrep <span class="string">&quot;1d78|8dc|8cc&quot;</span></span><br><span class="line"><span class="number">00000000000008</span>cc  w    F .text  <span class="number">000000000000000f</span>              Base::bar()</span><br><span class="line"><span class="number">00000000000008</span>dc  w    F .text  <span class="number">000000000000000f</span>              Derived::foo()</span><br><span class="line"><span class="number">0000000000001</span>d78  w    O .data.rel.ro   <span class="number">0000000000000018</span>              typeinfo <span class="keyword">for</span> Derived</span><br></pre></td></tr></table></figure>
+
+<h1 id="虚函数表指针在哪？"><a href="#虚函数表指针在哪？" class="headerlink" title="虚函数表指针在哪？"></a>虚函数表指针在哪？</h1><p>测试代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span> : <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> a = <span class="number">0x11223344</span>;</span><br><span class="line">	<span class="type">short</span> b = <span class="number">0x5566</span>;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Base* p = <span class="keyword">new</span> <span class="built_in">Derived</span>();</span><br><span class="line">    p-&gt;<span class="built_in">foo</span>();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>多态对象的构造:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">17</span>          Base* p = new Derived();</span><br><span class="line">   <span class="number">0x0000555555554866</span> &lt;+<span class="number">13</span>&gt;:    mov    $<span class="number">0x10</span>,%edi     <span class="comment">// sizeof(Derived) = 16 = 0x10</span></span><br><span class="line">   <span class="number">0x000055555555486b</span> &lt;+<span class="number">18</span>&gt;:    callq  <span class="number">0x555555554760</span> <span class="comment">// new()</span></span><br><span class="line">   <span class="number">0x0000555555554870</span> &lt;+<span class="number">23</span>&gt;:    mov    %rax,%rbx      <span class="comment">// $rax 存 new() 申请到的内存的起始地址，将该地址转存 $rbx，$rbx等价于函数指针p</span></span><br><span class="line">   <span class="number">0x0000555555554873</span> &lt;+<span class="number">26</span>&gt;:    movq   $<span class="number">0x0</span>,(%rbx)    <span class="comment">// 初始化堆中对象前8字节为0</span></span><br><span class="line">   <span class="number">0x000055555555487a</span> &lt;+<span class="number">33</span>&gt;:    movl   $<span class="number">0x0</span>,<span class="number">0x8</span>(%rbx) <span class="comment">// 初始化紧跟的4字节为0</span></span><br><span class="line">   <span class="number">0x0000555555554881</span> &lt;+<span class="number">40</span>&gt;:    movw   $<span class="number">0x0</span>,<span class="number">0xc</span>(%rbx) <span class="comment">// 初始化紧跟的2字节为0</span></span><br><span class="line">   <span class="number">0x0000555555554887</span> &lt;+<span class="number">46</span>&gt;:    mov    %rbx,%rdi      <span class="comment">// 将对象起始地址传入$rdi，作为 Derived::Derived() 的首个入参</span></span><br><span class="line">=&gt; <span class="number">0x000055555555488a</span> &lt;+<span class="number">49</span>&gt;:    callq  <span class="number">0x555555554900</span> &lt;Derived::Derived()&gt;</span><br><span class="line">   <span class="number">0x000055555555488f</span> &lt;+<span class="number">54</span>&gt;:    mov    %rbx,<span class="number">-0x18</span>(%rbp)</span><br></pre></td></tr></table></figure>
+
+<p>p 指向对象起始地址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(gdb) p/x $rbx</span><br><span class="line">$<span class="number">9</span> = <span class="number">0x555555568eb0</span></span><br><span class="line">(gdb) p/x p</span><br><span class="line">$<span class="number">10</span> = <span class="number">0x555555568eb0</span></span><br></pre></td></tr></table></figure>
+
+<p>此刻p所指对象的状态：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(gdb) x/<span class="number">12b</span> $rbx</span><br><span class="line"><span class="number">0x555555568eb0</span>: <span class="number">0x00</span>    <span class="number">0x00</span>    <span class="number">0x00</span>    <span class="number">0x00</span>    <span class="number">0x00</span>    <span class="number">0x00</span>    <span class="number">0x00</span>    <span class="number">0x00</span></span><br><span class="line"><span class="number">0x555555568eb8</span>: <span class="number">0x00</span>    <span class="number">0x00</span>    <span class="number">0x00</span>    <span class="number">0x00</span>    <span class="number">0x00</span>    <span class="number">0x00</span>    <span class="number">0x00</span>    <span class="number">0x00</span></span><br></pre></td></tr></table></figure>
+
+<p>执行 <code>main+49</code> 即 <code>Derived::Derived()</code> 后，构造函数填充如下内容：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(gdb) x/<span class="number">16b</span> $rbx</span><br><span class="line"><span class="number">0x555555568eb0</span>: <span class="number">0x38</span>    <span class="number">0x5d</span>    <span class="number">0x55</span>    <span class="number">0x55</span>    <span class="number">0x55</span>    <span class="number">0x55</span>    <span class="number">0x00</span>    <span class="number">0x00</span></span><br><span class="line"><span class="number">0x555555568eb8</span>: <span class="number">0x44</span>    <span class="number">0x33</span>    <span class="number">0x22</span>    <span class="number">0x11</span>    <span class="number">0x66</span>    <span class="number">0x55</span>    <span class="number">0x00</span>    <span class="number">0x00</span></span><br></pre></td></tr></table></figure>
+
+<p>由于小端存储，这16字节，翻译过来是：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0x0000555555555d38</span> | <span class="number">0x11223344</span> | <span class="number">0x00005566</span></span><br></pre></td></tr></table></figure>
+
+<p>前8字节就是虚函数表指针</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info symbol <span class="number">0x0000555555555d38</span></span><br><span class="line">vtable <span class="keyword">for</span> Derived + <span class="number">16</span> in section .data.rel.ro.local of /home/redis/demo/a.out</span><br></pre></td></tr></table></figure>
+
+<h1 id="虚函数调用过程"><a href="#虚函数调用过程" class="headerlink" title="虚函数调用过程"></a>虚函数调用过程</h1><p>测试代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span> : <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Base* p = <span class="keyword">new</span> <span class="built_in">Derived</span>();</span><br><span class="line">    p-&gt;<span class="built_in">foo</span>();</span><br><span class="line">    p-&gt;<span class="built_in">bar</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>p-&gt;foo();</code> 即调用子类重写的函数，对应的汇编代码片段：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">   <span class="number">0x000055555555487d</span> &lt;+<span class="number">36</span>&gt;:    callq  <span class="number">0x55555555490a</span> &lt;Derived::Derived()&gt;</span><br><span class="line">   <span class="number">0x0000555555554882</span> &lt;+<span class="number">41</span>&gt;:    mov    %rbx,<span class="number">-0x18</span>(%rbp)   <span class="comment">// 复制指针p的值到 $rbp-0x18</span></span><br><span class="line">   <span class="number">0x0000555555554886</span> &lt;+<span class="number">45</span>&gt;:    mov    <span class="number">-0x18</span>(%rbp),%rax   <span class="comment">// 转存指针p的值到 $rax</span></span><br><span class="line">=&gt; <span class="number">0x000055555555488a</span> &lt;+<span class="number">49</span>&gt;:    mov    (%rax),%rax        </span><br><span class="line">   <span class="number">0x000055555555488d</span> &lt;+<span class="number">52</span>&gt;:    mov    (%rax),%rdx</span><br><span class="line">   <span class="number">0x0000555555554890</span> &lt;+<span class="number">55</span>&gt;:    mov    <span class="number">-0x18</span>(%rbp),%rax</span><br><span class="line">   <span class="number">0x0000555555554894</span> &lt;+<span class="number">59</span>&gt;:    mov    %rax,%rdi</span><br><span class="line">   <span class="number">0x0000555555554897</span> &lt;+<span class="number">62</span>&gt;:    callq  *%rdx</span><br></pre></td></tr></table></figure>
+
+<p>此刻寄存器与内存的状态如下，此刻 <code>$rbx</code> 存指针 <code>p</code> 的值</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">(gdb) p/x p</span><br><span class="line">$<span class="number">18</span> = <span class="number">0x555555568eb0</span></span><br><span class="line">(gdb) x/g $rbx</span><br><span class="line"><span class="number">0x555555568eb0</span>: <span class="number">0x0000555555555d38</span>     <span class="comment">// $rbx存0x555555568eb0，而 0x555555568eb0 地址上存放8字节 0x0000555555555d38</span></span><br><span class="line">(gdb) x/g $rbp<span class="number">-0x18</span></span><br><span class="line"><span class="number">0x7fffffffe2b8</span>: <span class="number">0x0000555555568eb0</span>     <span class="comment">// 将 p 的值暂存当前栈帧上</span></span><br><span class="line">(gdb) x/g $rax</span><br><span class="line"><span class="number">0x555555568eb0</span>: <span class="number">0x0000555555555d38</span>     <span class="comment">// $rax = p</span></span><br></pre></td></tr></table></figure>
+
+<p>关键就在这两行汇编代码，此刻 <code>$rax</code> 存指针 <code>p</code> 的值，这两行执行后，<code>$rdx</code> 要存放 <code>Derived::foo()</code> 的入口地址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">=&gt; <span class="number">0x000055555555488a</span> &lt;+<span class="number">49</span>&gt;:    mov    (%rax),%rax</span><br><span class="line">   <span class="number">0x000055555555488d</span> &lt;+<span class="number">52</span>&gt;:    mov    (%rax),%rdx</span><br></pre></td></tr></table></figure>
+
+<p>执行 <code>main+49</code> 的 <code>mov (%rax),%rax</code> ，读取 <code>p</code> 所指内存前8字节内容，读取到 <code>0x555555555d38</code> 即虚函数表指针，存入 <code>$rax</code>。<br>而 <code>0x555555555d38</code> 位于 <code>vtable for Derived+16</code>，即虚函数表内首个函数指针的地址。<br>而 <code>0x555555555d38</code> 所指的 <code>0x00005555555548dc</code> 正是位于 <code>.text</code> 节的 <code>Derived::foo()</code> 符号的入口地址。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">   <span class="number">0x000055555555488a</span> &lt;+<span class="number">49</span>&gt;:    mov    (%rax),%rax        </span><br><span class="line">=&gt; <span class="number">0x000055555555488d</span> &lt;+<span class="number">52</span>&gt;:    mov    (%rax),%rdx</span><br><span class="line"></span><br><span class="line">(gdb) x/g $rax</span><br><span class="line"><span class="number">0x555555555d38</span> &lt;_ZTV7Derived+<span class="number">16</span>&gt;:       <span class="number">0x00005555555548dc</span></span><br><span class="line">(gdb) dem _ZTV7Derived</span><br><span class="line">vtable <span class="keyword">for</span> Derived</span><br><span class="line"></span><br><span class="line">(gdb) info symbol <span class="number">0x555555555d38</span></span><br><span class="line">vtable <span class="keyword">for</span> Derived + <span class="number">16</span> in section .data.rel.ro.local of /home/redis/demo/a.out</span><br><span class="line"></span><br><span class="line">(gdb) info vtbl p</span><br><span class="line">vtable <span class="keyword">for</span> <span class="string">&#x27;Base&#x27;</span> @ <span class="number">0x555555555d38</span> (subobject @ <span class="number">0x555555568eb0</span>):</span><br><span class="line">[<span class="number">0</span>]: <span class="number">0x5555555548dc</span> &lt;Derived::foo()&gt;</span><br><span class="line">[<span class="number">1</span>]: <span class="number">0x5555555548cc</span> &lt;Base::bar()&gt;</span><br><span class="line"></span><br><span class="line">(gdb) info symbol <span class="number">0x00005555555548dc</span></span><br><span class="line">Derived::foo() in section .text of /home/redis/demo/a.out</span><br></pre></td></tr></table></figure>
+
+<p>继续执行 <code>mov (%rax),%rdx</code>，对 <code>0x555555555d38</code> 这个函数指针的地址解引用，取得所指的 <code>Derived::foo()</code> 的符号入口地址 <code>0x5555555548dc</code>，存入 <code>$rdx</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) x/x $rdx</span><br><span class="line"><span class="number">0x5555555548dc</span> &lt;Derived::foo()&gt;:        <span class="number">0xe5894855fa1e0ff3</span>  <span class="comment">// 0xe5894855fa1e0ff3这一串其实是 Derived::foo() 的汇编指令</span></span><br></pre></td></tr></table></figure>
+
+<p>最后执行 <code>Derived::foo()</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0x0000555555554897</span> &lt;+<span class="number">62</span>&gt;:    callq  *%rdx</span><br></pre></td></tr></table></figure>
+
+<p>总结：通过对象中的虚函数表指针，找到虚函数表，进而找到对应成员函数的真正入口地址。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/cpp/" rel="tag"># cpp</a>
+              <a href="/tags/%E6%B1%87%E7%BC%96/" rel="tag"># 汇编</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/03/06/note/linux/gas/" rel="prev" title="Linux GAS">
+                  <i class="fa fa-angle-left"></i> Linux GAS
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/03/06/note/linux/ld/" rel="next" title="Linux ld">
+                  Linux ld <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">折纸飞向麦田</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
