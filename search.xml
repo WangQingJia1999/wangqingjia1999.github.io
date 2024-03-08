@@ -1,71 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>哈希冲突处理</title>
-    <url>/2024/02/29/note/algo/%E5%93%88%E5%B8%8C%E5%86%B2%E7%AA%81/</url>
-    <content><![CDATA[<h1 id="哈希冲突"><a href="#哈希冲突" class="headerlink" title="哈希冲突"></a>哈希冲突</h1><h1 id="开放定址法（Open-Addressing"><a href="#开放定址法（Open-Addressing" class="headerlink" title="开放定址法（Open Addressing)"></a>开放定址法（Open Addressing)</h1><p>冲突时，按照一定规则，找到一个空闲位置。当删除某个键值对时，不能直接删除，否则影响其他键值对的查找，打个标记</p>
-<p>优点：</p>
-<ul>
-<li>低内存开销，只需一个hash数组和一个哈希函数，无需像拉链法额外存指针维护链表，因此能用同样的空间提供更多卡槽，潜在地减少冲突可能</li>
-<li>对缓存友好，发生冲突时，线性探查</li>
-</ul>
-<p>缺点：</p>
-<ul>
-<li>删除操作麻烦点，先打标记，等有元素来，才真正替换掉</li>
-</ul>
-<h2 id="线行探查法-Linear-Probing"><a href="#线行探查法-Linear-Probing" class="headerlink" title="线行探查法(Linear Probing)"></a>线行探查法(Linear Probing)</h2><p>发生冲突的单元起，依次判断下一个单元是否为空，当达到最后一个单元时，再从表首依次判断。直到碰到空闲的单元或者探查完全部单元为止。</p>
-<p>线性探测带来的最大问题就是冲突的堆积，你把别人预定的坑占了，别人也就要像你一样去找坑。当装填因子变大，效率降低，改进的办法有二次方探测法和随机数探测法。</p>
-<h2 id="平方探查法-Quadratic-Probing"><a href="#平方探查法-Quadratic-Probing" class="headerlink" title="平方探查法(Quadratic Probing)"></a>平方探查法(Quadratic Probing)</h2><p>Let hash(x) be the slot index computed using the hash function.</p>
-<ul>
-<li>If the slot <code>hash(x) % S</code> is full, then we try <code>(hash(x) + 1*1) % S</code>.</li>
-<li>If <code>(hash(x) + 1*1) % S</code> is also full, then we try <code>(hash(x) + 2*2) % S</code>.</li>
-<li>If <code>(hash(x) + 2*2) % S</code> is also full, then we try <code>(hash(x) + 3*3) % S</code>.</li>
-<li>This process is repeated for all the values of i until an empty slot is found.</li>
-</ul>
-<p>平方探查法不能探查到全部剩余的单元。不过在实际应用中，能探查到一半单元也就可以了。若探查到一半单元仍找不到一个空闲单元，表明此散列表太满，应该重新建立。</p>
-<h2 id="双重散列-Double-hashing"><a href="#双重散列-Double-hashing" class="headerlink" title="双重散列(Double hashing)"></a>双重散列(Double hashing)</h2><p><em>Double hashing can be done using :</em></p>
-<p><em><strong>(hash1(key) + i * hash2(key)) % TABLE_SIZE</strong></em></p>
-<p><em>Here hash1() and hash2() are hash functions and TABLE_SIZE</em></p>
-<p><em>is size of hash table.</em></p>
-<p><em>(We repeat by increasing i when collision occurs)</em></p>
-<p>First hash function is typically hash1(key) &#x3D; key % TABLE_SIZE</p>
-<p>A popular second hash function is</p>
-<p><strong>hash2(key) &#x3D; PRIME – (key % PRIME)</strong></p>
-<p>where PRIME is a prime smaller than the TABLE_SIZE.</p>
-<p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240229091342.png" alt="image.png"></p>
-<h1 id="链地址法（拉链法）（Separate-chaining）"><a href="#链地址法（拉链法）（Separate-chaining）" class="headerlink" title="链地址法（拉链法）（Separate chaining）"></a>链地址法（拉链法）（Separate chaining）</h1><ul>
-<li>链表法适用于经常进行插入和删除的情况。</li>
-<li>注：Java8之前版本用链接地址法单链表解决HashMap哈希冲突，Java8 则采用了一种混合模式，对于链表长度大于8的，会转换为红黑树存储（以hashcode比较树中节点大小），如果树中元素低于6个则回退单链表，如果树中元素超过64个，则换更大的buckets数组重新散列，h<a href="https://stackoverflow.com/a/43911638/11850070">ttps:&#x2F;&#x2F;stackoverflow.com&#x2F;a&#x2F;43911638&#x2F;11850070</a></li>
-<li>缓存不友好，因为链表的每个节点在内存中分散存储的，不像开放地址法那样相邻。</li>
-</ul>
-<h1 id="再哈希法"><a href="#再哈希法" class="headerlink" title="再哈希法"></a>再哈希法</h1><p>就是同时构造多个不同的哈希函数：<br>当H1 &#x3D; RH1(key)  发生冲突时，再用H2 &#x3D; RH2(key) 进行计算，直到冲突不再产生，这种方法不易产生聚集，但是增加了计算时间。</p>
-<h1 id="建立公共溢出区"><a href="#建立公共溢出区" class="headerlink" title="建立公共溢出区"></a>建立公共溢出区</h1><p>将哈希表分为公共表和溢出表，当溢出发生时，将所有溢出数据统一放到溢出区。</p>
-]]></content>
-      <tags>
-        <tag>algo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>布隆过滤器</title>
-    <url>/2024/02/29/note/algo/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/</url>
-    <content><![CDATA[<h1 id="Bloom-Filter的原理"><a href="#Bloom-Filter的原理" class="headerlink" title="Bloom Filter的原理"></a>Bloom Filter的原理</h1><p>用来告诉你 “某个元素一定不存在或者可能存在”。</p>
-<p>布隆过滤器的原理是，当一个元素被加入集合时，通过K个散列函数将这个元素映射成一个bit数组中的K个点位，把它们均置为1。</p>
-<p>检索时，我们只要看看这些点是不是都是1就（大约）知道集合中有没有它了：</p>
-<ul>
-<li><p>如果这些点有任何一个0，则被检元素一定不在；</p>
-</li>
-<li><p>如果都是1，则被检元素很可能在。</p>
-</li>
-<li><p>缺点是有一定的误识别率和删除困难。</p>
-</li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/wangqingjia1999/img/master/20240229091315.png" alt="image.png"></p>
-]]></content>
-      <tags>
-        <tag>algo</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>CMake备忘</title>
     <url>/2024/02/19/note/cpp/CMake%20/</url>
     <content><![CDATA[<p>add cxx flags for a target</p>
@@ -169,36 +104,6 @@
       </tags>
   </entry>
   <entry>
-    <title>C++ Universal Reference vs Forwarding Reference</title>
-    <url>/2024/02/19/note/cpp/Universal%20Reference%20Forwarding%20Reference/</url>
-    <content><![CDATA[<h1 id="Universal-Reference-Forwarding-Reference"><a href="#Universal-Reference-Forwarding-Reference" class="headerlink" title="Universal Reference &#x2F; Forwarding Reference"></a>Universal Reference &#x2F; Forwarding Reference</h1><p>两个名词指同一个东西，Universal Reference 是 Scott Meyers 提出的，而标准用的是Forwarding Reference，来源：<a href="https://stackoverflow.com/a/39552345/11850070">https://stackoverflow.com/a/39552345/11850070</a></p>
-<h1 id="什么是通用引用（Universal-Reference）"><a href="#什么是通用引用（Universal-Reference）" class="headerlink" title="什么是通用引用（Universal Reference）"></a>什么是通用引用（Universal Reference）</h1><p>T&amp;&amp;形式且有类型推导，有函数模板通用引用参数和auto通用引用，通用引用可以绑定左值或者右值，配合std::forward实现完美转发。</p>
-<h1 id="怎么辨别Universal-Reference"><a href="#怎么辨别Universal-Reference" class="headerlink" title="怎么辨别Universal Reference"></a>怎么辨别Universal Reference</h1><h2 id="函数模板"><a href="#函数模板" class="headerlink" title="函数模板"></a>函数模板</h2><ul>
-<li><p>一定要有类型推导</p>
-<ul>
-<li><p>std::vector::push_back没有类型推导，不是通用引用</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">Allocator</span> = allocator&lt;T&gt;&gt;</span><br><span class="line"><span class="keyword">class</span> vector &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">void</span> <span class="built_in">push_back</span>(T&amp;&amp; x);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">std::vector&lt;Widget&gt; v; <span class="comment">// 因为声明std::vector时就指明了T，没有类型推导</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 其实实例化后的类是如下，push_back的参数是rvalue ref,不是universal ref</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">vector</span>&lt;Widget, allocator&lt;Widget&gt;&gt; &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">push_back</span><span class="params">(Widget&amp;&amp; x)</span></span>; <span class="comment">// rvalue reference</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 但 emplace_back 是通用引用</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">Allocator</span> = allocator&lt;T&gt;&gt;</span><br><span class="line"><span class="keyword">class</span> vector &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span>... Args&gt;</span><br><span class="line">    <span class="type">void</span> <span class="built_in">emplace_back</span>(Args&amp;&amp;... args); <span class="comment">// emplace_back不依赖T，每处调用都要推断Args，因此是通用引用</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>一定要是T&amp;&amp;</p>
-<ul>
-<li><p>形式不对：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(std::vector&lt;T&gt;&amp;&amp; param)</span></span>; <span class="comment">// param is an rvalue reference</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>有const就不是了</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(<span class="type">const</span> T&amp;&amp; param)</span></span>; <span class="comment">// param is an rvalue reference</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ul>
-<h2 id="auto关键字"><a href="#auto关键字" class="headerlink" title="auto关键字"></a>auto关键字</h2><ul>
-<li>形式一定是 auto&amp;&amp;</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>cpp</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>x86 ABI</title>
     <url>/2024/02/19/note/cpp/X86%20Linux%20ABI%20Registers%20for%20Argument%20Passing/</url>
     <content><![CDATA[<h1 id="X86-Linux-ABI-Registers-for-Argument-Passing"><a href="#X86-Linux-ABI-Registers-for-Argument-Passing" class="headerlink" title="X86 Linux ABI Registers for Argument Passing"></a>X86 Linux ABI Registers for Argument Passing</h1><p>In Linux, the registers used to pass arguments to functions are determined by the calling convention of the system, which, in turn, is influenced by the architecture of the processor. For systems running on x86-64 architecture, which is quite common, the System V Application Binary Interface (ABI) is typically used.</p>
@@ -234,9 +139,39 @@
       </tags>
   </entry>
   <entry>
+    <title>C++ Universal Reference vs Forwarding Reference</title>
+    <url>/2024/02/19/note/cpp/Universal%20Reference%20Forwarding%20Reference/</url>
+    <content><![CDATA[<h1 id="Universal-Reference-Forwarding-Reference"><a href="#Universal-Reference-Forwarding-Reference" class="headerlink" title="Universal Reference &#x2F; Forwarding Reference"></a>Universal Reference &#x2F; Forwarding Reference</h1><p>两个名词指同一个东西，Universal Reference 是 Scott Meyers 提出的，而标准用的是Forwarding Reference，来源：<a href="https://stackoverflow.com/a/39552345/11850070">https://stackoverflow.com/a/39552345/11850070</a></p>
+<h1 id="什么是通用引用（Universal-Reference）"><a href="#什么是通用引用（Universal-Reference）" class="headerlink" title="什么是通用引用（Universal Reference）"></a>什么是通用引用（Universal Reference）</h1><p>T&amp;&amp;形式且有类型推导，有函数模板通用引用参数和auto通用引用，通用引用可以绑定左值或者右值，配合std::forward实现完美转发。</p>
+<h1 id="怎么辨别Universal-Reference"><a href="#怎么辨别Universal-Reference" class="headerlink" title="怎么辨别Universal Reference"></a>怎么辨别Universal Reference</h1><h2 id="函数模板"><a href="#函数模板" class="headerlink" title="函数模板"></a>函数模板</h2><ul>
+<li><p>一定要有类型推导</p>
+<ul>
+<li><p>std::vector::push_back没有类型推导，不是通用引用</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">Allocator</span> = allocator&lt;T&gt;&gt;</span><br><span class="line"><span class="keyword">class</span> vector &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">void</span> <span class="built_in">push_back</span>(T&amp;&amp; x);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">std::vector&lt;Widget&gt; v; <span class="comment">// 因为声明std::vector时就指明了T，没有类型推导</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 其实实例化后的类是如下，push_back的参数是rvalue ref,不是universal ref</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">vector</span>&lt;Widget, allocator&lt;Widget&gt;&gt; &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">push_back</span><span class="params">(Widget&amp;&amp; x)</span></span>; <span class="comment">// rvalue reference</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 但 emplace_back 是通用引用</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">Allocator</span> = allocator&lt;T&gt;&gt;</span><br><span class="line"><span class="keyword">class</span> vector &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span>... Args&gt;</span><br><span class="line">    <span class="type">void</span> <span class="built_in">emplace_back</span>(Args&amp;&amp;... args); <span class="comment">// emplace_back不依赖T，每处调用都要推断Args，因此是通用引用</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>一定要是T&amp;&amp;</p>
+<ul>
+<li><p>形式不对：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(std::vector&lt;T&gt;&amp;&amp; param)</span></span>; <span class="comment">// param is an rvalue reference</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>有const就不是了</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(<span class="type">const</span> T&amp;&amp; param)</span></span>; <span class="comment">// param is an rvalue reference</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="auto关键字"><a href="#auto关键字" class="headerlink" title="auto关键字"></a>auto关键字</h2><ul>
+<li>形式一定是 auto&amp;&amp;</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>cpp</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>记录一次 C++ extern 关键字触发的 Asan 报错</title>
-    <url>/2024/03/07/note/cpp/asan_extern_error/</url>
-    <content><![CDATA[<p>开发中我习惯一直开着 <code>Asan</code>，有次发现同事刚提交的代码中一个有趣的bug，复现流程简化为：</p>
+    <url>/2024/03/08/note/cpp/asan_extern_error/</url>
+    <content><![CDATA[<p>开发中我习惯一直开着 <code>Asan</code>，有次发现一个有趣的bug，复现流程简化为：</p>
 <p><code>lib.cpp</code></p>
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">bool</span> v = <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
 
@@ -336,6 +271,16 @@
       </tags>
   </entry>
   <entry>
+    <title>coredump备忘</title>
+    <url>/2024/02/19/note/cpp/coredump/</url>
+    <content><![CDATA[<p>The location of the core file depends on <code>/proc/sys/kernel/core_pattern</code></p>
+]]></content>
+      <tags>
+        <tag>cpp</tag>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Clang查看C++模板实例化后代码</title>
     <url>/2024/02/19/note/cpp/clang/</url>
     <content><![CDATA[<h1 id="Clang-AST"><a href="#Clang-AST" class="headerlink" title="Clang AST"></a>Clang AST</h1><p>see the compiler-instantiated code for a function template or a class template in C++?</p>
@@ -346,16 +291,6 @@
 ]]></content>
       <tags>
         <tag>cpp</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>coredump备忘</title>
-    <url>/2024/02/19/note/cpp/coredump/</url>
-    <content><![CDATA[<p>The location of the core file depends on <code>/proc/sys/kernel/core_pattern</code></p>
-]]></content>
-      <tags>
-        <tag>cpp</tag>
-        <tag>linux</tag>
       </tags>
   </entry>
   <entry>
@@ -668,19 +603,6 @@
       </tags>
   </entry>
   <entry>
-    <title>C++ explicit 关键字</title>
-    <url>/2024/02/19/note/cpp/explicit/</url>
-    <content><![CDATA[<p>加在哪: 只有一个参数的构造参数, 或者有多个参数，但只有一个没有默认值的构造函数声明前。<br>原则：默认全加上，除非能找出合适的转换情况。</p>
-<p>Constructors that take a single std::initializer_list parameter should also omit explicit, in order to support copy-initialization (e.g., MyType m &#x3D; {1, 2};).</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">String</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">String</span>(<span class="type">int</span> n) &#123;&#125;;</span><br><span class="line">    <span class="built_in">String</span>(<span class="type">const</span> <span class="type">char</span> *p) &#123;&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    String s1 = <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>不加explict, 调的是 String(int n)</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">main:</span><br><span class="line">    pushq   %rbp</span><br><span class="line">    movq    %rsp, %rbp</span><br><span class="line">    subq    $16, %rsp</span><br><span class="line">    leaq    -1(%rbp), %rax</span><br><span class="line">    movl    $97, %esi</span><br><span class="line">    movq    %rax, %rdi</span><br><span class="line">    call    String::String(int) [complete object constructor]</span><br><span class="line">    movl    $0, %eax</span><br><span class="line">    leave</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>cpp</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>C++ dynamic_cast</title>
     <url>/2024/02/19/note/cpp/dynamic_cast/</url>
     <content><![CDATA[<p><code>dynamic_cast</code> is used primarily for polymorphism. When you have a pointer or reference to a base type, <code>dynamic_cast</code> helps in safely converting it to a derived type. Here’s a summary of the key points about <code>dynamic_cast</code>:</p>
@@ -712,6 +634,51 @@
       <tags>
         <tag>cpp</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>C++ explicit 关键字</title>
+    <url>/2024/02/19/note/cpp/explicit/</url>
+    <content><![CDATA[<p>加在哪: 只有一个参数的构造参数, 或者有多个参数，但只有一个没有默认值的构造函数声明前。<br>原则：默认全加上，除非能找出合适的转换情况。</p>
+<p>Constructors that take a single std::initializer_list parameter should also omit explicit, in order to support copy-initialization (e.g., MyType m &#x3D; {1, 2};).</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">String</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">String</span>(<span class="type">int</span> n) &#123;&#125;;</span><br><span class="line">    <span class="built_in">String</span>(<span class="type">const</span> <span class="type">char</span> *p) &#123;&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    String s1 = <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不加explict, 调的是 String(int n)</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">main:</span><br><span class="line">    pushq   %rbp</span><br><span class="line">    movq    %rsp, %rbp</span><br><span class="line">    subq    $16, %rsp</span><br><span class="line">    leaq    -1(%rbp), %rax</span><br><span class="line">    movl    $97, %esi</span><br><span class="line">    movq    %rax, %rdi</span><br><span class="line">    call    String::String(int) [complete object constructor]</span><br><span class="line">    movl    $0, %eax</span><br><span class="line">    leave</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>cpp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2024/02/19/note/cpp/make/</url>
+    <content><![CDATA[<p>The <code>make</code> command in Linux is a utility used to automate the compilation and building process of projects. It reads a file named <code>Makefile</code> that contains a set of directives about how to compile and link a program. Here’s a brief overview of the syntax and key concepts of a <code>Makefile</code>:</p>
+<h3 id="Basic-Structure"><a href="#Basic-Structure" class="headerlink" title="Basic Structure"></a>Basic Structure</h3><p>A <code>Makefile</code> typically consists of a set of rules. A rule is made up of three parts:</p>
+<ol>
+<li><strong>Target</strong>: The name of the file that the rule produces.</li>
+<li><strong>Prerequisites</strong>: The files that are used as input to create the target.</li>
+<li><strong>Recipe</strong>: The commands that will be executed to create the target from the prerequisites.</li>
+</ol>
+<p>The basic syntax of a rule is:</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="section">target: prerequisites</span></span><br><span class="line">    recipe</span><br></pre></td></tr></table></figure>
+
+<h3 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h3><p>Here’s a simple example of a <code>Makefile</code> that compiles a C program:</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Define the compiler</span></span><br><span class="line">CC=gcc</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the compiler flags</span></span><br><span class="line">CFLAGS=-Wall</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the target executable</span></span><br><span class="line">TARGET=myprogram</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the rule for the target</span></span><br><span class="line"><span class="variable">$(TARGET)</span>: <span class="variable">$(TARGET)</span>.c</span><br><span class="line">    <span class="variable">$(CC)</span> <span class="variable">$(CFLAGS)</span> -o <span class="variable">$(TARGET)</span> <span class="variable">$(TARGET)</span>.c</span><br></pre></td></tr></table></figure>
+
+<h3 id="Variables"><a href="#Variables" class="headerlink" title="Variables"></a>Variables</h3><p>You can define variables in a <code>Makefile</code> to make it more readable and maintainable. In the example above, <code>CC</code>, <code>CFLAGS</code>, and <code>TARGET</code> are variables.</p>
+<h3 id="Comments"><a href="#Comments" class="headerlink" title="Comments"></a>Comments</h3><p>Comments in a <code>Makefile</code> start with the <code>#</code> symbol. Anything following this symbol on a line is considered a comment.</p>
+<h3 id="Phony-Targets"><a href="#Phony-Targets" class="headerlink" title="Phony Targets"></a>Phony Targets</h3><p>By default, Makefile targets are “file targets” - they are used to build files from other files. Make assumes its target is a file, and this makes writing Makefiles relatively easy:</p>
+<p>In terms of Make, a phony target is simply a target that is always out-of-date, so whenever you ask make <phony_target>, it will run, independent from the state of the file system. Some common make targets that are often phony are: all, install, clean, distclean, TAGS, info, check.</p>
+<p>A phony target is one that does not represent a file. It’s used to avoid conflicts with files of the same name and to improve performance. You can declare phony targets using the <code>.PHONY</code> directive.</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="meta"><span class="keyword">.PHONY</span>: clean</span></span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">    rm -f <span class="variable">$(TARGET)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Advanced-Features"><a href="#Advanced-Features" class="headerlink" title="Advanced Features"></a>Advanced Features</h3><ul>
+<li><strong>Pattern Rules</strong>: Allow you to define generic rules using <code>%</code> as a pattern matcher.</li>
+<li><strong>Automatic Variables</strong>: Variables like <code>$@</code> (the name of the target), <code>$&lt;</code> (the name of the first prerequisite), and <code>$^</code> (the names of all the prerequisites) are set automatically and can be used in recipes.</li>
+<li><strong>Conditional Execution</strong>: You can include conditionals in a <code>Makefile</code> to control the flow based on certain conditions.</li>
+</ul>
+<h3 id="Running-Make"><a href="#Running-Make" class="headerlink" title="Running Make"></a>Running Make</h3><p>To run <code>make</code>, simply type <code>make</code> in the terminal in the directory containing the <code>Makefile</code>. If you want to run a specific target, type <code>make &lt;target_name&gt;</code>.</p>
+<p>This overview covers the basics of <code>make</code> syntax. <code>make</code> is a powerful tool with many more features and capabilities to explore.</p>
+]]></content>
   </entry>
   <entry>
     <title>C++ 内部链接与外部链接</title>
@@ -776,36 +743,19 @@
       </tags>
   </entry>
   <entry>
-    <title></title>
-    <url>/2024/02/19/note/cpp/make/</url>
-    <content><![CDATA[<p>The <code>make</code> command in Linux is a utility used to automate the compilation and building process of projects. It reads a file named <code>Makefile</code> that contains a set of directives about how to compile and link a program. Here’s a brief overview of the syntax and key concepts of a <code>Makefile</code>:</p>
-<h3 id="Basic-Structure"><a href="#Basic-Structure" class="headerlink" title="Basic Structure"></a>Basic Structure</h3><p>A <code>Makefile</code> typically consists of a set of rules. A rule is made up of three parts:</p>
-<ol>
-<li><strong>Target</strong>: The name of the file that the rule produces.</li>
-<li><strong>Prerequisites</strong>: The files that are used as input to create the target.</li>
-<li><strong>Recipe</strong>: The commands that will be executed to create the target from the prerequisites.</li>
-</ol>
-<p>The basic syntax of a rule is:</p>
-<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="section">target: prerequisites</span></span><br><span class="line">    recipe</span><br></pre></td></tr></table></figure>
+    <title>C++ pahole 查看对象成员内存布局</title>
+    <url>/2024/02/19/note/cpp/pahole/</url>
+    <content><![CDATA[<p>pahole: Poke-a-Hole</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt-get -y install dwarves</span><br></pre></td></tr></table></figure>
 
-<h3 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h3><p>Here’s a simple example of a <code>Makefile</code> that compiles a C program:</p>
-<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Define the compiler</span></span><br><span class="line">CC=gcc</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the compiler flags</span></span><br><span class="line">CFLAGS=-Wall</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the target executable</span></span><br><span class="line">TARGET=myprogram</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the rule for the target</span></span><br><span class="line"><span class="variable">$(TARGET)</span>: <span class="variable">$(TARGET)</span>.c</span><br><span class="line">    <span class="variable">$(CC)</span> <span class="variable">$(CFLAGS)</span> -o <span class="variable">$(TARGET)</span> <span class="variable">$(TARGET)</span>.c</span><br></pre></td></tr></table></figure>
+<p>–show_private_classes 显示所有在namespace内部的类</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">wqj@WQJ:~/demo$ pahole ./a.out --show_private_classes | grep shared_ptr</span><br><span class="line">die__process_class: tag not supported 0x2f (template_type_parameter)!</span><br><span class="line">die__process_class: tag not supported 0x30 (template_value_parameter)!</span><br><span class="line">die__process_function: tag not supported 0x4107 (GNU_template_parameter_pack)!</span><br><span class="line">die__process_function: tag not supported 0x4108 (GNU_formal_parameter_pack)!</span><br><span class="line">class __shared_ptr_access&lt;int, (__gnu_cxx::_Lock_policy)2, false, false&gt; &#123;</span><br><span class="line">class __shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; : public __shared_ptr_access&lt;int, (__gnu_cxx::_Lock_policy)2, false, false&gt; &#123;</span><br><span class="line">        /* class __shared_ptr_access&lt;int, (__gnu_cxx::_Lock_policy)2, false, false&gt; &lt;ancestor&gt;; */ /*     0     0 */</span><br><span class="line">class shared_ptr&lt;int&gt; : public __shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; &#123;</span><br><span class="line">        /* class __shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; &lt;ancestor&gt;; */ /*     0    16 */</span><br></pre></td></tr></table></figure>
 
-<h3 id="Variables"><a href="#Variables" class="headerlink" title="Variables"></a>Variables</h3><p>You can define variables in a <code>Makefile</code> to make it more readable and maintainable. In the example above, <code>CC</code>, <code>CFLAGS</code>, and <code>TARGET</code> are variables.</p>
-<h3 id="Comments"><a href="#Comments" class="headerlink" title="Comments"></a>Comments</h3><p>Comments in a <code>Makefile</code> start with the <code>#</code> symbol. Anything following this symbol on a line is considered a comment.</p>
-<h3 id="Phony-Targets"><a href="#Phony-Targets" class="headerlink" title="Phony Targets"></a>Phony Targets</h3><p>By default, Makefile targets are “file targets” - they are used to build files from other files. Make assumes its target is a file, and this makes writing Makefiles relatively easy:</p>
-<p>In terms of Make, a phony target is simply a target that is always out-of-date, so whenever you ask make <phony_target>, it will run, independent from the state of the file system. Some common make targets that are often phony are: all, install, clean, distclean, TAGS, info, check.</p>
-<p>A phony target is one that does not represent a file. It’s used to avoid conflicts with files of the same name and to improve performance. You can declare phony targets using the <code>.PHONY</code> directive.</p>
-<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="meta"><span class="keyword">.PHONY</span>: clean</span></span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">    rm -f <span class="variable">$(TARGET)</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="Advanced-Features"><a href="#Advanced-Features" class="headerlink" title="Advanced Features"></a>Advanced Features</h3><ul>
-<li><strong>Pattern Rules</strong>: Allow you to define generic rules using <code>%</code> as a pattern matcher.</li>
-<li><strong>Automatic Variables</strong>: Variables like <code>$@</code> (the name of the target), <code>$&lt;</code> (the name of the first prerequisite), and <code>$^</code> (the names of all the prerequisites) are set automatically and can be used in recipes.</li>
-<li><strong>Conditional Execution</strong>: You can include conditionals in a <code>Makefile</code> to control the flow based on certain conditions.</li>
-</ul>
-<h3 id="Running-Make"><a href="#Running-Make" class="headerlink" title="Running Make"></a>Running Make</h3><p>To run <code>make</code>, simply type <code>make</code> in the terminal in the directory containing the <code>Makefile</code>. If you want to run a specific target, type <code>make &lt;target_name&gt;</code>.</p>
-<p>This overview covers the basics of <code>make</code> syntax. <code>make</code> is a powerful tool with many more features and capabilities to explore.</p>
-]]></content>
+<p>It doesn’t uses any source code files, just the DWARF2<br>information in ELF sections, inserted by ‘gcc -g’, to print out the<br>above information:</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[acme@newtoy net-2.6]$ pahole kernel/sched.o task_struct</span><br><span class="line">/* include2/asm/system.h:11 */</span><br><span class="line">struct task_struct &#123;</span><br><span class="line">        volatile long int       state;          /*     0     4 */</span><br><span class="line">        struct thread_info *    thread_info;    /*     4     4 */</span><br><span class="line">        atomic_t                usage;          /*     8     4 */</span><br><span class="line">        long unsigned int       flags;          /*    12     4 */</span><br><span class="line"></span><br><span class="line">	&lt;SNIP&gt;</span><br><span class="line"></span><br><span class="line">        short unsigned int         ioprio;      /*    52     2 */</span><br><span class="line"></span><br><span class="line">        /* XXX 2 bytes hole, try to pack */</span><br><span class="line"></span><br><span class="line">        long unsigned int          sleep_avg;   /*    56     4 */ */</span><br><span class="line">        unsigned char              fpu_counter; /*   388     1 */</span><br><span class="line"></span><br><span class="line">        /* XXX 3 bytes hole, try to pack */</span><br><span class="line"></span><br><span class="line">        int                        oomkilladj;  /*   392     4 */</span><br><span class="line"></span><br><span class="line">	&lt;SNIP&gt;</span><br><span class="line"></span><br><span class="line">&#125;; /* size: 1312, sum members: 1287, holes: 3, sum holes: 13, padding: 12 */</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>cpp</tag>
+      </tags>
   </entry>
   <entry>
     <title>C++ placement new</title>
@@ -866,21 +816,6 @@
 <h2 id="为什么用std-forward"><a href="#为什么用std-forward" class="headerlink" title="为什么用std::forward?"></a>为什么用std::forward?</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;utility&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">foo</span><span class="params">(T&amp;&amp; t)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">foo</span>(t);</span><br><span class="line">    <span class="built_in">foo</span>(forward&lt;T&gt;(t));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">foo</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">void foo&lt;int&gt;(int&amp;&amp;):</span><br><span class="line">        push    rbp</span><br><span class="line">        mov     rbp, rsp</span><br><span class="line">        sub     rsp, 16</span><br><span class="line">        mov     QWORD PTR [rbp-8], rdi</span><br><span class="line">        mov     rax, QWORD PTR [rbp-8]</span><br><span class="line">        mov     rdi, rax</span><br><span class="line">        call    void foo&lt;int&amp;&gt;(int&amp;) // 这里以左值传递给下一层，错了</span><br><span class="line">        mov     rax, QWORD PTR [rbp-8]</span><br><span class="line">        mov     rdi, rax</span><br><span class="line">        call    int&amp;&amp; std::forward&lt;int&gt;(std::remove_reference&lt;int&gt;::type&amp;)</span><br><span class="line">        mov     rdi, rax</span><br><span class="line">        call    void foo&lt;int&gt;(int&amp;&amp;) // 这里以右值继续传递，正确</span><br><span class="line">        nop</span><br><span class="line">        leave</span><br><span class="line">        ret</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>cpp</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>C++ pahole 查看对象成员内存布局</title>
-    <url>/2024/02/19/note/cpp/pahole/</url>
-    <content><![CDATA[<p>pahole: Poke-a-Hole</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt-get -y install dwarves</span><br></pre></td></tr></table></figure>
-
-<p>–show_private_classes 显示所有在namespace内部的类</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">wqj@WQJ:~/demo$ pahole ./a.out --show_private_classes | grep shared_ptr</span><br><span class="line">die__process_class: tag not supported 0x2f (template_type_parameter)!</span><br><span class="line">die__process_class: tag not supported 0x30 (template_value_parameter)!</span><br><span class="line">die__process_function: tag not supported 0x4107 (GNU_template_parameter_pack)!</span><br><span class="line">die__process_function: tag not supported 0x4108 (GNU_formal_parameter_pack)!</span><br><span class="line">class __shared_ptr_access&lt;int, (__gnu_cxx::_Lock_policy)2, false, false&gt; &#123;</span><br><span class="line">class __shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; : public __shared_ptr_access&lt;int, (__gnu_cxx::_Lock_policy)2, false, false&gt; &#123;</span><br><span class="line">        /* class __shared_ptr_access&lt;int, (__gnu_cxx::_Lock_policy)2, false, false&gt; &lt;ancestor&gt;; */ /*     0     0 */</span><br><span class="line">class shared_ptr&lt;int&gt; : public __shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; &#123;</span><br><span class="line">        /* class __shared_ptr&lt;int, (__gnu_cxx::_Lock_policy)2&gt; &lt;ancestor&gt;; */ /*     0    16 */</span><br></pre></td></tr></table></figure>
-
-<p>It doesn’t uses any source code files, just the DWARF2<br>information in ELF sections, inserted by ‘gcc -g’, to print out the<br>above information:</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[acme@newtoy net-2.6]$ pahole kernel/sched.o task_struct</span><br><span class="line">/* include2/asm/system.h:11 */</span><br><span class="line">struct task_struct &#123;</span><br><span class="line">        volatile long int       state;          /*     0     4 */</span><br><span class="line">        struct thread_info *    thread_info;    /*     4     4 */</span><br><span class="line">        atomic_t                usage;          /*     8     4 */</span><br><span class="line">        long unsigned int       flags;          /*    12     4 */</span><br><span class="line"></span><br><span class="line">	&lt;SNIP&gt;</span><br><span class="line"></span><br><span class="line">        short unsigned int         ioprio;      /*    52     2 */</span><br><span class="line"></span><br><span class="line">        /* XXX 2 bytes hole, try to pack */</span><br><span class="line"></span><br><span class="line">        long unsigned int          sleep_avg;   /*    56     4 */ */</span><br><span class="line">        unsigned char              fpu_counter; /*   388     1 */</span><br><span class="line"></span><br><span class="line">        /* XXX 3 bytes hole, try to pack */</span><br><span class="line"></span><br><span class="line">        int                        oomkilladj;  /*   392     4 */</span><br><span class="line"></span><br><span class="line">	&lt;SNIP&gt;</span><br><span class="line"></span><br><span class="line">&#125;; /* size: 1312, sum members: 1287, holes: 3, sum holes: 13, padding: 12 */</span><br></pre></td></tr></table></figure>]]></content>
       <tags>
         <tag>cpp</tag>
       </tags>
@@ -954,26 +889,6 @@
       </tags>
   </entry>
   <entry>
-    <title>C++ 继承类构造与析构顺序</title>
-    <url>/2024/02/19/note/cpp/%E7%BB%A7%E6%89%BF%E7%B1%BB%E6%9E%84%E9%80%A0%E4%B8%8E%E6%9E%90%E6%9E%84%E9%A1%BA%E5%BA%8F%20/</url>
-    <content><![CDATA[<ul>
-<li>先base类构造函数，如果继承多个，则从左到右依次构造base，如果其中有virtual继承，则高优先级；</li>
-<li>接着是成员变量，按声明的顺序依次构建</li>
-<li>最后是这个类当前构造函数花括号内的逻辑</li>
-<li>析构与构造顺序完全相反</li>
-</ul>
-<h2 id="连续继承"><a href="#连续继承" class="headerlink" title="连续继承"></a>连续继承</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line"><span class="built_in">MyCircle</span>()</span><br><span class="line"></span><br><span class="line">~<span class="built_in">MyCircle</span>()</span><br><span class="line">~<span class="built_in">Circle</span>()</span><br><span class="line">~<span class="built_in">Shape</span>()</span><br></pre></td></tr></table></figure>
-
-<h2 id="既继承又包含"><a href="#既继承又包含" class="headerlink" title="既继承又包含"></a>既继承又包含</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">A</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">A</span>() &#123; cout &lt;&lt; <span class="string">&quot;A() C-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">A</span>() &#123; cout &lt;&lt; <span class="string">&quot;~A() D-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">B</span> : <span class="keyword">public</span> A </span><br><span class="line">&#123;</span><br><span class="line">    A a;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">B</span>() &#123; cout &lt;&lt; <span class="string">&quot;B() C-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">B</span>() &#123; cout &lt;&lt; <span class="string">&quot;~B() D-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123; B b; &#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">A</span>() C-<span class="function">tor</span></span><br><span class="line"><span class="function"><span class="title">A</span><span class="params">()</span> C-tor</span></span><br><span class="line"><span class="function"><span class="title">B</span><span class="params">()</span> C-tor</span></span><br><span class="line"><span class="function">~<span class="title">B</span><span class="params">()</span> D-tor</span></span><br><span class="line"><span class="function">~<span class="title">A</span><span class="params">()</span> D-tor</span></span><br><span class="line"><span class="function">~<span class="title">A</span><span class="params">()</span> D-tor</span></span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>cpp</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>C++ 编译器自动生成的构造，拷贝，移动函数</title>
     <url>/2024/02/19/note/cpp/%E7%BC%96%E8%AF%91%E5%99%A8%E7%94%9F%E6%88%90%E7%9A%84%E6%9E%84%E9%80%A0%EF%BC%8C%E6%8B%B7%E8%B4%9D%EF%BC%8C%E7%A7%BB%E5%8A%A8%E5%87%BD%E6%95%B0/</url>
     <content><![CDATA[<blockquote>
@@ -1006,49 +921,21 @@
       </tags>
   </entry>
   <entry>
-    <title>C++ 虚析构函数</title>
-    <url>/2024/02/19/note/cpp/%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0/</url>
-    <content><![CDATA[<h1 id="适用于什么情况？"><a href="#适用于什么情况？" class="headerlink" title="适用于什么情况？"></a>适用于什么情况？</h1><blockquote>
-<p>Virtual destructors are useful when you might potentially delete an instance of a derived class through a pointer to base class. In most implementations, the call to the destructor will be resolved like any non-virtual code, meaning that the destructor of the base class will be called but not the one of the derived class, resulting in a resources leak.</p>
-<ul>
-<li><a href="https://stackoverflow.com/a/461224/11850070">https://stackoverflow.com/a/461224/11850070</a></li>
+    <title>C++ 继承类构造与析构顺序</title>
+    <url>/2024/02/19/note/cpp/%E7%BB%A7%E6%89%BF%E7%B1%BB%E6%9E%84%E9%80%A0%E4%B8%8E%E6%9E%90%E6%9E%84%E9%A1%BA%E5%BA%8F%20/</url>
+    <content><![CDATA[<ul>
+<li>先base类构造函数，如果继承多个，则从左到右依次构造base，如果其中有virtual继承，则高优先级；</li>
+<li>接着是成员变量，按声明的顺序依次构建</li>
+<li>最后是这个类当前构造函数花括号内的逻辑</li>
+<li>析构与构造顺序完全相反</li>
 </ul>
-</blockquote>
-<p>当准备通过基类指针删除子类对象时，如果基类的析构函数没加virtual，则是未定义行为，大多数编译器的实现是把基类的析构函数当作普通非虚函数，因此只析构基类，导致子类未析构，子类资源泄漏。</p>
-<p>实测下：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">// 这里去掉了virtual</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="连续继承"><a href="#连续继承" class="headerlink" title="连续继承"></a>连续继承</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>子类 <code>Circle</code> 与 <code>MyCircle</code> 未析构</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">Shape()</span><br><span class="line">Circle()</span><br><span class="line">MyCircle()</span><br><span class="line">~Shape() </span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line"><span class="built_in">MyCircle</span>()</span><br><span class="line"></span><br><span class="line">~<span class="built_in">MyCircle</span>()</span><br><span class="line">~<span class="built_in">Circle</span>()</span><br><span class="line">~<span class="built_in">Shape</span>()</span><br></pre></td></tr></table></figure>
 
-<p>父类析构函数加上 <code>virtual</code> 后</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">// 这里加上virtual</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="既继承又包含"><a href="#既继承又包含" class="headerlink" title="既继承又包含"></a>既继承又包含</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">A</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">A</span>() &#123; cout &lt;&lt; <span class="string">&quot;A() C-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">A</span>() &#123; cout &lt;&lt; <span class="string">&quot;~A() D-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">B</span> : <span class="keyword">public</span> A </span><br><span class="line">&#123;</span><br><span class="line">    A a;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">B</span>() &#123; cout &lt;&lt; <span class="string">&quot;B() C-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">B</span>() &#123; cout &lt;&lt; <span class="string">&quot;~B() D-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123; B b; &#125;</span><br></pre></td></tr></table></figure>
 
-<p>析构与构造对称，没有资源泄漏</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line"><span class="built_in">MyCircle</span>()</span><br><span class="line">~<span class="built_in">MyCircle</span>()</span><br><span class="line">~<span class="built_in">Circle</span>()</span><br><span class="line">~<span class="built_in">Shape</span>()</span><br></pre></td></tr></table></figure>
-
-<h1 id="如何禁止通过父类指针删除子类对象？"><a href="#如何禁止通过父类指针删除子类对象？" class="headerlink" title="如何禁止通过父类指针删除子类对象？"></a>如何禁止通过父类指针删除子类对象？</h1><blockquote>
-<p>If you want to prevent the deletion of an instance through a base class pointer, you can make the base class destructor protected and nonvirtual; by doing so, the compiler won’t let you call <code>delete</code> on a base class pointer. </p>
-<ul>
-<li><a href="https://stackoverflow.com/a/461224/11850070">https://stackoverflow.com/a/461224/11850070</a></li>
-</ul>
-</blockquote>
-<p>声明基类的析构函数为protected，从而编译器禁止通过基类指针删除子类对象。</p>
-<p>测试代码：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>编译器报错：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">&lt;source&gt;: In function <span class="string">&#x27;int main()&#x27;</span>:</span><br><span class="line">&lt;source&gt;:<span class="number">30</span>:<span class="number">12</span>: error: <span class="string">&#x27;Shape::~Shape()&#x27;</span> is <span class="keyword">protected</span> within <span class="keyword">this</span> context</span><br><span class="line">   <span class="number">30</span> |     <span class="keyword">delete</span> shape;</span><br><span class="line">      |            ^~~~~</span><br><span class="line">&lt;source&gt;:<span class="number">10</span>:<span class="number">5</span>: note: declared <span class="keyword">protected</span> here</span><br><span class="line">   <span class="number">10</span> |     ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">      |     ^</span><br></pre></td></tr></table></figure>
-
-
-<h1 id="是否每个基类的析构函数都要加virtual？"><a href="#是否每个基类的析构函数都要加virtual？" class="headerlink" title="是否每个基类的析构函数都要加virtual？"></a>是否每个基类的析构函数都要加virtual？</h1><blockquote>
-<p>The default destructor is not virtual. If you declare the destructor of your base class as virtual, the destructors of the subclasses will be overrides, and thus also be virtual even without explicitly declaring them to be. </p>
-<ul>
-<li><a href="https://stackoverflow.com/a/5610164/11850070">https://stackoverflow.com/a/5610164/11850070</a></li>
-</ul>
-</blockquote>
-<p>不用，只要最上边的基类加 <code>virtual</code> 即可，其余子类的析构函数均继承了 <code>virtual</code>。</p>
-]]></content>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">A</span>() C-<span class="function">tor</span></span><br><span class="line"><span class="function"><span class="title">A</span><span class="params">()</span> C-tor</span></span><br><span class="line"><span class="function"><span class="title">B</span><span class="params">()</span> C-tor</span></span><br><span class="line"><span class="function">~<span class="title">B</span><span class="params">()</span> D-tor</span></span><br><span class="line"><span class="function">~<span class="title">A</span><span class="params">()</span> D-tor</span></span><br><span class="line"><span class="function">~<span class="title">A</span><span class="params">()</span> D-tor</span></span><br></pre></td></tr></table></figure>]]></content>
       <tags>
         <tag>cpp</tag>
       </tags>
@@ -1155,6 +1042,54 @@
       <tags>
         <tag>cpp</tag>
         <tag>汇编</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>C++ 虚析构函数</title>
+    <url>/2024/02/19/note/cpp/%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0/</url>
+    <content><![CDATA[<h1 id="适用于什么情况？"><a href="#适用于什么情况？" class="headerlink" title="适用于什么情况？"></a>适用于什么情况？</h1><blockquote>
+<p>Virtual destructors are useful when you might potentially delete an instance of a derived class through a pointer to base class. In most implementations, the call to the destructor will be resolved like any non-virtual code, meaning that the destructor of the base class will be called but not the one of the derived class, resulting in a resources leak.</p>
+<ul>
+<li><a href="https://stackoverflow.com/a/461224/11850070">https://stackoverflow.com/a/461224/11850070</a></li>
+</ul>
+</blockquote>
+<p>当准备通过基类指针删除子类对象时，如果基类的析构函数没加virtual，则是未定义行为，大多数编译器的实现是把基类的析构函数当作普通非虚函数，因此只析构基类，导致子类未析构，子类资源泄漏。</p>
+<p>实测下：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">// 这里去掉了virtual</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>子类 <code>Circle</code> 与 <code>MyCircle</code> 未析构</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">Shape()</span><br><span class="line">Circle()</span><br><span class="line">MyCircle()</span><br><span class="line">~Shape() </span><br></pre></td></tr></table></figure>
+
+<p>父类析构函数加上 <code>virtual</code> 后</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">// 这里加上virtual</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>析构与构造对称，没有资源泄漏</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line"><span class="built_in">MyCircle</span>()</span><br><span class="line">~<span class="built_in">MyCircle</span>()</span><br><span class="line">~<span class="built_in">Circle</span>()</span><br><span class="line">~<span class="built_in">Shape</span>()</span><br></pre></td></tr></table></figure>
+
+<h1 id="如何禁止通过父类指针删除子类对象？"><a href="#如何禁止通过父类指针删除子类对象？" class="headerlink" title="如何禁止通过父类指针删除子类对象？"></a>如何禁止通过父类指针删除子类对象？</h1><blockquote>
+<p>If you want to prevent the deletion of an instance through a base class pointer, you can make the base class destructor protected and nonvirtual; by doing so, the compiler won’t let you call <code>delete</code> on a base class pointer. </p>
+<ul>
+<li><a href="https://stackoverflow.com/a/461224/11850070">https://stackoverflow.com/a/461224/11850070</a></li>
+</ul>
+</blockquote>
+<p>声明基类的析构函数为protected，从而编译器禁止通过基类指针删除子类对象。</p>
+<p>测试代码：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译器报错：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">&lt;source&gt;: In function <span class="string">&#x27;int main()&#x27;</span>:</span><br><span class="line">&lt;source&gt;:<span class="number">30</span>:<span class="number">12</span>: error: <span class="string">&#x27;Shape::~Shape()&#x27;</span> is <span class="keyword">protected</span> within <span class="keyword">this</span> context</span><br><span class="line">   <span class="number">30</span> |     <span class="keyword">delete</span> shape;</span><br><span class="line">      |            ^~~~~</span><br><span class="line">&lt;source&gt;:<span class="number">10</span>:<span class="number">5</span>: note: declared <span class="keyword">protected</span> here</span><br><span class="line">   <span class="number">10</span> |     ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">      |     ^</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="是否每个基类的析构函数都要加virtual？"><a href="#是否每个基类的析构函数都要加virtual？" class="headerlink" title="是否每个基类的析构函数都要加virtual？"></a>是否每个基类的析构函数都要加virtual？</h1><blockquote>
+<p>The default destructor is not virtual. If you declare the destructor of your base class as virtual, the destructors of the subclasses will be overrides, and thus also be virtual even without explicitly declaring them to be. </p>
+<ul>
+<li><a href="https://stackoverflow.com/a/5610164/11850070">https://stackoverflow.com/a/5610164/11850070</a></li>
+</ul>
+</blockquote>
+<p>不用，只要最上边的基类加 <code>virtual</code> 即可，其余子类的析构函数均继承了 <code>virtual</code>。</p>
+]]></content>
+      <tags>
+        <tag>cpp</tag>
       </tags>
   </entry>
   <entry>
@@ -1444,7 +1379,7 @@
 <h3 id="hash"><a href="#hash" class="headerlink" title=".hash"></a>.hash</h3><p>给<code>ld.so</code> 查询动态符号用的哈希表</p>
 <p><a href="https://flapenguin.me/elf-dt-hash">https://flapenguin.me/elf-dt-hash</a></p>
 <h3 id="dynsym"><a href="#dynsym" class="headerlink" title=".dynsym"></a>.dynsym</h3><p>This section holds the dynamic linking symbol table</p>
-<p>The <code>.dynsym</code> section of an ELF file consists of fixed-length records, either of type <code>Elf32_Sym</code> or <code>Elf64_Sym</code>, depending on the architecture. These records are unable to directly contain the symbol names due to their variable length nature. Instead, they include an offset within the <code>.dynstr</code> section (in the <code>.st_name</code> field), where the actual symbol name is located. Therefore, it is incorrect to say that <code>.dynsym</code> directly contains symbol names like “<a href="mailto:&#115;&#x65;&#116;&#x73;&#x6f;&#99;&#x6b;&#111;&#x70;&#116;&#x40;&#x47;&#x4c;&#x49;&#66;&#x43;&#x5f;&#50;&#x2e;&#x30;">&#115;&#x65;&#116;&#x73;&#x6f;&#99;&#x6b;&#111;&#x70;&#116;&#x40;&#x47;&#x4c;&#x49;&#66;&#x43;&#x5f;&#50;&#x2e;&#x30;</a>.” It accurately contains an <code>Elf32_Sym</code> or <code>Elf64_Sym</code> entry for an imported symbol such as <code>setsockopt</code>, which refers to the symbol name’s offset in the <code>.dynstr</code> section.</p>
+<p>The <code>.dynsym</code> section of an ELF file consists of fixed-length records, either of type <code>Elf32_Sym</code> or <code>Elf64_Sym</code>, depending on the architecture. These records are unable to directly contain the symbol names due to their variable length nature. Instead, they include an offset within the <code>.dynstr</code> section (in the <code>.st_name</code> field), where the actual symbol name is located. Therefore, it is incorrect to say that <code>.dynsym</code> directly contains symbol names like “<a href="mailto:&#x73;&#x65;&#x74;&#115;&#111;&#x63;&#x6b;&#111;&#112;&#116;&#64;&#x47;&#76;&#x49;&#66;&#67;&#95;&#x32;&#46;&#x30;">&#x73;&#x65;&#x74;&#115;&#111;&#x63;&#x6b;&#111;&#112;&#116;&#64;&#x47;&#76;&#x49;&#66;&#67;&#95;&#x32;&#46;&#x30;</a>.” It accurately contains an <code>Elf32_Sym</code> or <code>Elf64_Sym</code> entry for an imported symbol such as <code>setsockopt</code>, which refers to the symbol name’s offset in the <code>.dynstr</code> section.</p>
 <h3 id="dynstr"><a href="#dynstr" class="headerlink" title=".dynstr"></a>.dynstr</h3><p>This section holds strings needed for dynamic linking</p>
 <h3 id="init"><a href="#init" class="headerlink" title=".init"></a>.init</h3><p>This section holds executable instructions that contribute to the process initialization code. When a program starts to run, the system executes the code in this section before calling the main program entry point (called main for C programs).</p>
 <h3 id="fini"><a href="#fini" class="headerlink" title=".fini"></a>.fini</h3><p>This section holds executable instructions that contribute to the process termination code. When a program exits normally, the system executes the code in this section.</p>
@@ -2059,75 +1994,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Linux objdump</title>
-    <url>/2024/02/19/note/linux/objdump/</url>
-    <content><![CDATA[<h1 id="objdump"><a href="#objdump" class="headerlink" title="objdump"></a>objdump</h1><p><a href="https://man7.org/linux/man-pages/man1/objdump.1.html">https://man7.org/linux/man-pages/man1/objdump.1.html</a></p>
-<h1 id="disassemble-all-sections-of-an-exe"><a href="#disassemble-all-sections-of-an-exe" class="headerlink" title="disassemble all sections of an exe"></a>disassemble all sections of an exe</h1><p>问题：.rodata等数据段也被解释成指令了</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">objdump -C -S -D demo &gt; demo.exe.s</span><br><span class="line"></span><br><span class="line">-C demangle</span><br><span class="line">-S 插入源码</span><br><span class="line">-D 反汇编所有段</span><br></pre></td></tr></table></figure>
-
-<h1 id="Dump-all-symbols-Dump-symbol-table"><a href="#Dump-all-symbols-Dump-symbol-table" class="headerlink" title="Dump all symbols &#x2F; Dump symbol table"></a>Dump all symbols &#x2F; Dump symbol table</h1><p>-t 选项</p>
-<p>Display the contents of the symbol table(s)</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]<span class="meta"># objdump -C -t demo | grep vtable</span></span><br><span class="line"><span class="number">0000000000400</span>ac8  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> A</span><br><span class="line"><span class="number">0000000000600</span>d40  w    O .data.rel.ro   <span class="number">0000000000000058</span>              vtable <span class="keyword">for</span> __cxxabiv1::__class_type_info@@CXXABI_1<span class="number">.3</span></span><br><span class="line"><span class="number">0000000000400</span>a98  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> C</span><br><span class="line"><span class="number">0000000000600</span>da0  w    O .data.rel.ro   <span class="number">0000000000000058</span>              vtable <span class="keyword">for</span> __cxxabiv1::__si_class_type_info@@CXXABI_1<span class="number">.3</span></span><br><span class="line"><span class="number">0000000000400</span>ab0  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> B</span><br></pre></td></tr></table></figure>
-
-<ol>
-<li><p><strong>Address Column (e.g., <code>0000000000400238</code>):</strong></p>
-<ul>
-<li>This column shows the memory address where the symbol is located.</li>
-</ul>
-</li>
-<li><p><strong>Scope Column (e.g., <code>l</code>):</strong></p>
-<ul>
-<li>The symbol is a local (l), global (g), unique global (u),<br> neither global nor local (a space) or both global and<br> local (!).</li>
-</ul>
-</li>
-<li><p><strong>Section Type Column (e.g., <code>d</code>):</strong></p>
- <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;w&quot; The symbol is weak (w) or strong (a space).</span><br><span class="line">    </span><br><span class="line">&quot;C&quot; The symbol denotes a constructor (C) or an ordinary</span><br><span class="line">    symbol (a space).</span><br><span class="line">    </span><br><span class="line">&quot;W&quot; The symbol is a warning (W) or a normal symbol (a space).</span><br><span class="line">    A warning symbol&#x27;s name is a message to be displayed if</span><br><span class="line">    the symbol following the warning symbol is ever</span><br><span class="line">    referenced.</span><br><span class="line">    </span><br><span class="line">&quot;I&quot;</span><br><span class="line">&quot;i&quot; The symbol is an indirect reference to another symbol</span><br><span class="line">    (I), a function to be evaluated during reloc processing</span><br><span class="line">    (i) or a normal symbol (a space).</span><br><span class="line">    </span><br><span class="line">&quot;d&quot;</span><br><span class="line">&quot;D&quot; The symbol is a debugging symbol (d) or a dynamic symbol</span><br><span class="line">    (D) or a normal symbol (a space).</span><br><span class="line">    </span><br><span class="line">&quot;F&quot;</span><br><span class="line">&quot;f&quot;</span><br><span class="line">&quot;O&quot; The symbol is the name of a function (F) or a file (f) or</span><br><span class="line">    an object (O) or just a normal symbol (a space).</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>Section Name Column (e.g., <code>.interp</code>):</strong></p>
-<ul>
-<li>This column shows the name of the section in which the symbol is defined.</li>
-</ul>
-</li>
-<li><p><strong>Size Column (e.g., <code>0000000000000000</code>):</strong></p>
-<ul>
-<li>For common symbols is the alignment and for other symbol is<br> the size.</li>
-<li>e.g. 对象</li>
-</ul>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="number">0000000000400</span>ae0 &lt;typeinfo <span class="keyword">for</span> C&gt;:</span><br><span class="line">  <span class="number">400</span>ae0:       b0 <span class="number">0</span>d <span class="number">60</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> f8 <span class="number">0</span>a <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ..`.......@.....</span><br><span class="line">  <span class="number">400</span>af0:       <span class="number">00</span> <span class="number">0b</span> <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>                             ..@.....</span><br><span class="line"></span><br><span class="line"><span class="number">0000000000400</span>ae0  w    O .rodata	<span class="number">0000000000000018</span>              typeinfo <span class="keyword">for</span> C</span><br><span class="line"></span><br><span class="line"><span class="number">0x18</span> = <span class="number">16</span>+<span class="number">8</span> = <span class="number">24B</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>e.g. 函数</li>
-</ul>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="number">0000000000400968</span> &lt;A::<span class="built_in">foo</span>()&gt;:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;A::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">  <span class="number">400968</span>:	<span class="number">55</span>                   	push   %rbp</span><br><span class="line">  <span class="number">400969</span>:	<span class="number">48</span> <span class="number">89</span> e5             	mov    %rsp,%rbp</span><br><span class="line">  <span class="number">40096</span>c:	<span class="number">48</span> <span class="number">83</span> ec <span class="number">10</span>          	sub    $<span class="number">0x10</span>,%rsp</span><br><span class="line">  <span class="number">400970</span>:	<span class="number">48</span> <span class="number">89</span> <span class="number">7</span>d f8          	mov    %rdi,<span class="number">-0x8</span>(%rbp)</span><br><span class="line">  <span class="number">400974</span>:	be b1 <span class="number">0</span>a <span class="number">40</span> <span class="number">00</span>       	mov    $<span class="number">0x400ab1</span>,%esi</span><br><span class="line">  <span class="number">400979</span>:	bf <span class="number">60</span> <span class="number">20</span> <span class="number">60</span> <span class="number">00</span>       	mov    $<span class="number">0x602060</span>,%edi</span><br><span class="line">  <span class="number">40097</span>e:	e8 <span class="number">0</span>d fe ff ff       	callq  <span class="number">400790</span> &lt;std::basic_ostream&lt;<span class="type">char</span>, std::char_traits&lt;<span class="type">char</span>&gt; &gt;&amp; std::<span class="keyword">operator</span>&lt;&lt; &lt;std::char_traits&lt;<span class="type">char</span>&gt; &gt;(std::basic_ostream&lt;<span class="type">char</span>, std::char_traits&lt;<span class="type">char</span>&gt; &gt;&amp;, <span class="type">char</span> <span class="type">const</span>*)@plt&gt;</span><br><span class="line">  <span class="number">400983</span>:	be b0 <span class="number">07</span> <span class="number">40</span> <span class="number">00</span>       	mov    $<span class="number">0x4007b0</span>,%esi</span><br><span class="line">  <span class="number">400988</span>:	<span class="number">48</span> <span class="number">89</span> c7             	mov    %rax,%rdi</span><br><span class="line">  <span class="number">40098b</span>:	e8 <span class="number">10</span> fe ff ff       	callq  <span class="number">4007</span>a0 &lt;std::ostream::<span class="keyword">operator</span>&lt;&lt;(std::ostream&amp; (*)(std::ostream&amp;))@plt&gt;</span><br><span class="line">  <span class="number">400990</span>:	<span class="number">90</span>                   	nop</span><br><span class="line">  <span class="number">400991</span>:	c9                   	leaveq </span><br><span class="line">  <span class="number">400992</span>:	c3                   	retq   </span><br><span class="line">  <span class="number">400993</span>:	<span class="number">90</span>                   	nop</span><br><span class="line"></span><br><span class="line"><span class="number">0000000000400968</span>  w    F .text	<span class="number">000000000000002b</span>              A::<span class="built_in">foo</span>()</span><br><span class="line"></span><br><span class="line"><span class="number">0x400993</span><span class="number">-0x400968</span> = <span class="number">0x2b</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>Symbol Name Column (e.g., <code>.interp</code>):</strong></p>
-<ul>
-<li>This column lists the name of the symbol.</li>
-</ul>
-</li>
-</ol>
-<h1 id="Dump-all-symbols-inside-a-section"><a href="#Dump-all-symbols-inside-a-section" class="headerlink" title="Dump all symbols inside a section"></a>Dump all symbols inside a section</h1><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]<span class="meta"># objdump -C -t -j .rodata demo </span></span><br><span class="line"></span><br><span class="line">demo:     file format elf64-x86<span class="number">-64</span></span><br><span class="line"></span><br><span class="line">SYMBOL TABLE:</span><br><span class="line"><span class="number">0000000000400</span>a70 l    d  .rodata        <span class="number">0000000000000000</span>              .rodata</span><br><span class="line"><span class="number">0000000000400</span>a80 l     O .rodata        <span class="number">0000000000000001</span>              std::piecewise_construct</span><br><span class="line"><span class="number">0000000000400</span>af8  w    O .rodata        <span class="number">0000000000000003</span>              typeinfo name <span class="keyword">for</span> C</span><br><span class="line"><span class="number">0000000000400</span>ac8  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> A</span><br><span class="line"><span class="number">0000000000400</span>ae0  w    O .rodata        <span class="number">0000000000000018</span>              typeinfo <span class="keyword">for</span> C</span><br><span class="line"><span class="number">0000000000400</span>a70 g     O .rodata        <span class="number">0000000000000004</span>              _IO_stdin_used</span><br><span class="line"><span class="number">0000000000400b</span>30  w    O .rodata        <span class="number">0000000000000003</span>              typeinfo name <span class="keyword">for</span> A</span><br><span class="line"><span class="number">0000000000400</span>a78 g     O .rodata        <span class="number">0000000000000000</span>              .hidden __dso_handle</span><br><span class="line"><span class="number">0000000000400</span>a98  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> C</span><br><span class="line"><span class="number">0000000000400b</span>20  w    O .rodata        <span class="number">0000000000000010</span>              typeinfo <span class="keyword">for</span> A</span><br><span class="line"><span class="number">0000000000400b</span>18  w    O .rodata        <span class="number">0000000000000003</span>              typeinfo name <span class="keyword">for</span> B</span><br><span class="line"><span class="number">0000000000400</span>ab0  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> B</span><br><span class="line"><span class="number">0000000000400b</span>00  w    O .rodata        <span class="number">0000000000000018</span>              typeinfo <span class="keyword">for</span> B</span><br></pre></td></tr></table></figure>
-
-<h1 id="list-all-sections-info"><a href="#list-all-sections-info" class="headerlink" title="list all sections info"></a>list all sections info</h1><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]# objdump -h demo</span><br><span class="line">demo:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line">Sections:</span><br><span class="line">Idx Name          Size      VMA               LMA               File off  Algn     </span><br><span class="line">  0 .interp       0000001c  0000000000400238  0000000000400238  00000238  2**0     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  1 .note.ABI-tag 00000020  0000000000400254  0000000000400254  00000254  2**2     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  2 .note.gnu.build-id 00000024  0000000000400274  0000000000400274  00000274  2**2</span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  3 .gnu.hash     00000038  0000000000400298  0000000000400298  00000298  2**3     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  4 .dynsym       00000120  00000000004002d0  00000000004002d0  000002d0  2**3     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  5 .dynstr       00000190  00000000004003f0  00000000004003f0  000003f0  2**0     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  6 .gnu.version  00000018  0000000000400580  0000000000400580  00000580  2**1     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  7 .gnu.version_r 00000050  0000000000400598  0000000000400598  00000598  2**3    </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  8 .rela.dyn     00000060  00000000004005e8  00000000004005e8  000005e8  2**3     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  9 .rela.plt     000000c0  0000000000400648  0000000000400648  00000648  2**3     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
-
-<h1 id="disassemble-a-section"><a href="#disassemble-a-section" class="headerlink" title="disassemble a section"></a>disassemble a section</h1><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">-s </span><br><span class="line">		打印section内所有内容</span><br><span class="line">-j xxx 或者 --section=xxx</span><br><span class="line">		只打印xxx段</span><br><span class="line">-d </span><br><span class="line">		反汇编</span><br><span class="line">-C </span><br><span class="line">		demangle输出</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]# objdump -C -j .rodata -d demo</span><br><span class="line"></span><br><span class="line">demo:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line">Disassembly of section .rodata:</span><br><span class="line"></span><br><span class="line">0000000000400a70 &lt;_IO_stdin_used&gt;:</span><br><span class="line">  400a70:       01 00 02 00 00 00 00 00                             ........</span><br><span class="line"></span><br><span class="line">0000000000400a78 &lt;__dso_handle&gt;:</span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">0000000000400a80 &lt;std::piecewise_construct&gt;:</span><br><span class="line">  400a80:       00 41 3a 3a 66 6f 6f 00 42 3a 3a 66 6f 6f 00 43     .A::foo.B::foo.C</span><br><span class="line">  400a90:       3a 3a 66 6f 6f 00 00 00                             ::foo...</span><br><span class="line"></span><br><span class="line">0000000000400a98 &lt;vtable for C&gt;:</span><br><span class="line">        ...</span><br><span class="line">  400aa0:       e0 0a 40 00 00 00 00 00 c0 09 40 00 00 00 00 00     ..@.......@.....</span><br><span class="line"></span><br><span class="line">0000000000400ab0 &lt;vtable for B&gt;:</span><br><span class="line">        ...</span><br><span class="line">  400ab8:       00 0b 40 00 00 00 00 00 94 09 40 00 00 00 00 00     ..@.......@.....</span><br><span class="line"></span><br><span class="line">0000000000400ac8 &lt;vtable for A&gt;:</span><br><span class="line">        ...</span><br><span class="line">  400ad0:       20 0b 40 00 00 00 00 00 68 09 40 00 00 00 00 00      .@.....h.@.....</span><br><span class="line"></span><br><span class="line">0000000000400ae0 &lt;typeinfo for C&gt;:</span><br><span class="line">  400ae0:       b0 0d 60 00 00 00 00 00 f8 0a 40 00 00 00 00 00     ..`.......@.....</span><br><span class="line">  400af0:       00 0b 40 00 00 00 00 00                             ..@.....</span><br><span class="line"></span><br><span class="line">0000000000400af8 &lt;typeinfo name for C&gt;:</span><br><span class="line">  400af8:       31 43 00 00 00 00 00 00                             1C......</span><br><span class="line"></span><br><span class="line">0000000000400b00 &lt;typeinfo for B&gt;:</span><br><span class="line">  400b00:       b0 0d 60 00 00 00 00 00 18 0b 40 00 00 00 00 00     ..`.......@.....</span><br><span class="line">  400b10:       20 0b 40 00 00 00 00 00                              .@.....</span><br><span class="line"></span><br><span class="line">0000000000400b18 &lt;typeinfo name for B&gt;:</span><br><span class="line">  400b18:       31 42 00 00 00 00 00 00                             1B......</span><br><span class="line"></span><br><span class="line">0000000000400b20 &lt;typeinfo for A&gt;:</span><br><span class="line">  400b20:       50 0d 60 00 00 00 00 00 30 0b 40 00 00 00 00 00     P.`.....0.@.....</span><br><span class="line"></span><br><span class="line">0000000000400b30 &lt;typeinfo name for A&gt;:</span><br><span class="line">  400b30:       31 41 00                                            1A.</span><br></pre></td></tr></table></figure>
-
-<h1 id="反汇编某个data-section"><a href="#反汇编某个data-section" class="headerlink" title="反汇编某个data section"></a>反汇编某个data section</h1><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">wqj@WQJ:~/demo$ objdump -C -S -z -j .data.rel.ro.local a.out </span><br><span class="line"></span><br><span class="line">a.out:     file format elf64-x86<span class="number">-64</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Disassembly of section .data.rel.ro.local:</span><br><span class="line"></span><br><span class="line"><span class="number">0000000000001</span>d28 &lt;vtable <span class="keyword">for</span> Derived&gt;:</span><br><span class="line">    <span class="number">1</span>d28:       <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">78</span> <span class="number">1</span>d <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ........x.......</span><br><span class="line">    <span class="number">1</span>d38:       dc <span class="number">08</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> cc <span class="number">08</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ................</span><br><span class="line"></span><br><span class="line"><span class="number">0000000000001</span>d48 &lt;vtable <span class="keyword">for</span> Base&gt;:</span><br><span class="line">    <span class="number">1</span>d48:       <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">90</span> <span class="number">1</span>d <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ................</span><br><span class="line">    <span class="number">1</span>d58:       bc <span class="number">08</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> cc <span class="number">08</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ................</span><br></pre></td></tr></table></figure>
-
-<h1 id="disassemble-text-and-rodata-sections"><a href="#disassemble-text-and-rodata-sections" class="headerlink" title="disassemble .text and .rodata sections"></a>disassemble .text and .rodata sections</h1><p>分析虚函数表用到</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">objdump -C -j .rodata -j .text -z -S demo</span><br><span class="line"></span><br><span class="line">-d 反汇编会略去<span class="number">0</span></span><br><span class="line">-z 反汇编显示<span class="number">0</span></span><br></pre></td></tr></table></figure>
-
-<h1 id="d-vs-z"><a href="#d-vs-z" class="headerlink" title="-d vs -z"></a>-d vs -z</h1><p>-d 把 [0x400b50, 400b57] 8B的全0给省略了，带来困扰</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="number">0000000000400b</span>50 &lt;vtable <span class="keyword">for</span> C&gt;:</span><br><span class="line">	...</span><br><span class="line">  <span class="number">400b</span>58:	b0 <span class="number">0b</span> <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">02</span> <span class="number">0</span>a <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ..@.......@.....</span><br><span class="line">  <span class="number">400b</span>68:	aa <span class="number">09</span> <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>                             ..@.....</span><br></pre></td></tr></table></figure>
-
-<p>-z</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="number">0000000000400b</span>50 &lt;vtable <span class="keyword">for</span> C&gt;:</span><br><span class="line">  <span class="number">400b</span>50:	<span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> b0 <span class="number">0b</span> <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ..........@.....</span><br><span class="line">  <span class="number">400b</span>60:	<span class="number">02</span> <span class="number">0</span>a <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> aa <span class="number">09</span> <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ..@.......@.....</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>linux</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Linux readelf</title>
     <url>/2024/02/21/note/linux/readelf/</url>
     <content><![CDATA[<h1 id="Options"><a href="#Options" class="headerlink" title="Options"></a>Options</h1><p><code>-h</code> 打印 elf header<br><code>-l</code> 打印 program headers<br><code>-S</code> 打印 section headers<br><code>-x section_name</code> Hexdump the contents of section<br><code>-W --wide</code> 输出宽度超过80个字符也不换行</p>
@@ -2276,6 +2142,75 @@
       </tags>
   </entry>
   <entry>
+    <title>Linux objdump</title>
+    <url>/2024/02/19/note/linux/objdump/</url>
+    <content><![CDATA[<h1 id="objdump"><a href="#objdump" class="headerlink" title="objdump"></a>objdump</h1><p><a href="https://man7.org/linux/man-pages/man1/objdump.1.html">https://man7.org/linux/man-pages/man1/objdump.1.html</a></p>
+<h1 id="disassemble-all-sections-of-an-exe"><a href="#disassemble-all-sections-of-an-exe" class="headerlink" title="disassemble all sections of an exe"></a>disassemble all sections of an exe</h1><p>问题：.rodata等数据段也被解释成指令了</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">objdump -C -S -D demo &gt; demo.exe.s</span><br><span class="line"></span><br><span class="line">-C demangle</span><br><span class="line">-S 插入源码</span><br><span class="line">-D 反汇编所有段</span><br></pre></td></tr></table></figure>
+
+<h1 id="Dump-all-symbols-Dump-symbol-table"><a href="#Dump-all-symbols-Dump-symbol-table" class="headerlink" title="Dump all symbols &#x2F; Dump symbol table"></a>Dump all symbols &#x2F; Dump symbol table</h1><p>-t 选项</p>
+<p>Display the contents of the symbol table(s)</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]<span class="meta"># objdump -C -t demo | grep vtable</span></span><br><span class="line"><span class="number">0000000000400</span>ac8  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> A</span><br><span class="line"><span class="number">0000000000600</span>d40  w    O .data.rel.ro   <span class="number">0000000000000058</span>              vtable <span class="keyword">for</span> __cxxabiv1::__class_type_info@@CXXABI_1<span class="number">.3</span></span><br><span class="line"><span class="number">0000000000400</span>a98  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> C</span><br><span class="line"><span class="number">0000000000600</span>da0  w    O .data.rel.ro   <span class="number">0000000000000058</span>              vtable <span class="keyword">for</span> __cxxabiv1::__si_class_type_info@@CXXABI_1<span class="number">.3</span></span><br><span class="line"><span class="number">0000000000400</span>ab0  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> B</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p><strong>Address Column (e.g., <code>0000000000400238</code>):</strong></p>
+<ul>
+<li>This column shows the memory address where the symbol is located.</li>
+</ul>
+</li>
+<li><p><strong>Scope Column (e.g., <code>l</code>):</strong></p>
+<ul>
+<li>The symbol is a local (l), global (g), unique global (u),<br> neither global nor local (a space) or both global and<br> local (!).</li>
+</ul>
+</li>
+<li><p><strong>Section Type Column (e.g., <code>d</code>):</strong></p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;w&quot; The symbol is weak (w) or strong (a space).</span><br><span class="line">    </span><br><span class="line">&quot;C&quot; The symbol denotes a constructor (C) or an ordinary</span><br><span class="line">    symbol (a space).</span><br><span class="line">    </span><br><span class="line">&quot;W&quot; The symbol is a warning (W) or a normal symbol (a space).</span><br><span class="line">    A warning symbol&#x27;s name is a message to be displayed if</span><br><span class="line">    the symbol following the warning symbol is ever</span><br><span class="line">    referenced.</span><br><span class="line">    </span><br><span class="line">&quot;I&quot;</span><br><span class="line">&quot;i&quot; The symbol is an indirect reference to another symbol</span><br><span class="line">    (I), a function to be evaluated during reloc processing</span><br><span class="line">    (i) or a normal symbol (a space).</span><br><span class="line">    </span><br><span class="line">&quot;d&quot;</span><br><span class="line">&quot;D&quot; The symbol is a debugging symbol (d) or a dynamic symbol</span><br><span class="line">    (D) or a normal symbol (a space).</span><br><span class="line">    </span><br><span class="line">&quot;F&quot;</span><br><span class="line">&quot;f&quot;</span><br><span class="line">&quot;O&quot; The symbol is the name of a function (F) or a file (f) or</span><br><span class="line">    an object (O) or just a normal symbol (a space).</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Section Name Column (e.g., <code>.interp</code>):</strong></p>
+<ul>
+<li>This column shows the name of the section in which the symbol is defined.</li>
+</ul>
+</li>
+<li><p><strong>Size Column (e.g., <code>0000000000000000</code>):</strong></p>
+<ul>
+<li>For common symbols is the alignment and for other symbol is<br> the size.</li>
+<li>e.g. 对象</li>
+</ul>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="number">0000000000400</span>ae0 &lt;typeinfo <span class="keyword">for</span> C&gt;:</span><br><span class="line">  <span class="number">400</span>ae0:       b0 <span class="number">0</span>d <span class="number">60</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> f8 <span class="number">0</span>a <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ..`.......@.....</span><br><span class="line">  <span class="number">400</span>af0:       <span class="number">00</span> <span class="number">0b</span> <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>                             ..@.....</span><br><span class="line"></span><br><span class="line"><span class="number">0000000000400</span>ae0  w    O .rodata	<span class="number">0000000000000018</span>              typeinfo <span class="keyword">for</span> C</span><br><span class="line"></span><br><span class="line"><span class="number">0x18</span> = <span class="number">16</span>+<span class="number">8</span> = <span class="number">24B</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>e.g. 函数</li>
+</ul>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="number">0000000000400968</span> &lt;A::<span class="built_in">foo</span>()&gt;:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;A::foo&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">  <span class="number">400968</span>:	<span class="number">55</span>                   	push   %rbp</span><br><span class="line">  <span class="number">400969</span>:	<span class="number">48</span> <span class="number">89</span> e5             	mov    %rsp,%rbp</span><br><span class="line">  <span class="number">40096</span>c:	<span class="number">48</span> <span class="number">83</span> ec <span class="number">10</span>          	sub    $<span class="number">0x10</span>,%rsp</span><br><span class="line">  <span class="number">400970</span>:	<span class="number">48</span> <span class="number">89</span> <span class="number">7</span>d f8          	mov    %rdi,<span class="number">-0x8</span>(%rbp)</span><br><span class="line">  <span class="number">400974</span>:	be b1 <span class="number">0</span>a <span class="number">40</span> <span class="number">00</span>       	mov    $<span class="number">0x400ab1</span>,%esi</span><br><span class="line">  <span class="number">400979</span>:	bf <span class="number">60</span> <span class="number">20</span> <span class="number">60</span> <span class="number">00</span>       	mov    $<span class="number">0x602060</span>,%edi</span><br><span class="line">  <span class="number">40097</span>e:	e8 <span class="number">0</span>d fe ff ff       	callq  <span class="number">400790</span> &lt;std::basic_ostream&lt;<span class="type">char</span>, std::char_traits&lt;<span class="type">char</span>&gt; &gt;&amp; std::<span class="keyword">operator</span>&lt;&lt; &lt;std::char_traits&lt;<span class="type">char</span>&gt; &gt;(std::basic_ostream&lt;<span class="type">char</span>, std::char_traits&lt;<span class="type">char</span>&gt; &gt;&amp;, <span class="type">char</span> <span class="type">const</span>*)@plt&gt;</span><br><span class="line">  <span class="number">400983</span>:	be b0 <span class="number">07</span> <span class="number">40</span> <span class="number">00</span>       	mov    $<span class="number">0x4007b0</span>,%esi</span><br><span class="line">  <span class="number">400988</span>:	<span class="number">48</span> <span class="number">89</span> c7             	mov    %rax,%rdi</span><br><span class="line">  <span class="number">40098b</span>:	e8 <span class="number">10</span> fe ff ff       	callq  <span class="number">4007</span>a0 &lt;std::ostream::<span class="keyword">operator</span>&lt;&lt;(std::ostream&amp; (*)(std::ostream&amp;))@plt&gt;</span><br><span class="line">  <span class="number">400990</span>:	<span class="number">90</span>                   	nop</span><br><span class="line">  <span class="number">400991</span>:	c9                   	leaveq </span><br><span class="line">  <span class="number">400992</span>:	c3                   	retq   </span><br><span class="line">  <span class="number">400993</span>:	<span class="number">90</span>                   	nop</span><br><span class="line"></span><br><span class="line"><span class="number">0000000000400968</span>  w    F .text	<span class="number">000000000000002b</span>              A::<span class="built_in">foo</span>()</span><br><span class="line"></span><br><span class="line"><span class="number">0x400993</span><span class="number">-0x400968</span> = <span class="number">0x2b</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Symbol Name Column (e.g., <code>.interp</code>):</strong></p>
+<ul>
+<li>This column lists the name of the symbol.</li>
+</ul>
+</li>
+</ol>
+<h1 id="Dump-all-symbols-inside-a-section"><a href="#Dump-all-symbols-inside-a-section" class="headerlink" title="Dump all symbols inside a section"></a>Dump all symbols inside a section</h1><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]<span class="meta"># objdump -C -t -j .rodata demo </span></span><br><span class="line"></span><br><span class="line">demo:     file format elf64-x86<span class="number">-64</span></span><br><span class="line"></span><br><span class="line">SYMBOL TABLE:</span><br><span class="line"><span class="number">0000000000400</span>a70 l    d  .rodata        <span class="number">0000000000000000</span>              .rodata</span><br><span class="line"><span class="number">0000000000400</span>a80 l     O .rodata        <span class="number">0000000000000001</span>              std::piecewise_construct</span><br><span class="line"><span class="number">0000000000400</span>af8  w    O .rodata        <span class="number">0000000000000003</span>              typeinfo name <span class="keyword">for</span> C</span><br><span class="line"><span class="number">0000000000400</span>ac8  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> A</span><br><span class="line"><span class="number">0000000000400</span>ae0  w    O .rodata        <span class="number">0000000000000018</span>              typeinfo <span class="keyword">for</span> C</span><br><span class="line"><span class="number">0000000000400</span>a70 g     O .rodata        <span class="number">0000000000000004</span>              _IO_stdin_used</span><br><span class="line"><span class="number">0000000000400b</span>30  w    O .rodata        <span class="number">0000000000000003</span>              typeinfo name <span class="keyword">for</span> A</span><br><span class="line"><span class="number">0000000000400</span>a78 g     O .rodata        <span class="number">0000000000000000</span>              .hidden __dso_handle</span><br><span class="line"><span class="number">0000000000400</span>a98  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> C</span><br><span class="line"><span class="number">0000000000400b</span>20  w    O .rodata        <span class="number">0000000000000010</span>              typeinfo <span class="keyword">for</span> A</span><br><span class="line"><span class="number">0000000000400b</span>18  w    O .rodata        <span class="number">0000000000000003</span>              typeinfo name <span class="keyword">for</span> B</span><br><span class="line"><span class="number">0000000000400</span>ab0  w    O .rodata        <span class="number">0000000000000018</span>              vtable <span class="keyword">for</span> B</span><br><span class="line"><span class="number">0000000000400b</span>00  w    O .rodata        <span class="number">0000000000000018</span>              typeinfo <span class="keyword">for</span> B</span><br></pre></td></tr></table></figure>
+
+<h1 id="list-all-sections-info"><a href="#list-all-sections-info" class="headerlink" title="list all sections info"></a>list all sections info</h1><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]# objdump -h demo</span><br><span class="line">demo:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line">Sections:</span><br><span class="line">Idx Name          Size      VMA               LMA               File off  Algn     </span><br><span class="line">  0 .interp       0000001c  0000000000400238  0000000000400238  00000238  2**0     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  1 .note.ABI-tag 00000020  0000000000400254  0000000000400254  00000254  2**2     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  2 .note.gnu.build-id 00000024  0000000000400274  0000000000400274  00000274  2**2</span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  3 .gnu.hash     00000038  0000000000400298  0000000000400298  00000298  2**3     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  4 .dynsym       00000120  00000000004002d0  00000000004002d0  000002d0  2**3     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  5 .dynstr       00000190  00000000004003f0  00000000004003f0  000003f0  2**0     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  6 .gnu.version  00000018  0000000000400580  0000000000400580  00000580  2**1     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  7 .gnu.version_r 00000050  0000000000400598  0000000000400598  00000598  2**3    </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  8 .rela.dyn     00000060  00000000004005e8  00000000004005e8  000005e8  2**3     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  9 .rela.plt     000000c0  0000000000400648  0000000000400648  00000648  2**3     </span><br><span class="line">                  CONTENTS, ALLOC, LOAD, READONLY, DATA</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+
+<h1 id="disassemble-a-section"><a href="#disassemble-a-section" class="headerlink" title="disassemble a section"></a>disassemble a section</h1><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">-s </span><br><span class="line">		打印section内所有内容</span><br><span class="line">-j xxx 或者 --section=xxx</span><br><span class="line">		只打印xxx段</span><br><span class="line">-d </span><br><span class="line">		反汇编</span><br><span class="line">-C </span><br><span class="line">		demangle输出</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[root@ZLPC-wangqingjia demo]# objdump -C -j .rodata -d demo</span><br><span class="line"></span><br><span class="line">demo:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line">Disassembly of section .rodata:</span><br><span class="line"></span><br><span class="line">0000000000400a70 &lt;_IO_stdin_used&gt;:</span><br><span class="line">  400a70:       01 00 02 00 00 00 00 00                             ........</span><br><span class="line"></span><br><span class="line">0000000000400a78 &lt;__dso_handle&gt;:</span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">0000000000400a80 &lt;std::piecewise_construct&gt;:</span><br><span class="line">  400a80:       00 41 3a 3a 66 6f 6f 00 42 3a 3a 66 6f 6f 00 43     .A::foo.B::foo.C</span><br><span class="line">  400a90:       3a 3a 66 6f 6f 00 00 00                             ::foo...</span><br><span class="line"></span><br><span class="line">0000000000400a98 &lt;vtable for C&gt;:</span><br><span class="line">        ...</span><br><span class="line">  400aa0:       e0 0a 40 00 00 00 00 00 c0 09 40 00 00 00 00 00     ..@.......@.....</span><br><span class="line"></span><br><span class="line">0000000000400ab0 &lt;vtable for B&gt;:</span><br><span class="line">        ...</span><br><span class="line">  400ab8:       00 0b 40 00 00 00 00 00 94 09 40 00 00 00 00 00     ..@.......@.....</span><br><span class="line"></span><br><span class="line">0000000000400ac8 &lt;vtable for A&gt;:</span><br><span class="line">        ...</span><br><span class="line">  400ad0:       20 0b 40 00 00 00 00 00 68 09 40 00 00 00 00 00      .@.....h.@.....</span><br><span class="line"></span><br><span class="line">0000000000400ae0 &lt;typeinfo for C&gt;:</span><br><span class="line">  400ae0:       b0 0d 60 00 00 00 00 00 f8 0a 40 00 00 00 00 00     ..`.......@.....</span><br><span class="line">  400af0:       00 0b 40 00 00 00 00 00                             ..@.....</span><br><span class="line"></span><br><span class="line">0000000000400af8 &lt;typeinfo name for C&gt;:</span><br><span class="line">  400af8:       31 43 00 00 00 00 00 00                             1C......</span><br><span class="line"></span><br><span class="line">0000000000400b00 &lt;typeinfo for B&gt;:</span><br><span class="line">  400b00:       b0 0d 60 00 00 00 00 00 18 0b 40 00 00 00 00 00     ..`.......@.....</span><br><span class="line">  400b10:       20 0b 40 00 00 00 00 00                              .@.....</span><br><span class="line"></span><br><span class="line">0000000000400b18 &lt;typeinfo name for B&gt;:</span><br><span class="line">  400b18:       31 42 00 00 00 00 00 00                             1B......</span><br><span class="line"></span><br><span class="line">0000000000400b20 &lt;typeinfo for A&gt;:</span><br><span class="line">  400b20:       50 0d 60 00 00 00 00 00 30 0b 40 00 00 00 00 00     P.`.....0.@.....</span><br><span class="line"></span><br><span class="line">0000000000400b30 &lt;typeinfo name for A&gt;:</span><br><span class="line">  400b30:       31 41 00                                            1A.</span><br></pre></td></tr></table></figure>
+
+<h1 id="反汇编某个data-section"><a href="#反汇编某个data-section" class="headerlink" title="反汇编某个data section"></a>反汇编某个data section</h1><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">wqj@WQJ:~/demo$ objdump -C -S -z -j .data.rel.ro.local a.out </span><br><span class="line"></span><br><span class="line">a.out:     file format elf64-x86<span class="number">-64</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Disassembly of section .data.rel.ro.local:</span><br><span class="line"></span><br><span class="line"><span class="number">0000000000001</span>d28 &lt;vtable <span class="keyword">for</span> Derived&gt;:</span><br><span class="line">    <span class="number">1</span>d28:       <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">78</span> <span class="number">1</span>d <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ........x.......</span><br><span class="line">    <span class="number">1</span>d38:       dc <span class="number">08</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> cc <span class="number">08</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ................</span><br><span class="line"></span><br><span class="line"><span class="number">0000000000001</span>d48 &lt;vtable <span class="keyword">for</span> Base&gt;:</span><br><span class="line">    <span class="number">1</span>d48:       <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">90</span> <span class="number">1</span>d <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ................</span><br><span class="line">    <span class="number">1</span>d58:       bc <span class="number">08</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> cc <span class="number">08</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ................</span><br></pre></td></tr></table></figure>
+
+<h1 id="disassemble-text-and-rodata-sections"><a href="#disassemble-text-and-rodata-sections" class="headerlink" title="disassemble .text and .rodata sections"></a>disassemble .text and .rodata sections</h1><p>分析虚函数表用到</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">objdump -C -j .rodata -j .text -z -S demo</span><br><span class="line"></span><br><span class="line">-d 反汇编会略去<span class="number">0</span></span><br><span class="line">-z 反汇编显示<span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="d-vs-z"><a href="#d-vs-z" class="headerlink" title="-d vs -z"></a>-d vs -z</h1><p>-d 把 [0x400b50, 400b57] 8B的全0给省略了，带来困扰</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="number">0000000000400b</span>50 &lt;vtable <span class="keyword">for</span> C&gt;:</span><br><span class="line">	...</span><br><span class="line">  <span class="number">400b</span>58:	b0 <span class="number">0b</span> <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">02</span> <span class="number">0</span>a <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ..@.......@.....</span><br><span class="line">  <span class="number">400b</span>68:	aa <span class="number">09</span> <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>                             ..@.....</span><br></pre></td></tr></table></figure>
+
+<p>-z</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="number">0000000000400b</span>50 &lt;vtable <span class="keyword">for</span> C&gt;:</span><br><span class="line">  <span class="number">400b</span>50:	<span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> b0 <span class="number">0b</span> <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ..........@.....</span><br><span class="line">  <span class="number">400b</span>60:	<span class="number">02</span> <span class="number">0</span>a <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> aa <span class="number">09</span> <span class="number">40</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>     ..@.......@.....</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Linux软链接和硬链接用法及区别</title>
     <url>/2024/02/29/note/linux/soft_link_and_hard_link/</url>
     <content><![CDATA[<h1 id="Linux软链接和硬链接"><a href="#Linux软链接和硬链接" class="headerlink" title="Linux软链接和硬链接"></a>Linux软链接和硬链接</h1><h2 id="创建软硬链接"><a href="#创建软硬链接" class="headerlink" title="创建软硬链接"></a>创建软硬链接</h2><p>Creating a symlink</p>
@@ -2349,239 +2284,6 @@
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@ZLPC-WangQingJia demo]<span class="comment"># as demo.s -o demo.o</span></span><br><span class="line">[root@ZLPC-WangQingJia demo]<span class="comment"># objdump -s demo.o</span></span><br><span class="line"></span><br><span class="line">demo.o:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line">Contents of section .data:</span><br><span class="line"> 0000 88776655 44332211                    .wfUD3<span class="string">&quot;.</span></span><br></pre></td></tr></table></figure>]]></content>
       <tags>
         <tag>linux</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Redis数据类型</title>
-    <url>/2024/02/19/note/redis/Redis%E5%90%84%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF/</url>
-    <content><![CDATA[<p>Redis各种数据类型的API不在此页面赘述，直接查<a href="https://redis.io/commands/">官方文档</a></p>
-<h1 id="String"><a href="#String" class="headerlink" title="String"></a>String</h1><h2 id="缓存对象"><a href="#缓存对象" class="headerlink" title="缓存对象"></a>缓存对象</h2><p>使用 String 来缓存对象有两种方式：</p>
-<ul>
-<li>直接缓存整个对象的 JSON，命令例子： <code>SET user:1 &#39;&#123;&quot;name&quot;:&quot;xiaolin&quot;, &quot;age&quot;:18&#125;&#39;</code>。</li>
-<li>将对象拆分开存，命令例子： <code>MSET user:1:name xiaolin user:1:age 18 user:2:name xiaomei user:2:age 20</code>。</li>
-</ul>
-<h2 id="常规计数"><a href="#常规计数" class="headerlink" title="常规计数"></a>常规计数</h2><p>因为 Redis 处理命令是单线程，所以执行命令的过程是原子的。因此 String 数据类型适合计数场景，比如计算访问次数、点赞、转发、库存数量等等。</p>
-<p>比如计算文章的阅读量：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># 初始化文章的阅读量</span><br><span class="line">&gt; SET aritcle:readcount:1001 0</span><br><span class="line">OK</span><br><span class="line">#阅读量+1</span><br><span class="line">&gt; INCR aritcle:readcount:1001</span><br><span class="line">(integer) 1</span><br><span class="line">#阅读量+1</span><br><span class="line">&gt; INCR aritcle:readcount:1001</span><br><span class="line">(integer) 2</span><br><span class="line">#阅读量+1</span><br><span class="line">&gt; INCR aritcle:readcount:1001</span><br><span class="line">(integer) 3</span><br><span class="line"># 获取对应文章的阅读量</span><br><span class="line">&gt; GET aritcle:readcount:1001</span><br><span class="line">&quot;3&quot;</span><br></pre></td></tr></table></figure>
-
-<h2 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h2><p>SET 命令有个 NX 参数可以实现「key不存在才插入」，可以用它来实现分布式锁：</p>
-<ul>
-<li>如果 key 不存在，则显示插入成功，可以用来表示加锁成功；</li>
-<li>如果 key 存在，则会显示插入失败，可以用来表示加锁失败。</li>
-</ul>
-<p>一般而言，还会对分布式锁加上过期时间，分布式锁的命令如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SET lock_key unique_value NX PX 10000</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>lock_key 就是 key 键；</li>
-<li>unique_value 是客户端生成的唯一的标识；</li>
-<li>NX 代表只在 lock_key 不存在时，才对 lock_key 进行设置操作；</li>
-<li>PX 10000 表示设置 lock_key 的过期时间为 10s，这是为了避免客户端发生异常而无法释放锁。</li>
-</ul>
-<p>而解锁的过程就是将 lock_key 键删除，但不能乱删，要保证执行操作的客户端就是加锁的客户端。所以，解锁的时候，我们要先判断锁的 unique_value 是否为加锁客户端，是的话，才将 lock_key 键删除。</p>
-<p>可以看到，解锁是有两个操作，这时就需要 Lua 脚本来保证解锁的原子性，因为 Redis 在执行 Lua 脚本时，可以以原子性的方式执行，保证了锁释放操作的原子性。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">// 释放锁时，先比较 unique_value 是否相等，避免锁的误释放</span><br><span class="line">if redis.call(&quot;get&quot;,KEYS[1]) == ARGV[1] then</span><br><span class="line">    return redis.call(&quot;del&quot;,KEYS[1])</span><br><span class="line">else</span><br><span class="line">    return 0</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
-
-<p>这样一来，就通过使用 SET 命令和 Lua 脚本在 Redis 单节点上完成了分布式锁的加锁和解锁。</p>
-<h2 id="共享-Session-信息"><a href="#共享-Session-信息" class="headerlink" title="共享 Session 信息"></a>共享 Session 信息</h2><p>通常我们在开发后台管理系统时，会使用 Session 来保存用户的会话(登录)状态，这些 Session 信息会被保存在服务器端，但这只适用于单系统应用，如果是分布式系统此模式将不再适用。</p>
-<p>例如用户一的 Session 信息被存储在服务器一，但第二次访问时用户一被分配到服务器二，这个时候服务器并没有用户一的 Session 信息，就会出现需要重复登录的问题，问题在于分布式系统每次会把请求随机分配到不同的服务器。</p>
-<p>分布式系统单独存储 Session 流程图：</p>
-<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/redis/%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/Session1.png"></p>
-<p>因此，我们需要借助 Redis 对这些 Session 信息进行统一的存储和管理，这样无论请求发送到那台服务器，服务器都会去同一个 Redis 获取相关的 Session 信息，这样就解决了分布式系统下 Session 存储的问题。</p>
-<p>分布式系统使用同一个 Redis 存储 Session 流程图：</p>
-<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/redis/%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/Session2.png"></p>
-<h1 id="List"><a href="#List" class="headerlink" title="List"></a>List</h1><h2 id="消息队列"><a href="#消息队列" class="headerlink" title="消息队列"></a>消息队列</h2><p>消息队列在存取消息时，必须要满足三个需求，分别是<strong>消息保序、处理重复的消息和保证消息可靠性</strong>。</p>
-<p>Redis 的 List 和 Stream 两种数据类型，就可以满足消息队列的这三个需求。</p>
-<p>我们先来了解下基于 List 的消息队列实现方法，后面在介绍 Stream 数据类型时候，在详细说说 Stream。</p>
-<h3 id="1、如何满足消息保序需求？"><a href="#1、如何满足消息保序需求？" class="headerlink" title="1、如何满足消息保序需求？"></a>1、如何满足消息保序需求？</h3><p>List 本身就是按先进先出的顺序对数据进行存取的，所以，如果使用 List 作为消息队列保存消息的话，就已经能满足消息保序的需求了。</p>
-<p>List 可以使用 LPUSH + RPOP （或者反过来，RPUSH+LPOP）命令实现消息队列。</p>
-<img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/redis/%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/list%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97.png" title="" alt="" width="792">
-
-<ul>
-<li><p>生产者使用 <code>LPUSH key value[value...]</code> 将消息插入到队列的头部，如果 key 不存在则会创建一个空的队列再插入消息。</p>
-</li>
-<li><p>消费者使用 <code>RPOP key</code> 依次读取队列的消息，先进先出。</p>
-</li>
-</ul>
-<p>不过，在消费者读取数据时，有一个潜在的性能风险点。</p>
-<p>在生产者往 List 中写入数据时，List 并不会主动地通知消费者有新消息写入，如果消费者想要及时处理消息，就需要在程序中不停地调用 <code>RPOP</code> 命令（比如使用一个while(1)循环）。如果有新消息写入，RPOP命令就会返回结果，否则，RPOP命令返回空值，再继续循环。</p>
-<p>所以，即使没有新消息写入List，消费者也要不停地调用 RPOP 命令，这就会导致消费者程序的 CPU 一直消耗在执行 RPOP 命令上，带来不必要的性能损失。</p>
-<p>为了解决这个问题，Redis提供了 BRPOP 命令。<strong>BRPOP命令也称为阻塞式读取，客户端在没有读到队列数据时，自动阻塞，直到有新的数据写入队列，再开始读取新数据</strong>。和消费者程序自己不停地调用RPOP命令相比，这种方式能节省CPU开销。</p>
-<img title="" src="https://cdn.xiaolincoding.com/gh/xiaolincoder/redis/%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97.png" alt="" width="774">
-
-<h3 id="2、如何处理重复的消息？"><a href="#2、如何处理重复的消息？" class="headerlink" title="2、如何处理重复的消息？"></a>2、如何处理重复的消息？</h3><p>消费者要实现重复消息的判断，需要 2 个方面的要求：</p>
-<ul>
-<li>每个消息都有一个全局的 ID。</li>
-<li>消费者要记录已经处理过的消息的 ID。当收到一条消息后，消费者程序就可以对比收到的消息 ID 和记录的已处理过的消息 ID，来判断当前收到的消息有没有经过处理。如果已经处理过，那么，消费者程序就不再进行处理了。</li>
-</ul>
-<p>但是 <strong>List 并不会为每个消息生成 ID 号，所以我们需要自行为每个消息生成一个全局唯一ID</strong>，生成之后，我们在用 LPUSH 命令把消息插入 List 时，需要在消息中包含这个全局唯一 ID。</p>
-<p>例如，我们执行以下命令，就把一条全局 ID 为 111000102、库存量为 99 的消息插入了消息队列：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; LPUSH mq &quot;111000102:stock:99&quot;</span><br><span class="line">(integer) 1</span><br></pre></td></tr></table></figure>
-
-<h3 id="3、如何保证消息可靠性？"><a href="#3、如何保证消息可靠性？" class="headerlink" title="3、如何保证消息可靠性？"></a>3、如何保证消息可靠性？</h3><p>当消费者程序从 List 中读取一条消息后，List 就不会再留存这条消息了。所以，如果消费者程序在处理消息的过程出现了故障或宕机，就会导致消息没有处理完成，那么，消费者程序再次启动后，就没法再次从 List 中读取消息了。</p>
-<p>为了留存消息，List 类型提供了 <code>BRPOPLPUSH</code> 命令，这个命令的<strong>作用是让消费者程序从一个 List 中读取消息，同时，Redis 会把这个消息再插入到另一个 List（可以叫作备份 List）留存</strong>。</p>
-<p>这样一来，如果消费者程序读了消息但没能正常处理，等它重启后，就可以从备份 List 中重新读取消息并进行处理了。</p>
-<p>好了，到这里可以知道基于 List 类型的消息队列，满足消息队列的三大需求（消息保序、处理重复的消息和保证消息可靠性）。</p>
-<ul>
-<li>消息保序：使用 LPUSH + RPOP；</li>
-<li>阻塞读取：使用 BRPOP；</li>
-<li>重复消息处理：生产者自行实现全局唯一 ID；</li>
-<li>消息的可靠性：使用 BRPOPLPUSH</li>
-</ul>
-<h3 id="List-作为消息队列有什么缺陷？"><a href="#List-作为消息队列有什么缺陷？" class="headerlink" title="List 作为消息队列有什么缺陷？"></a>List 作为消息队列有什么缺陷？</h3><p><strong>List 不支持多个消费者消费同一条消息</strong>，因为一旦消费者拉取一条消息后，这条消息就从 List 中删除了，无法被其它消费者再次消费。</p>
-<p>要实现一条消息可以被多个消费者消费，那么就要将多个消费者组成一个消费组，使得多个消费者可以消费同一条消息，但是 <strong>List 类型并不支持消费组的实现</strong>。</p>
-<p>这就要说起 Redis 从 5.0 版本开始提供的 Stream 数据类型了，Stream 同样能够满足消息队列的三大需求，而且它还支持「消费组」形式的消息读取。</p>
-<h1 id="Hash"><a href="#Hash" class="headerlink" title="Hash"></a>Hash</h1><h2 id="缓存对象-1"><a href="#缓存对象-1" class="headerlink" title="缓存对象"></a>缓存对象</h2><p>以用户 id 为 key，商品 id 为 field，商品数量为 value，恰好构成了购物车的3个要素，如下图所示。</p>
-<img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/redis/%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/%E8%B4%AD%E7%89%A9%E8%BD%A6.png" title="" alt="" width="345">
-
-<p>涉及的命令如下：</p>
-<ul>
-<li>添加商品：<code>HSET cart:&#123;用户id&#125; &#123;商品id&#125; 1</code></li>
-<li>添加数量：<code>HINCRBY cart:&#123;用户id&#125; &#123;商品id&#125; 1</code></li>
-<li>商品总数：<code>HLEN cart:&#123;用户id&#125;</code></li>
-<li>删除商品：<code>HDEL cart:&#123;用户id&#125; &#123;商品id&#125;</code></li>
-<li>获取购物车所有商品：<code>HGETALL cart:&#123;用户id&#125;</code></li>
-</ul>
-<p>当前仅仅是将商品ID存储到了Redis 中，在回显商品具体信息的时候，还需要拿着商品 id 查询一次数据库，获取完整的商品的信息。</p>
-<h1 id="Set"><a href="#Set" class="headerlink" title="Set"></a>Set</h1><p>Set 类型是一个无序并唯一的键值集合，它的存储顺序不会按照插入的先后顺序进行存储。</p>
-<p>支持多个集合取交集、并集、差集。</p>
-<h2 id="点赞"><a href="#点赞" class="headerlink" title="点赞"></a>点赞</h2><p>Set 类型可以保证一个用户只能点一个赞，这里举例子一个场景，key 是文章id，value 是用户id。</p>
-<p><code>uid:1</code> 、<code>uid:2</code>、<code>uid:3</code> 三个用户分别对 article:1 文章点赞了。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># uid:1 用户对文章 article:1 点赞</span><br><span class="line">&gt; SADD article:1 uid:1</span><br><span class="line">(integer) 1</span><br><span class="line"># uid:2 用户对文章 article:1 点赞</span><br><span class="line">&gt; SADD article:1 uid:2</span><br><span class="line">(integer) 1</span><br><span class="line"># uid:3 用户对文章 article:1 点赞</span><br><span class="line">&gt; SADD article:1 uid:3</span><br><span class="line">(integer) 1</span><br></pre></td></tr></table></figure>
-
-<p><code>uid:1</code> 取消了对 article:1 文章点赞。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; SREM article:1 uid:1</span><br><span class="line">(integer) 1</span><br></pre></td></tr></table></figure>
-
-<p>获取 article:1 文章所有点赞用户 :</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; SMEMBERS article:1</span><br><span class="line">1) &quot;uid:3&quot;</span><br><span class="line">2) &quot;uid:2&quot;</span><br></pre></td></tr></table></figure>
-
-<p>获取 article:1 文章的点赞用户数量：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; SCARD article:1</span><br><span class="line">(integer) 2</span><br></pre></td></tr></table></figure>
-
-<p>判断用户 <code>uid:1</code> 是否对文章 article:1 点赞了：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; SISMEMBER article:1 uid:1</span><br><span class="line">(integer) 0  # 返回0说明没点赞，返回1则说明点赞了</span><br></pre></td></tr></table></figure>
-
-<h2 id="共同关注"><a href="#共同关注" class="headerlink" title="共同关注"></a>共同关注</h2><p>Set 类型支持交集运算，所以可以用来计算共同关注的好友、公众号等。</p>
-<p>key 可以是用户id，value 则是已关注的公众号的id。</p>
-<p><code>uid:1</code> 用户关注公众号 id 为 5、6、7、8、9，<code>uid:2</code> 用户关注公众号 id 为 7、8、9、10、11。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># uid:1 用户关注公众号 id 为 5、6、7、8、9</span><br><span class="line">&gt; SADD uid:1 5 6 7 8 9</span><br><span class="line">(integer) 5</span><br><span class="line"># uid:2  用户关注公众号 id 为 7、8、9、10、11</span><br><span class="line">&gt; SADD uid:2 7 8 9 10 11</span><br><span class="line">(integer) 5</span><br></pre></td></tr></table></figure>
-
-<p><code>uid:1</code> 和 <code>uid:2</code> 共同关注的公众号：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># 获取共同关注</span><br><span class="line">&gt; SINTER uid:1 uid:2</span><br><span class="line">1) &quot;7&quot;</span><br><span class="line">2) &quot;8&quot;</span><br><span class="line">3) &quot;9&quot;</span><br></pre></td></tr></table></figure>
-
-<p>给 <code>uid:2</code> 推荐 <code>uid:1</code> 关注的公众号：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; SDIFF uid:1 uid:2</span><br><span class="line">1) &quot;5&quot;</span><br><span class="line">2) &quot;6&quot;</span><br></pre></td></tr></table></figure>
-
-<p>验证某个公众号是否同时被 <code>uid:1</code> 或 <code>uid:2</code> 关注:</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; SISMEMBER uid:1 5</span><br><span class="line">(integer) 1 # 返回0，说明关注了</span><br><span class="line">&gt; SISMEMBER uid:2 5</span><br><span class="line">(integer) 0 # 返回0，说明没关注</span><br></pre></td></tr></table></figure>
-
-<h2 id="抽奖"><a href="#抽奖" class="headerlink" title="抽奖"></a>抽奖</h2><p>存储某活动中中奖的用户名 ，Set 类型因为有去重功能，可以保证同一个用户不会中奖两次。</p>
-<p>key为抽奖活动名，value为员工名称，把所有员工名称放入抽奖箱 ：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt;SADD lucky Tom Jerry John Sean Marry Lindy Sary Mark</span><br><span class="line">(integer) 5</span><br></pre></td></tr></table></figure>
-
-<p>如果允许重复中奖，可以使用 SRANDMEMBER 命令。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># 抽取 1 个一等奖：</span><br><span class="line">&gt; SRANDMEMBER lucky 1</span><br><span class="line">1) &quot;Tom&quot;</span><br><span class="line"># 抽取 2 个二等奖：</span><br><span class="line">&gt; SRANDMEMBER lucky 2</span><br><span class="line">1) &quot;Mark&quot;</span><br><span class="line">2) &quot;Jerry&quot;</span><br><span class="line"># 抽取 3 个三等奖：</span><br><span class="line">&gt; SRANDMEMBER lucky 3</span><br><span class="line">1) &quot;Sary&quot;</span><br><span class="line">2) &quot;Tom&quot;</span><br><span class="line">3) &quot;Jerry&quot;</span><br></pre></td></tr></table></figure>
-
-<p>如果不允许重复中奖，可以使用 SPOP 命令。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># 抽取一等奖1个</span><br><span class="line">&gt; SPOP lucky 1</span><br><span class="line">1) &quot;Sary&quot;</span><br><span class="line"># 抽取二等奖2个</span><br><span class="line">&gt; SPOP lucky 2</span><br><span class="line">1) &quot;Jerry&quot;</span><br><span class="line">2) &quot;Mark&quot;</span><br><span class="line"># 抽取三等奖3个</span><br><span class="line">&gt; SPOP lucky 3</span><br><span class="line">1) &quot;John&quot;</span><br><span class="line">2) &quot;Sean&quot;</span><br><span class="line">3) &quot;Lindy&quot;</span><br></pre></td></tr></table></figure>
-
-<h1 id="ZSet"><a href="#ZSet" class="headerlink" title="ZSet"></a>ZSet</h1><h2 id="排行榜"><a href="#排行榜" class="headerlink" title="排行榜"></a>排行榜</h2><p>有序集合比较典型的使用场景就是排行榜。例如学生成绩的排名榜、游戏积分排行榜、视频播放排名、电商系统中商品的销量排名等。</p>
-<p>我们以博文点赞排名为例，小林发表了五篇博文，分别获得赞为 200、40、100、50、150。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># arcticle:1 文章获得了200个赞</span><br><span class="line">&gt; ZADD user:xiaolin:ranking 200 arcticle:1</span><br><span class="line">(integer) 1</span><br><span class="line"># arcticle:2 文章获得了40个赞</span><br><span class="line">&gt; ZADD user:xiaolin:ranking 40 arcticle:2</span><br><span class="line">(integer) 1</span><br><span class="line"># arcticle:3 文章获得了100个赞</span><br><span class="line">&gt; ZADD user:xiaolin:ranking 100 arcticle:3</span><br><span class="line">(integer) 1</span><br><span class="line"># arcticle:4 文章获得了50个赞</span><br><span class="line">&gt; ZADD user:xiaolin:ranking 50 arcticle:4</span><br><span class="line">(integer) 1</span><br><span class="line"># arcticle:5 文章获得了150个赞</span><br><span class="line">&gt; ZADD user:xiaolin:ranking 150 arcticle:5</span><br><span class="line">(integer) 1</span><br></pre></td></tr></table></figure>
-
-<p>文章 arcticle:4 新增一个赞，可以使用 ZINCRBY 命令（为有序集合key中元素member的分值加上increment）：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; ZINCRBY user:xiaolin:ranking 1 arcticle:4</span><br><span class="line">&quot;51&quot;</span><br></pre></td></tr></table></figure>
-
-<p>查看某篇文章的赞数，可以使用 ZSCORE 命令（返回有序集合key中元素个数）：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; ZSCORE user:xiaolin:ranking arcticle:4</span><br><span class="line">&quot;50&quot;</span><br></pre></td></tr></table></figure>
-
-<p>获取小林文章赞数最多的 3 篇文章，可以使用 ZREVRANGE 命令（倒序获取有序集合 key 从start下标到stop下标的元素）：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># WITHSCORES 表示把 score 也显示出来</span><br><span class="line">&gt; ZREVRANGE user:xiaolin:ranking 0 2 WITHSCORES</span><br><span class="line">1) &quot;arcticle:1&quot;</span><br><span class="line">2) &quot;200&quot;</span><br><span class="line">3) &quot;arcticle:5&quot;</span><br><span class="line">4) &quot;150&quot;</span><br><span class="line">5) &quot;arcticle:3&quot;</span><br><span class="line">6) &quot;100&quot;</span><br></pre></td></tr></table></figure>
-
-<p>获取小林 100 赞到 200 赞的文章，可以使用 ZRANGEBYSCORE 命令（返回有序集合中指定分数区间内的成员，分数由低到高排序）：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; ZRANGEBYSCORE user:xiaolin:ranking 100 200 WITHSCORES</span><br><span class="line">1) &quot;arcticle:3&quot;</span><br><span class="line">2) &quot;100&quot;</span><br><span class="line">3) &quot;arcticle:5&quot;</span><br><span class="line">4) &quot;150&quot;</span><br><span class="line">5) &quot;arcticle:1&quot;</span><br><span class="line">6) &quot;200&quot;</span><br></pre></td></tr></table></figure>
-
-<h2 id="电话或姓名排序"><a href="#电话或姓名排序" class="headerlink" title="电话或姓名排序"></a>电话或姓名排序</h2><p>使用有序集合的 <code>ZRANGEBYLEX</code> 或 <code>ZREVRANGEBYLEX</code> 可以帮助我们实现电话号码或姓名的排序，我们以 <code>ZRANGEBYLEX</code> （返回指定成员区间内的成员，按 key 正序排列，分数必须相同）为例。</p>
-<h3 id="电话排序"><a href="#电话排序" class="headerlink" title="电话排序"></a>电话排序</h3><p>我们可以将电话号码存储到 SortSet 中，然后根据需要来获取号段：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; ZADD phone 0 13100111100 0 13110114300 0 13132110901 </span><br><span class="line">(integer) 3</span><br><span class="line">&gt; ZADD phone 0 13200111100 0 13210414300 0 13252110901 </span><br><span class="line">(integer) 3</span><br><span class="line">&gt; ZADD phone 0 13300111100 0 13310414300 0 13352110901 </span><br><span class="line">(integer) 3</span><br></pre></td></tr></table></figure>
-
-<p>获取所有号码:</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; ZRANGEBYLEX phone - +</span><br><span class="line">1) &quot;13100111100&quot;</span><br><span class="line">2) &quot;13110114300&quot;</span><br><span class="line">3) &quot;13132110901&quot;</span><br><span class="line">4) &quot;13200111100&quot;</span><br><span class="line">5) &quot;13210414300&quot;</span><br><span class="line">6) &quot;13252110901&quot;</span><br><span class="line">7) &quot;13300111100&quot;</span><br><span class="line">8) &quot;13310414300&quot;</span><br><span class="line">9) &quot;13352110901&quot;</span><br></pre></td></tr></table></figure>
-
-<p>获取 132 号段的号码：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; ZRANGEBYLEX phone [132 (133</span><br><span class="line">1) &quot;13200111100&quot;</span><br><span class="line">2) &quot;13210414300&quot;</span><br><span class="line">3) &quot;13252110901&quot;</span><br></pre></td></tr></table></figure>
-
-<p>获取132、133号段的号码：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; ZRANGEBYLEX phone [132 (134</span><br><span class="line">1) &quot;13200111100&quot;</span><br><span class="line">2) &quot;13210414300&quot;</span><br><span class="line">3) &quot;13252110901&quot;</span><br><span class="line">4) &quot;13300111100&quot;</span><br><span class="line">5) &quot;13310414300&quot;</span><br><span class="line">6) &quot;13352110901&quot;</span><br></pre></td></tr></table></figure>
-
-<h3 id="姓名排序"><a href="#姓名排序" class="headerlink" title="姓名排序"></a>姓名排序</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; zadd names 0 Toumas 0 Jake 0 Bluetuo 0 Gaodeng 0 Aimini 0 Aidehua </span><br><span class="line">(integer) 6</span><br></pre></td></tr></table></figure>
-
-<p>获取所有人的名字:</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; ZRANGEBYLEX names - +</span><br><span class="line">1) &quot;Aidehua&quot;</span><br><span class="line">2) &quot;Aimini&quot;</span><br><span class="line">3) &quot;Bluetuo&quot;</span><br><span class="line">4) &quot;Gaodeng&quot;</span><br><span class="line">5) &quot;Jake&quot;</span><br><span class="line">6) &quot;Toumas&quot;</span><br></pre></td></tr></table></figure>
-
-<p>获取名字中大写字母A开头的所有人：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; ZRANGEBYLEX names [A (B</span><br><span class="line">1) &quot;Aidehua&quot;</span><br><span class="line">2) &quot;Aimini&quot;</span><br></pre></td></tr></table></figure>
-
-<p>获取名字中大写字母 C 到 Z 的所有人：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; ZRANGEBYLEX names [C [Z</span><br><span class="line">1) &quot;Gaodeng&quot;</span><br><span class="line">2) &quot;Jake&quot;</span><br><span class="line">3) &quot;Toumas&quot;</span><br></pre></td></tr></table></figure>
-
-<h1 id="BitMap"><a href="#BitMap" class="headerlink" title="BitMap"></a>BitMap</h1><p>Bitmap 类型非常适合二值状态统计的场景，这里的二值状态就是指集合元素的取值就只有 0 和 1 两种，在记录海量数据时，Bitmap 能够有效地节省内存空间。</p>
-<h2 id="签到统计"><a href="#签到统计" class="headerlink" title="签到统计"></a>签到统计</h2><p>在签到打卡的场景中，我们只用记录签到（1）或未签到（0），所以它就是非常典型的二值状态。</p>
-<p>签到统计时，每个用户一天的签到用 1 个 bit 位就能表示，一个月（假设是 31 天）的签到情况用 31 个 bit 位就可以，而一年的签到也只需要用 365 个 bit 位，根本不用太复杂的集合类型。</p>
-<p>假设我们要统计 ID 100 的用户在 2022 年 6 月份的签到情况，就可以按照下面的步骤进行操作。</p>
-<p>第一步，执行下面的命令，记录该用户 6 月 3 号已签到。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SETBIT uid:sign:100:202206 2 1</span><br></pre></td></tr></table></figure>
-
-<p>第二步，检查该用户 6 月 3 日是否签到。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">GETBIT uid:sign:100:202206 2 </span><br></pre></td></tr></table></figure>
-
-<p>第三步，统计该用户在 6 月份的签到次数。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">BITCOUNT uid:sign:100:202206</span><br></pre></td></tr></table></figure>
-
-<p>这样，我们就知道该用户在 6 月份的签到情况了。</p>
-<blockquote>
-<p>如何统计这个月首次打卡时间呢？</p>
-</blockquote>
-<p>Redis 提供了 <code>BITPOS key bitValue [start] [end]</code>指令，返回数据表示 Bitmap 中第一个值为 <code>bitValue</code> 的 offset 位置。</p>
-<p>在默认情况下， 命令将检测整个位图， 用户可以通过可选的 <code>start</code> 参数和 <code>end</code> 参数指定要检测的范围。所以我们可以通过执行这条命令来获取 userID &#x3D; 100 在 2022 年 6 月份<strong>首次打卡</strong>日期：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">BITPOS uid:sign:100:202206 1</span><br></pre></td></tr></table></figure>
-
-<p>需要注意的是，因为 offset 从 0 开始的，所以我们需要将返回的 value + 1 。</p>
-<h2 id="判断用户登陆状态"><a href="#判断用户登陆状态" class="headerlink" title="判断用户登陆状态"></a>判断用户登陆状态</h2><p>Bitmap 提供了 <code>GETBIT、SETBIT</code> 操作，通过一个偏移值 offset 对 bit 数组的 offset 位置的 bit 位进行读写操作，需要注意的是 offset 从 0 开始。</p>
-<p>只需要一个 key &#x3D; login_status 表示存储用户登陆状态集合数据， 将用户 ID 作为 offset，在线就设置为 1，下线设置 0。通过 <code>GETBIT</code>判断对应的用户是否在线。 5000 万用户只需要 6 MB 的空间。</p>
-<p>假如我们要判断 ID &#x3D; 10086 的用户的登陆情况：</p>
-<p>第一步，执行以下指令，表示用户已登录。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SETBIT login_status 10086 1</span><br></pre></td></tr></table></figure>
-
-<p>第二步，检查该用户是否登陆，返回值 1 表示已登录。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">GETBIT login_status 10086</span><br></pre></td></tr></table></figure>
-
-<p>第三步，登出，将 offset 对应的 value 设置成 0。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SETBIT login_status 10086 0</span><br></pre></td></tr></table></figure>
-
-<h2 id="连续签到用户总数"><a href="#连续签到用户总数" class="headerlink" title="连续签到用户总数"></a>连续签到用户总数</h2><p>如何统计出这连续 7 天连续打卡用户总数呢？</p>
-<p>我们把每天的日期作为 Bitmap 的 key，userId 作为 offset，若是打卡则将 offset 位置的 bit 设置成 1。</p>
-<p>key 对应的集合的每个 bit 位的数据则是一个用户在该日期的打卡记录。</p>
-<p>一共有 7 个这样的 Bitmap，如果我们能对这 7 个 Bitmap 的对应的 bit 位做 『与』运算。同样的 UserID offset 都是一样的，当一个 userID 在 7 个 Bitmap 对应对应的 offset 位置的 bit &#x3D; 1 就说明该用户 7 天连续打卡。</p>
-<p>结果保存到一个新 Bitmap 中，我们再通过 <code>BITCOUNT</code> 统计 bit &#x3D; 1 的个数便得到了连续打卡 7 天的用户总数了。</p>
-<p>Redis 提供了 <code>BITOP operation destkey key [key ...]</code>这个指令用于对一个或者多个 key 的 Bitmap 进行位元操作。</p>
-<ul>
-<li><code>operation</code> 可以是 <code>and</code>、<code>OR</code>、<code>NOT</code>、<code>XOR</code>。当 BITOP 处理不同长度的字符串时，较短的那个字符串所缺少的部分会被看作 <code>0</code> 。空的 <code>key</code> 也被看作是包含 <code>0</code> 的字符串序列。</li>
-</ul>
-<p>假设要统计 3 天连续打卡的用户数，则是将三个 bitmap 进行 AND 操作，并将结果保存到 destmap 中，接着对 destmap 执行 BITCOUNT 统计，如下命令：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># 与操作</span><br><span class="line">BITOP AND destmap bitmap:01 bitmap:02 bitmap:03</span><br><span class="line"># 统计 bit 位 =  1 的个数</span><br><span class="line">BITCOUNT destmap</span><br></pre></td></tr></table></figure>
-
-<p>即使一天产生一个亿的数据，Bitmap 占用的内存也不大，大约占 12 MB 的内存（10^8&#x2F;8&#x2F;1024&#x2F;1024），7 天的 Bitmap 的内存开销约为 84 MB。同时我们最好给 Bitmap 设置过期时间，让 Redis 删除过期的打卡数据，节省内存。</p>
-<h1 id="Stream"><a href="#Stream" class="headerlink" title="Stream"></a>Stream</h1><p>消息队列。 </p>
-<p>TODO</p>
-<p>针对 Redis 是否适合做消息队列，关键看你的业务场景：</p>
-<ul>
-<li>如果你的业务场景足够简单，对于数据丢失不敏感，而且消息积压概率比较小的情况下，把 Redis 当作队列是完全可以的。</li>
-<li>如果你的业务有海量消息，消息积压的概率比较大，并且不能接受数据丢失，那么还是用专业的消息队列中间件吧。</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>redis</tag>
       </tags>
   </entry>
   <entry>

@@ -147,13 +147,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">60</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -170,340 +170,6 @@
     </div>
 
     <div class="main-inner index posts-expand">
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/glibc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/linux/glibc/" class="post-title-link" itemprop="url">Linux glibc 编译</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>1.6k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>3 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="编译glibc"><a href="#编译glibc" class="headerlink" title="编译glibc"></a>编译glibc</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git://sourceware.org/git/glibc.git</span><br><span class="line"><span class="built_in">cd</span> glibc</span><br><span class="line">git checkout glibc-2.32</span><br><span class="line"><span class="built_in">mkdir</span> build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line"><span class="built_in">export</span> glibc_install=<span class="string">&quot;<span class="subst">$(pwd)</span>/install&quot;</span></span><br><span class="line">../configure --prefix <span class="string">&quot;<span class="variable">$glibc_install</span>&quot;</span></span><br><span class="line">make -j `<span class="built_in">nproc</span>`</span><br><span class="line">make install -j `<span class="built_in">nproc</span>`</span><br></pre></td></tr></table></figure>
-
-<h2 id="用linux自带的gcc编译程序并链接glibc"><a href="#用linux自带的gcc编译程序并链接glibc" class="headerlink" title="用linux自带的gcc编译程序并链接glibc"></a>用linux自带的gcc编译程序并链接glibc</h2><p>test_glibc.c</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;assert.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;gnu/libc-version.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdatomic.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;threads.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">atomic_int</span> acnt;</span><br><span class="line"><span class="type">int</span> cnt;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">f</span><span class="params">(<span class="type">void</span>* thr_data)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> n = <span class="number">0</span>; n &lt; <span class="number">1000</span>; ++n) &#123;</span><br><span class="line">        ++cnt;</span><br><span class="line">        ++acnt;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span> &#123;</span><br><span class="line">    <span class="comment">/* Basic library version check. */</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;gnu_get_libc_version() = %s\n&quot;</span>, gnu_get_libc_version());</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Exercise thrd_create from -pthread,</span></span><br><span class="line"><span class="comment">     * which is not present in glibc 2.27 in Ubuntu 18.04.</span></span><br><span class="line"><span class="comment">     * https://stackoverflow.com/questions/56810/how-do-i-start-threads-in-plain-c/52453291#52453291 */</span></span><br><span class="line">    <span class="type">thrd_t</span> thr[<span class="number">10</span>];</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> n = <span class="number">0</span>; n &lt; <span class="number">10</span>; ++n)</span><br><span class="line">        thrd_create(&amp;thr[n], f, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> n = <span class="number">0</span>; n &lt; <span class="number">10</span>; ++n)</span><br><span class="line">        thrd_join(thr[n], <span class="literal">NULL</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;The atomic counter is %u\n&quot;</span>, acnt);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;The non-atomic counter is %u\n&quot;</span>, cnt);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>test_glibc.sh</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env bash</span></span><br><span class="line"><span class="built_in">set</span> -eux</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> glibc_install=<span class="string">&quot;<span class="subst">$(pwd)</span>/build/install&quot;</span></span><br><span class="line"></span><br><span class="line">gcc \</span><br><span class="line">  -L <span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/lib&quot;</span> \</span><br><span class="line">  -I <span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/include&quot;</span> \</span><br><span class="line">  -Wl,--rpath=<span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/lib&quot;</span> \</span><br><span class="line">  -Wl,--dynamic-linker=<span class="string">&quot;<span class="variable">$&#123;glibc_install&#125;</span>/lib/ld-linux-x86-64.so.2&quot;</span> \</span><br><span class="line">  -std=c11 \</span><br><span class="line">  -o test_glibc.out \</span><br><span class="line">  -v \</span><br><span class="line">  test_glibc.c \</span><br><span class="line">  -pthread \</span><br><span class="line">;</span><br><span class="line">ldd ./test_glibc.out</span><br><span class="line">./test_glibc.out</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/inode/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/linux/inode/" class="post-title-link" itemprop="url">Linux文件系统的Inode</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-02-28 20:38:12" itemprop="dateModified" datetime="2024-02-28T20:38:12+08:00">2024-02-28</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>2.8k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>5 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="Inode-Iindex-Node"><a href="#Inode-Iindex-Node" class="headerlink" title="Inode (Iindex Node)"></a>Inode (Iindex Node)</h1><p>同一个文件系统内inode唯一。</p>
-<h2 id="Inode上限"><a href="#Inode上限" class="headerlink" title="Inode上限"></a>Inode上限</h2><p>在文件系统创建时确定上限，一旦确定后，不能改了，因此要留意当前文件系统内inode数量。</p>
-<h2 id="Inode结构"><a href="#Inode结构" class="headerlink" title="Inode结构"></a>Inode结构</h2><ul>
-<li>File type</li>
-<li>File size</li>
-<li>Owner ID</li>
-<li>Group ID</li>
-<li>Read, write and execute permissions</li>
-<li>Last access time</li>
-<li>Last change time</li>
-<li>Last modification time</li>
-</ul>
-<h2 id="有关命令"><a href="#有关命令" class="headerlink" title="有关命令"></a>有关命令</h2><blockquote>
-<p>查看文件的inode号</p>
-</blockquote>
-<p>用 <code>stat</code> 命令</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-WangQingJia cpp]<span class="comment"># stat demo.o </span></span><br><span class="line">  File: ‘demo.o’</span><br><span class="line">  Size: 138120          Blocks: 480        IO Block: 4096   regular file</span><br><span class="line">Device: 2h/2d   Inode: 2814749768200812  Links: 1</span><br><span class="line">Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)</span><br><span class="line">Access: 2024-02-06 11:27:22.232719400 +0800</span><br><span class="line">Modify: 2024-02-06 10:22:58.208382800 +0800</span><br><span class="line">Change: 2024-02-06 10:22:58.208382800 +0800</span><br><span class="line"> Birth: -</span><br></pre></td></tr></table></figure>
-
-<p>也可以用 <code>ls -i</code></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-WangQingJia cpp]<span class="comment"># ll -i</span></span><br><span class="line">total 4172</span><br><span class="line">200410183418259079 -rwxr-xr-x 1 root root     300 Feb  6 11:44 build.sh  </span><br><span class="line">  2814749768200812 -rw-r--r-- 1 root root  138120 Feb  6 10:22 demo.o    </span><br><span class="line"> 20829148276678876 -rw-r--r-- 1 root root      27 Feb  6 11:45 lib.cpp   </span><br><span class="line">  6755399442050607 -rw-r--r-- 1 root root    2576 Feb  6 11:46 lib.o     </span><br><span class="line">186617909559210440 -rw-r--r-- 1 root root    8585 Feb  6 11:46 lib.o.s   </span><br><span class="line"> 14355223812957764 -rw-r--r-- 1 root root     129 Feb  6 11:46 main.cpp  </span><br><span class="line">  3096224744960750 -rwxr-xr-x 1 root root   94744 Feb  6 11:46 main.exe  </span><br><span class="line"> 49539595902153707 -rw-r--r-- 1 root root 1865435 Feb  6 11:46 main.exe.s</span><br><span class="line"> 12947848928836777 -rw-r--r-- 1 root root  138448 Feb  6 11:46 main.o    </span><br><span class="line">247697979505656983 -rw-r--r-- 1 root root 1896009 Feb  6 11:46 main.o.s  </span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>查看文件夹inode号</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-WangQingJia cpp]<span class="comment"># ls -id .</span></span><br><span class="line">19140298416923551 .</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>查看所有文件系统的inode数量</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-WangQingJia cpp]<span class="comment"># df -i</span></span><br><span class="line">Filesystem     Inodes   IUsed   IFree IUse% Mounted on</span><br><span class="line">rootfs            999 -999001 1000000     - /</span><br><span class="line">none              999 -999001 1000000     - /dev</span><br><span class="line">none              999 -999001 1000000     - /run</span><br><span class="line">none              999 -999001 1000000     - /run/lock</span><br><span class="line">none              999 -999001 1000000     - /run/shm</span><br><span class="line">none              999 -999001 1000000     - /run/user</span><br><span class="line">tmpfs             999 -999001 1000000     - /sys/fs/cgroup</span><br><span class="line">C:\               999 -999001 1000000     - /mnt/c</span><br><span class="line">D:\               999 -999001 1000000     - /mnt/d</span><br><span class="line">E:\               999 -999001 1000000     - /mnt/e</span><br><span class="line">F:\               999 -999001 1000000     - /mnt/f</span><br><span class="line">H:\               999 -999001 1000000     - /mnt/h</span><br></pre></td></tr></table></figure>
-
-<h2 id="inode-复用问题"><a href="#inode-复用问题" class="headerlink" title="inode 复用问题"></a>inode 复用问题</h2><p>TLDF：跟文件系统相关，有的复用，有的不会。</p>
-<p>删除文件后，新建个同名文件(内容即使与删除的不一样)，会复用原来的inode号，在xfs文件系统中复现。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[game@vm10-245-65-72 logs]$ ll -i file </span><br><span class="line">319997802 -rw-rw-r-- 1 game game 0 Feb  6 17:20 file</span><br><span class="line">[game@vm10-245-65-72 logs]$ <span class="built_in">rm</span> -f file &amp;&amp; <span class="built_in">touch</span> file &amp;&amp; ll -i file</span><br><span class="line">319997802 -rw-rw-r-- 1 game game 0 Feb  6 17:20 file</span><br><span class="line">[game@vm10-245-65-72 logs]$ <span class="built_in">rm</span> -f file &amp;&amp; <span class="built_in">touch</span> file &amp;&amp; ll -i file</span><br><span class="line">319997802 -rw-rw-r-- 1 game game 0 Feb  6 17:20 file</span><br><span class="line"></span><br><span class="line">[game@vm10-245-65-72 logs]$ <span class="built_in">df</span> -T .</span><br><span class="line">Filesystem     Type 1K-blocks      Used Available Use% Mounted on</span><br><span class="line">/dev/vdb       xfs  524032000 422586164 101445836  81% /export</span><br></pre></td></tr></table></figure>
-
-<p>但在wsl1中无法复现，文件系统为 wslfs</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># ll -i</span></span><br><span class="line">total 0</span><br><span class="line">94575592174828964 -rw-r--r-- 1 root root 0 Feb  6 17:19 file</span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># rm -f file &amp;&amp; touch file &amp;&amp; ll -i file</span></span><br><span class="line">94857067151539620 -rw-r--r-- 1 root root 0 Feb  6 17:23 file</span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># rm -f file &amp;&amp; touch file &amp;&amp; ll -i file</span></span><br><span class="line">95138542128250276 -rw-r--r-- 1 root root 0 Feb  6 17:23 file</span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># rm -f file &amp;&amp; touch file &amp;&amp; ll -i file</span></span><br><span class="line">95420017104960932 -rw-r--r-- 1 root root 0 Feb  6 17:23 file</span><br><span class="line"></span><br><span class="line">[root@ZLPC-WangQingJia inode]<span class="comment"># df -T .</span></span><br><span class="line">Filesystem     Type  1K-blocks      Used Available Use% Mounted on</span><br><span class="line">rootfs         wslfs 487945212 405172080  82773132  84% /</span><br></pre></td></tr></table></figure>
-
-<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/a/51019769/11850070">ext4也复用</a></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/linux/linux%20firewall/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/linux/linux%20firewall/" class="post-title-link" itemprop="url">Linux防火墙配置</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-02-23 17:39:26" itemprop="dateModified" datetime="2024-02-23T17:39:26+08:00">2024-02-23</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>631</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>1 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="linux-firewall"><a href="#linux-firewall" class="headerlink" title="linux firewall"></a>linux firewall</h1><p>To view open ports, use the following command.</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --list-ports</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>We use the following to see services whose ports are open.</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --list-services</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>We use the following to see services whose ports are open and see open ports</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --list-all</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>To add a service to the firewall, we use the following command, in which case the service will use any port to open in the firewall.</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --add-services=ntp</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>For this service to be permanently open we use the following command.</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd —add-service=ntp --permanent</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>To add a port, use the following command</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --add-port=132/tcp  --permanent</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>To run the firewall must be reloaded using the following command.</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --reload</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
 
     
 
@@ -969,108 +635,6 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E7%BB%A7%E6%89%BF%E7%B1%BB%E6%9E%84%E9%80%A0%E4%B8%8E%E6%9E%90%E6%9E%84%E9%A1%BA%E5%BA%8F%20/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="折纸飞向麦田">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/02/19/note/cpp/%E7%BB%A7%E6%89%BF%E7%B1%BB%E6%9E%84%E9%80%A0%E4%B8%8E%E6%9E%90%E6%9E%84%E9%A1%BA%E5%BA%8F%20/" class="post-title-link" itemprop="url">C++ 继承类构造与析构顺序</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>1.3k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>2 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <ul>
-<li>先base类构造函数，如果继承多个，则从左到右依次构造base，如果其中有virtual继承，则高优先级；</li>
-<li>接着是成员变量，按声明的顺序依次构建</li>
-<li>最后是这个类当前构造函数花括号内的逻辑</li>
-<li>析构与构造顺序完全相反</li>
-</ul>
-<h2 id="连续继承"><a href="#连续继承" class="headerlink" title="连续继承"></a>连续继承</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line"><span class="built_in">MyCircle</span>()</span><br><span class="line"></span><br><span class="line">~<span class="built_in">MyCircle</span>()</span><br><span class="line">~<span class="built_in">Circle</span>()</span><br><span class="line">~<span class="built_in">Shape</span>()</span><br></pre></td></tr></table></figure>
-
-<h2 id="既继承又包含"><a href="#既继承又包含" class="headerlink" title="既继承又包含"></a>既继承又包含</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">A</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">A</span>() &#123; cout &lt;&lt; <span class="string">&quot;A() C-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">A</span>() &#123; cout &lt;&lt; <span class="string">&quot;~A() D-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">B</span> : <span class="keyword">public</span> A </span><br><span class="line">&#123;</span><br><span class="line">    A a;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">B</span>() &#123; cout &lt;&lt; <span class="string">&quot;B() C-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">B</span>() &#123; cout &lt;&lt; <span class="string">&quot;~B() D-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123; B b; &#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">A</span>() C-<span class="function">tor</span></span><br><span class="line"><span class="function"><span class="title">A</span><span class="params">()</span> C-tor</span></span><br><span class="line"><span class="function"><span class="title">B</span><span class="params">()</span> C-tor</span></span><br><span class="line"><span class="function">~<span class="title">B</span><span class="params">()</span> D-tor</span></span><br><span class="line"><span class="function">~<span class="title">A</span><span class="params">()</span> D-tor</span></span><br><span class="line"><span class="function">~<span class="title">A</span><span class="params">()</span> D-tor</span></span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E7%BC%96%E8%AF%91%E5%99%A8%E7%94%9F%E6%88%90%E7%9A%84%E6%9E%84%E9%80%A0%EF%BC%8C%E6%8B%B7%E8%B4%9D%EF%BC%8C%E7%A7%BB%E5%8A%A8%E5%87%BD%E6%95%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1160,6 +724,108 @@
 <h2 id="空类，只用到默认构造、拷贝赋值"><a href="#空类，只用到默认构造、拷贝赋值" class="headerlink" title="空类，只用到默认构造、拷贝赋值"></a>空类，只用到默认构造、拷贝赋值</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  Empty e2 = e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span>: </span><br><span class="line">  <span class="comment">// inline constexpr Empty() noexcept = default;</span></span><br><span class="line">  <span class="comment">// inline constexpr Empty(const Empty &amp;) noexcept = default;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Empty e1;</span><br><span class="line">  Empty e2 = <span class="built_in">Empty</span>(e1);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E7%BB%A7%E6%89%BF%E7%B1%BB%E6%9E%84%E9%80%A0%E4%B8%8E%E6%9E%90%E6%9E%84%E9%A1%BA%E5%BA%8F%20/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/%E7%BB%A7%E6%89%BF%E7%B1%BB%E6%9E%84%E9%80%A0%E4%B8%8E%E6%9E%90%E6%9E%84%E9%A1%BA%E5%BA%8F%20/" class="post-title-link" itemprop="url">C++ 继承类构造与析构顺序</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <ul>
+<li>先base类构造函数，如果继承多个，则从左到右依次构造base，如果其中有virtual继承，则高优先级；</li>
+<li>接着是成员变量，按声明的顺序依次构建</li>
+<li>最后是这个类当前构造函数花括号内的逻辑</li>
+<li>析构与构造顺序完全相反</li>
+</ul>
+<h2 id="连续继承"><a href="#连续继承" class="headerlink" title="连续继承"></a>连续继承</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Shape</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Shape()&quot;</span> &lt;&lt; endl; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">Circle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~Circle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCircle</span> : <span class="keyword">public</span> Circle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">MyCircle</span>() &#123; cout &lt;&lt; <span class="string">&quot;~MyCircle()&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Shape* shape = <span class="keyword">new</span> <span class="built_in">MyCircle</span>();</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">delete</span> shape;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Shape</span>()</span><br><span class="line"><span class="built_in">Circle</span>()</span><br><span class="line"><span class="built_in">MyCircle</span>()</span><br><span class="line"></span><br><span class="line">~<span class="built_in">MyCircle</span>()</span><br><span class="line">~<span class="built_in">Circle</span>()</span><br><span class="line">~<span class="built_in">Shape</span>()</span><br></pre></td></tr></table></figure>
+
+<h2 id="既继承又包含"><a href="#既继承又包含" class="headerlink" title="既继承又包含"></a>既继承又包含</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">A</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">A</span>() &#123; cout &lt;&lt; <span class="string">&quot;A() C-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">A</span>() &#123; cout &lt;&lt; <span class="string">&quot;~A() D-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">B</span> : <span class="keyword">public</span> A </span><br><span class="line">&#123;</span><br><span class="line">    A a;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">B</span>() &#123; cout &lt;&lt; <span class="string">&quot;B() C-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    ~<span class="built_in">B</span>() &#123; cout &lt;&lt; <span class="string">&quot;~B() D-tor&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123; B b; &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">A</span>() C-<span class="function">tor</span></span><br><span class="line"><span class="function"><span class="title">A</span><span class="params">()</span> C-tor</span></span><br><span class="line"><span class="function"><span class="title">B</span><span class="params">()</span> C-tor</span></span><br><span class="line"><span class="function">~<span class="title">B</span><span class="params">()</span> D-tor</span></span><br><span class="line"><span class="function">~<span class="title">A</span><span class="params">()</span> D-tor</span></span><br><span class="line"><span class="function">~<span class="title">A</span><span class="params">()</span> D-tor</span></span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -1279,8 +945,303 @@
 
 
 
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/%E6%93%8D%E4%BD%9C%E7%AC%A6%E4%BC%98%E5%85%88%E7%BA%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/%E6%93%8D%E4%BD%9C%E7%AC%A6%E4%BC%98%E5%85%88%E7%BA%A7/" class="post-title-link" itemprop="url">C++ 运算符优先级</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-28 20:47:22" itemprop="dateModified" datetime="2024-02-28T20:47:22+08:00">2024-02-28</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>378</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>1 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>注意 <code>i--</code> 与等号运算符共用时的优先级问题</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; nums&#123; <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span> &#125;;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">0</span>;</span><br><span class="line">    nums[j + <span class="number">1</span>] = nums[j--];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span>&amp; num : nums)</span><br><span class="line">        cout &lt;&lt; num &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1 2 3 4 </span><br></pre></td></tr></table></figure>
+
+<p>解释：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">nums[j + <span class="number">1</span>] = nums[j--];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 1. 取 nums[j]，即 nums[0] = 1</span></span><br><span class="line"><span class="comment">// 2. j--，此时 j 为 -1</span></span><br><span class="line"><span class="comment">// 3. 将 1 赋值给 nums[j+1] = nums[-1+1] = nums[0]，所以是自己赋值给自己，数组没有任何变化</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/stl/emplace_back/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/stl/emplace_back/" class="post-title-link" itemprop="url">C++ std::vector::emplace_back</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.4k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>emplace_back可传入对象的参数列表，在容器末尾的位置用 placement new 原地构造，连move都省去了。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">President</span></span><br><span class="line">&#123;</span><br><span class="line">    std::string name;</span><br><span class="line">    std::string country;</span><br><span class="line">    <span class="type">int</span> year;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(std::string p_name, std::string p_country, <span class="type">int</span> p_year)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(p_name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(p_country)), <span class="built_in">year</span>(p_year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; name &lt;&lt; <span class="string">&quot; being constructed.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(President&amp;&amp; other)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(other.name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(other.country)), <span class="built_in">year</span>(other.year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; name &lt;&lt; <span class="string">&quot; being moved.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    President&amp; <span class="keyword">operator</span>=(<span class="type">const</span> President&amp; other) = <span class="keyword">default</span>;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::vector&lt;President&gt; elections;</span><br><span class="line">    elections.<span class="built_in">reserve</span>(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;emplace_back obj&#x27;s args:\n&quot;</span>;</span><br><span class="line">    elections.<span class="built_in">emplace_back</span>(<span class="string">&quot;Nelson&quot;</span>, <span class="string">&quot;South Africa&quot;</span>, <span class="number">1994</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果emplace_back一个对象，则是先构造，后移动</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\nemplace_back an obj:\n&quot;</span>;</span><br><span class="line">    elections.<span class="built_in">emplace_back</span>(<span class="built_in">President</span>(<span class="string">&quot;aaa&quot;</span>, <span class="string">&quot;usa&quot;</span>, <span class="number">2000</span>));</span><br><span class="line">    </span><br><span class="line"> </span><br><span class="line">    std::vector&lt;President&gt; reElections;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\npush_back:\n&quot;</span>;</span><br><span class="line">    reElections.<span class="built_in">push_back</span>(<span class="built_in">President</span>(<span class="string">&quot;Franklin&quot;</span>, <span class="string">&quot;the USA&quot;</span>, <span class="number">1936</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">emplace_back obj&#x27;s args:</span><br><span class="line">Nelson being constructed.</span><br><span class="line"></span><br><span class="line">emplace_back an obj:</span><br><span class="line">aaa being constructed.</span><br><span class="line">aaa being moved.</span><br><span class="line"></span><br><span class="line">push_back:</span><br><span class="line">Franklin being constructed.</span><br><span class="line">Franklin being moved.</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/note/cpp/make/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="折纸飞向麦田">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 折纸飞向麦田的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/02/19/note/cpp/make/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-19 20:08:28" itemprop="dateCreated datePublished" datetime="2024-02-19T20:08:28+08:00">2024-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>The <code>make</code> command in Linux is a utility used to automate the compilation and building process of projects. It reads a file named <code>Makefile</code> that contains a set of directives about how to compile and link a program. Here’s a brief overview of the syntax and key concepts of a <code>Makefile</code>:</p>
+<h3 id="Basic-Structure"><a href="#Basic-Structure" class="headerlink" title="Basic Structure"></a>Basic Structure</h3><p>A <code>Makefile</code> typically consists of a set of rules. A rule is made up of three parts:</p>
+<ol>
+<li><strong>Target</strong>: The name of the file that the rule produces.</li>
+<li><strong>Prerequisites</strong>: The files that are used as input to create the target.</li>
+<li><strong>Recipe</strong>: The commands that will be executed to create the target from the prerequisites.</li>
+</ol>
+<p>The basic syntax of a rule is:</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">target: prerequisites</span></span><br><span class="line">    recipe</span><br></pre></td></tr></table></figure>
+
+<h3 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h3><p>Here’s a simple example of a <code>Makefile</code> that compiles a C program:</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Define the compiler</span></span><br><span class="line">CC=gcc</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the compiler flags</span></span><br><span class="line">CFLAGS=-Wall</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the target executable</span></span><br><span class="line">TARGET=myprogram</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define the rule for the target</span></span><br><span class="line"><span class="variable">$(TARGET)</span>: <span class="variable">$(TARGET)</span>.c</span><br><span class="line">    <span class="variable">$(CC)</span> <span class="variable">$(CFLAGS)</span> -o <span class="variable">$(TARGET)</span> <span class="variable">$(TARGET)</span>.c</span><br></pre></td></tr></table></figure>
+
+<h3 id="Variables"><a href="#Variables" class="headerlink" title="Variables"></a>Variables</h3><p>You can define variables in a <code>Makefile</code> to make it more readable and maintainable. In the example above, <code>CC</code>, <code>CFLAGS</code>, and <code>TARGET</code> are variables.</p>
+<h3 id="Comments"><a href="#Comments" class="headerlink" title="Comments"></a>Comments</h3><p>Comments in a <code>Makefile</code> start with the <code>#</code> symbol. Anything following this symbol on a line is considered a comment.</p>
+<h3 id="Phony-Targets"><a href="#Phony-Targets" class="headerlink" title="Phony Targets"></a>Phony Targets</h3><p>By default, Makefile targets are “file targets” - they are used to build files from other files. Make assumes its target is a file, and this makes writing Makefiles relatively easy:</p>
+<p>In terms of Make, a phony target is simply a target that is always out-of-date, so whenever you ask make <phony_target>, it will run, independent from the state of the file system. Some common make targets that are often phony are: all, install, clean, distclean, TAGS, info, check.</p>
+<p>A phony target is one that does not represent a file. It’s used to avoid conflicts with files of the same name and to improve performance. You can declare phony targets using the <code>.PHONY</code> directive.</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"><span class="keyword">.PHONY</span>: clean</span></span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">    rm -f <span class="variable">$(TARGET)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Advanced-Features"><a href="#Advanced-Features" class="headerlink" title="Advanced Features"></a>Advanced Features</h3><ul>
+<li><strong>Pattern Rules</strong>: Allow you to define generic rules using <code>%</code> as a pattern matcher.</li>
+<li><strong>Automatic Variables</strong>: Variables like <code>$@</code> (the name of the target), <code>$&lt;</code> (the name of the first prerequisite), and <code>$^</code> (the names of all the prerequisites) are set automatically and can be used in recipes.</li>
+<li><strong>Conditional Execution</strong>: You can include conditionals in a <code>Makefile</code> to control the flow based on certain conditions.</li>
+</ul>
+<h3 id="Running-Make"><a href="#Running-Make" class="headerlink" title="Running Make"></a>Running Make</h3><p>To run <code>make</code>, simply type <code>make</code> in the terminal in the directory containing the <code>Makefile</code>. If you want to run a specific target, type <code>make &lt;target_name&gt;</code>.</p>
+<p>This overview covers the basics of <code>make</code> syntax. <code>make</code> is a powerful tool with many more features and capabilities to explore.</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
   <nav class="pagination">
-    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/5/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/5/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 </div>
